@@ -5,22 +5,22 @@
 bool Player::playUrl(const QString &url)
 {
     _isPlaying = true;
-    _player->setMedia(QMediaContent(url));
-    _player->setVolume(50);
-    _player->play();
-    qDebug() << "audio = " << _player->isAudioAvailable();
-    qDebug() << "mute = " << _player->isMuted();
-    qDebug() << "player = " << _player->isAvailable();
-    qDebug() << "audio = " << _player->isAudioAvailable();
-    qDebug() << "State = "<< _player->state();
-    qDebug() << "Duration = "<< _player->duration();
+    mPlayer->setMedia(QMediaContent(url));
+    mPlayer->setVolume(50);
+    mPlayer->play();
+    qDebug() << "audio = " << mPlayer->isAudioAvailable();
+    qDebug() << "mute = " << mPlayer->isMuted();
+    qDebug() << "player = " << mPlayer->isAvailable();
+    qDebug() << "audio = " << mPlayer->isAudioAvailable();
+    qDebug() << "State = "<< mPlayer->state();
+    qDebug() << "Duration = "<< mPlayer->duration();
 
     return true;
 }
 
 void Player::Stop()
 {
-    _player->stop();
+    mPlayer->stop();
 }
 
 Player::Player(QObject *parent)
@@ -28,22 +28,22 @@ Player::Player(QObject *parent)
 {
     _isPlaying = false;
     volume = 50;
-    _player = new QMediaPlayer(this,QMediaPlayer::StreamPlayback);
+    mPlayer = new QMediaPlayer(this,QMediaPlayer::StreamPlayback);
 
     // Connect all the signals
-    connect(_player, static_cast<void(QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error),
+    connect(mPlayer, static_cast<void(QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error),
         [=](QMediaPlayer::Error error){ qDebug() << "Error = " << error; });
 
-    connect(_player, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+    connect(mPlayer, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
 
-    connect(_player, SIGNAL(volumeChanged(int)), this, SLOT(volumeChanged(int)));
+    connect(mPlayer, SIGNAL(volumeChanged(int)), this, SLOT(volumeChanged(int)));
 
-    connect(_player, SIGNAL(audioAvailableChanged(bool)), this, SLOT(audioAvailableChanged(bool)));
+    connect(mPlayer, SIGNAL(audioAvailableChanged(bool)), this, SLOT(audioAvailableChanged(bool)));
 
-    connect(_player, SIGNAL(mutedChanged(bool)), this, SLOT(mutedChanged(bool)));
+    connect(mPlayer, SIGNAL(mutedChanged(bool)), this, SLOT(mutedChanged(bool)));
 
-    connect(_player, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
+    connect(mPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
 
-    connect(_player, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
+    connect(mPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
 
 }

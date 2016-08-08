@@ -46,43 +46,54 @@ void XmlReader::ReadSiXmlData( const QString& fileName)
                 }
                 else if ( reader.name() == "mediaDescription" )
                 {
-                    if( reader.readNextStartElement() &&  reader.name() == "multimedia" )
+                    if( reader.readNextStartElement() )
                     {
-                        bool art_found  = false;
-                        foreach(const QXmlStreamAttribute &attr, reader.attributes())
+                        if( reader.name() == "multimedia" )
                         {
-                            if (attr.name().toString() == QLatin1String("height"))
+                            bool art_found  = false;
+                            foreach(const QXmlStreamAttribute &attr, reader.attributes())
                             {
-                                QString attribute_value = attr.value().toString();
-                                if( attribute_value == "800" )
+                                if (attr.name().toString() == QLatin1String("height"))
                                 {
-                                    art_found = true;
+                                    QString attribute_value = attr.value().toString();
+                                    if( attribute_value == "800" )
+                                    {
+                                        art_found = true;
+                                    }
+                                    else
+                                    {
+                                        art_found = false;
+                                    }
                                 }
-                                else
-                                {
-                                    art_found = false;
-                                }
-                            }
 
-                            if (attr.name().toString() == QLatin1String("type"))
-                            {
-                                QString attribute_value = attr.value().toString();
-                                if( attribute_value == "logo_unrestricted" )
+                                if (attr.name().toString() == QLatin1String("type"))
                                 {
-                                    art_found = true;
+                                    QString attribute_value = attr.value().toString();
+                                    if( attribute_value == "logo_unrestricted" )
+                                    {
+                                        art_found = true;
+                                    }
+                                    else
+                                    {
+                                        art_found = false;
+                                    }
                                 }
-                                else
-                                {
-                                    art_found = false;
-                                }
-                            }
 
-                            if (attr.name().toString() == QLatin1String("url") && art_found == true)
-                            {
-                                QString attribute_value = attr.value().toString();
-                                //qDebug() << attribute_value;
-                                mCollector->SetArtwork(attribute_value);
+                                if (attr.name().toString() == QLatin1String("url") && art_found == true)
+                                {
+                                    QString attribute_value = attr.value().toString();
+                                    //qDebug() << attribute_value;
+                                    mCollector->SetArtwork(attribute_value);
+                                }
                             }
+                        }
+                        else if( "shortDescription" == reader.name() )
+                        {
+                            mCollector->SetDescription( reader.readElementText() );
+                        }
+                        else
+                        {
+                            // do nothing
                         }
                     }
                 }
@@ -97,6 +108,7 @@ void XmlReader::ReadSiXmlData( const QString& fileName)
                             if( attribute_value == "128" )
                             {
                                 //qDebug() << attribute_value;
+                                mCollector->SetBitrate( attribute_value );
                                 id_found = true;
                             }
                             else

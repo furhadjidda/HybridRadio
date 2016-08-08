@@ -14,7 +14,7 @@ public:
     ~Player()
     {
         qDebug()<<"Destructor Called";
-        delete _player;_player=0;
+        delete mPlayer;mPlayer=0;
     }
 
     bool Play(const QString &url);
@@ -54,7 +54,7 @@ public slots:
 
 
 private:
-    QMediaPlayer *_player;
+    QMediaPlayer *mPlayer;
     QMediaPlaylist *playlist;
     bool _isPlaying;
     int volume;

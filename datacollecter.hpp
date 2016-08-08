@@ -7,6 +7,9 @@
 struct StationData{
     QString serviceName;
     QString artwork;
+    QString description;
+    QString genre;
+    QString bitRate;
     QString playableMedia;
 };
 
@@ -26,6 +29,9 @@ public:
     void SetServiceName( const QString& val );
     void SetArtwork( const QString& val );
     void SetPlayableMedia( const QString& val );
+    void SetDescription( const QString& val );
+    void SetGenre( const QString& val );
+    void SetBitrate( const QString& val );
     void EndUpdate();
     void PrintCompleteList();
     void GetCompleteList( StationList& data )

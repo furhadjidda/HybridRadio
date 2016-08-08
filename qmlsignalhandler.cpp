@@ -96,7 +96,9 @@ void SignalHandler::OnFileDownloaded()
 
     QObject *artWork = mObject->findChild<QObject*>("artWork");
     QObject *StationName = mObject->findChild<QObject*>("StationNameObj");
-    //QObject *metadata = mObject->findChild<QObject*>("artWork");
+    QObject *description = mObject->findChild<QObject*>("DescriptionObject");
+    QObject *bitRate = mObject->findChild<QObject*>("BitRateObject");
+
 
     uint index = 0;
     index = rand()% mList.size() + 1;
@@ -150,6 +152,47 @@ void SignalHandler::OnFileDownloaded()
                     .write
                     (
                     mList[index].serviceName
+                    );
+        }
+
+        if( description )
+        {
+            description->setProperty
+                    (
+                    "text",
+                    QVariant(mList[index].description)
+                    );
+
+            QQmlProperty
+                    (
+                    description,
+                    "text"
+                    )
+                    .write
+                    (
+                    mList[index].description
+                    );
+        }
+
+
+        if( bitRate )
+        {
+            QString bitRateValue("BitRate:");
+            bitRateValue.append(mList[index].bitRate);
+            bitRate->setProperty
+                    (
+                    "text",
+                    QVariant(bitRateValue)
+                    );
+
+            QQmlProperty
+                    (
+                    bitRate,
+                    "text"
+                    )
+                    .write
+                    (
+                    bitRateValue
                     );
         }
     }

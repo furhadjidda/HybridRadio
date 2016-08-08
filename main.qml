@@ -42,10 +42,11 @@ Window {
         Text {
             id: text1
             objectName: "StationNameObj"
-            x: 108
+            x: 102
             y: 65
             width: 376
-            height: 114
+            height: 85
+            color: "#061a7e"
             text: "StationName"
             style: Text.Raised
             font.bold: true
@@ -75,8 +76,8 @@ Window {
 
         Image {
             id: image2
-            x: 227
-            y: 257
+            x: 160
+            y: 296
             width: 296
             height: 58
             source: "PlayStrip.PNG"
@@ -103,6 +104,48 @@ Window {
                 signal sendPlay()
                 onClicked: sendPlay()
             }
+        }
+
+        Text {
+            id: genre
+            objectName: "GenreObject"
+            x: 102
+            y: 193
+            width: 376
+            height: 22
+            text: ""
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 12
+        }
+
+        Text {
+            id: bitrate
+            objectName: "BitRateObject"
+            x: 102
+            y: 223
+            width: 115
+            height: 14
+            text: ""
+            font.bold: true
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 12
+        }
+
+        Text {
+            id: description
+            objectName: "DescriptionObject"
+            x: 102
+            y: 156
+            width: 376
+            height: 31
+            color: "#6581f5"
+            text: ""
+            styleColor: "#dd0b0b"
+            font.family: "Tahoma"
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 30
         }
     }
 }
