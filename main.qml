@@ -36,7 +36,7 @@ Window {
             z: 1
             antialiasing: true
             clip: true
-            source: "http://owdo.thisisglobal.com/2.0/id/204/logo/800x800.jpg"
+            source: "http://www.broadcastradio.com/media/52043/logosquare-400.png"
         }
 
         Text {
