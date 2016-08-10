@@ -5,6 +5,12 @@
 #include <QtQuick>
 #include <QObject>
 #include <QDebug>
+#include <QUrl>
+#include <QTimer>
+#include <QTimerEvent>
+#include <QtNetwork>
+#include <Qtimer>
+#include <QTimerEvent>
 #include "player.hpp"
 #include "datacollecter.hpp"
 #include "dnslookup.hpp"
@@ -34,6 +40,8 @@ public slots:
     void OnFileNameAvailable( QString si, QString xsi );
     void OnFileDownloaded();
     void OnStop();
+    void OnTimeout();
+    void httpFinished();
 
 
 private:
@@ -45,6 +53,11 @@ private:
     MyNetworkAccessManager *mDownloader;
     StationList mList;
     QString m_CurrentLyPlaying;
+    QTimer *mTimer;
+
+    //Network manager
+    QNetworkAccessManager qnam;
+    QNetworkReply *reply;
 };
 #endif // MAIN_H
 

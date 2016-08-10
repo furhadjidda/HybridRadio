@@ -1,4 +1,8 @@
 #include "dnslookup.hpp"
+#include <QtNetwork>
+#include <QUrl>
+#include <QTimer>
+#include <QTimerEvent>
 
 void DNSLookup::lookupCName( QString& val )
 {
@@ -43,6 +47,27 @@ void DNSLookup::lookupService( QString& val )
     mService->lookup();
 }
 
+void DNSLookup::lookupHttpVis()
+{
+    QString lookUp("_radiovis-http._tcp.");
+
+    lookUp = lookUp + mCNAME;
+    qDebug() << "Looking HTTP VIS with Name " << lookUp;
+
+    mHttpVis = new QDnsLookup(QDnsLookup::ANY,
+                         lookUp,
+                         QHostAddress(lookUp));
+
+    connect
+        (
+        mHttpVis,
+        SIGNAL(finished()),
+        this,
+        SLOT(onHttpVisResponse())
+        );
+    mHttpVis->lookup();
+}
+
 void DNSLookup::onCNameResponse()
 {
     // Check the lookup succeeded.
@@ -59,6 +84,7 @@ void DNSLookup::onCNameResponse()
         qDebug() << Name.value();
         mCNAME = Name.value();
         lookupService( mCNAME );
+        lookupHttpVis();
     }
     mCName->deleteLater();
 }
@@ -92,4 +118,26 @@ void DNSLookup::onServiceResponse()
         emit sendSIAndEPGFileNames(SIFileName,XSIFileName);
     }
     mService->deleteLater();
+}
+
+void DNSLookup::onHttpVisResponse()
+{
+    // Check the lookup succeeded.
+    if (mHttpVis->error() != QDnsLookup::NoError) {
+        qWarning("DNS lookup failed");
+        mHttpVis->deleteLater();
+        qDebug() << mHttpVis->error();
+        return;
+    }
+    // Handle the results.
+    const auto records = mHttpVis->serviceRecords();
+    for (const QDnsServiceRecord &record : records)
+    {
+        qDebug() << "HTTP Service" <<record.name();
+        qDebug() << "HTTP target" <<record.target();
+        mHttpTargetName = record.target();
+        qDebug() << "HTTP port" <<record.port();
+        mHttpServicePort = record.port();
+    }
+    mHttpVis->deleteLater();
 }

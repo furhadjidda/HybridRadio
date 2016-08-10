@@ -14,12 +14,15 @@ class DNSLookup : public QObject
 {
     Q_OBJECT
 public:
-    DNSLookup(){}
+    DNSLookup()
+    {
+    }
     ~DNSLookup()
     {
     }
     void lookupCName( QString& val );
     void lookupService( QString& val );
+    void lookupHttpVis();
 
     QString GetServiceName()
     {
@@ -30,19 +33,33 @@ public:
     {
         return mServicePort;
     }
+
+    QString GetHttpTargetName()
+    {
+        return mHttpTargetName;
+    }
+
+    uint GetHttpPortNumber()
+    {
+        return mHttpServicePort;
+    }
 signals:
     void sendSIAndEPGFileNames(QString,QString);
 public slots:
     void onCNameResponse();
     void onServiceResponse();
+    void onHttpVisResponse();
 
 
 private:
     QDnsLookup *mCName;
     QDnsLookup *mService;
+    QDnsLookup *mHttpVis;
     QString mCNAME;
     QString mServiceName;
     uint mServicePort;
+    QString mHttpTargetName;
+    uint mHttpServicePort;
 };
 
 #endif // DNSLOOKUP_HPP

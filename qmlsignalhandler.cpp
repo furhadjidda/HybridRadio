@@ -9,6 +9,8 @@ static const QString FMDemo2("FM Demo - 2 ");
 static const QString DABDemo1("DAB Demo - 1");
 static const QString DABDemo2("DAB Demo - 2");
 static QString FMDemo1_LookUp("09580.c479.ce1.fm.radiodns.org");
+static QString FMDemo1_TEXT("fm/ce1/c479/09580/text");
+static QString FMDemo1_IMAGE("fm/ce1/c479/09580/image");
 static QString FMDemo2_Lookup("10570.c372.ce1.fm.radiodns.org");
 static QString DABDemo1_LookUp("0.c221.ce15.ce1.dab.radiodns.org");
 //0.d220.100c.de0.dab.radiodns.org
@@ -26,6 +28,10 @@ SignalHandler::SignalHandler
     , mDnsLookup( dnsLookup )
     , mCollector( collector )
 {
+    // Creating a Timer
+    mTimer = new QTimer(this);
+    connect(mTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
+
     // Player which plays te URL.
     player = new Player();
 
@@ -73,6 +79,34 @@ SignalHandler::SignalHandler
             this,
             SLOT(OnFileDownloaded())
             );
+}
+
+
+void SignalHandler::OnTimeout()
+{
+    // Construct a url
+    QString urlFormation = "http://" +
+            mDnsLookup->GetHttpTargetName() +
+            ":" +
+            QString::number(mDnsLookup->GetHttpPortNumber())
+            + "/radiodns/vis/vis.json?topic=/topic/"
+            + FMDemo1_TEXT;
+    mDnsLookup->GetHttpTargetName();
+    QUrl url(urlFormation);
+    qDebug() << urlFormation;
+    reply = qnam.get(QNetworkRequest(url));
+    connect(reply, &QNetworkReply::finished, this, &httpFinished);
+}
+
+void SignalHandler::httpFinished()
+{
+    qDebug() << "http finished";
+    qDebug() << reply->readAll();
+    QString json(reply->readAll());
+    QJsonDocument d = QJsonDocument::fromJson(json.toUtf8());
+    QJsonObject sett2 = d.object();
+    QJsonValue value = sett2.value(QString("body"));
+    qWarning() << value;
 }
 
 void SignalHandler::OnPlay()
@@ -196,7 +230,7 @@ void SignalHandler::OnFileDownloaded()
                     );
         }
     }
-
+    mTimer->start(2000);
 }
 
 

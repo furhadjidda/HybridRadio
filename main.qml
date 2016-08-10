@@ -5,7 +5,7 @@ import QtQuick.Controls.Styles 1.4
 
 Window {
     width: 800
-    height: 400
+    height: 460
     visible: true
 
     MouseArea {
@@ -19,7 +19,7 @@ Window {
     Rectangle {
         id: rectangle1
         width: 800
-        height: 400
+        height: 460
         color: "#ffffff"
         rotation: 0
         z: 12
@@ -29,10 +29,10 @@ Window {
         Image {
             id: image1
             objectName: "artWork"
-            x: 575
+            x: 530
             y: 65
-            width: 194
-            height: 172
+            width: 239
+            height: 244
             z: 1
             antialiasing: true
             clip: true
@@ -76,8 +76,8 @@ Window {
 
         Image {
             id: image2
-            x: 160
-            y: 296
+            x: 182
+            y: 348
             width: 296
             height: 58
             source: "PlayStrip.PNG"
@@ -110,7 +110,7 @@ Window {
             id: genre
             objectName: "GenreObject"
             x: 102
-            y: 193
+            y: 298
             width: 376
             height: 22
             text: ""
@@ -122,8 +122,8 @@ Window {
         Text {
             id: bitrate
             objectName: "BitRateObject"
-            x: 102
-            y: 223
+            x: 515
+            y: 321
             width: 115
             height: 14
             text: ""
@@ -146,6 +146,18 @@ Window {
             font.family: "Tahoma"
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: 30
+        }
+
+        Text {
+            id: songName
+            x: 102
+            y: 200
+            width: 376
+            height: 41
+            text: qsTr("")
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 12
         }
     }
 }
