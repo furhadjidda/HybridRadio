@@ -150,14 +150,18 @@ Window {
 
         Text {
             id: songName
+            objectName: "SongObject"
             x: 102
             y: 200
             width: 376
             height: 41
+            color: "#054bba"
             text: qsTr("")
+            font.family: "Tahoma"
+            wrapMode: Text.WordWrap
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 12
+            font.pixelSize: 20
         }
     }
 }

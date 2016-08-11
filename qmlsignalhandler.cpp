@@ -96,17 +96,82 @@ void SignalHandler::OnTimeout()
     qDebug() << urlFormation;
     reply = qnam.get(QNetworkRequest(url));
     connect(reply, &QNetworkReply::finished, this, &httpFinished);
+
+    // Construct a url
+    QString urlFormation2 = "http://" +
+            mDnsLookup->GetHttpTargetName() +
+            ":" +
+            QString::number(mDnsLookup->GetHttpPortNumber())
+            + "/radiodns/vis/vis.json?topic=/topic/"
+            + FMDemo1_IMAGE;
+    mDnsLookup->GetHttpTargetName();
+    QUrl url2(urlFormation2);
+    qDebug() << urlFormation2;
+    imageReply = qnam.get(QNetworkRequest(url2));
+    connect(imageReply, &QNetworkReply::finished, this, &httpImageFinished);
 }
+
+void SignalHandler::httpImageFinished()
+{
+    qDebug() << "http finished";
+    QString json =  QString::fromStdString(imageReply->readAll().toStdString());
+    qDebug() <<"HTTP RESPONSE : " <<json;
+    QJsonDocument d = QJsonDocument::fromJson(json.toUtf8());
+    QJsonObject bodyVal = d.object();
+    QString value = bodyVal["body"].toString();
+    QString artLink = value.remove(0,5);
+    qDebug() << "ART : "<< artLink;
+    QObject *artWork = mObject->findChild<QObject*>("artWork");
+    if( artWork )
+    {
+        artWork->setProperty
+                (
+                "source",
+                artLink
+                );
+
+        QQmlProperty
+                (
+                artWork,
+                "source"
+                )
+                .write
+                (
+                artLink
+                );
+    }
+}
+
 
 void SignalHandler::httpFinished()
 {
     qDebug() << "http finished";
-    qDebug() << reply->readAll();
-    QString json(reply->readAll());
+    QString json =  QString::fromStdString(reply->readAll().toStdString());
+    qDebug() <<"HTTP RESPONSE : " <<json;
     QJsonDocument d = QJsonDocument::fromJson(json.toUtf8());
-    QJsonObject sett2 = d.object();
-    QJsonValue value = sett2.value(QString("body"));
-    qWarning() << value;
+    QJsonObject bodyVal = d.object();
+    QString value = bodyVal["body"].toString();
+    QString SongName = value.remove(0,5);
+    qDebug() << "SONG : "<< SongName;
+    QObject *songName = mObject->findChild<QObject*>("SongObject");
+    if( songName )
+    {
+        songName->setProperty
+                (
+                "text",
+                QVariant(SongName)
+                );
+
+        QQmlProperty
+                (
+                songName,
+                "text"
+                )
+                .write
+                (
+                SongName
+                );
+    }
 }
 
 void SignalHandler::OnPlay()

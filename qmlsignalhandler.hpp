@@ -42,6 +42,7 @@ public slots:
     void OnStop();
     void OnTimeout();
     void httpFinished();
+    void httpImageFinished();
 
 
 private:
@@ -58,6 +59,7 @@ private:
     //Network manager
     QNetworkAccessManager qnam;
     QNetworkReply *reply;
+    QNetworkReply *imageReply;
 };
 #endif // MAIN_H
 
