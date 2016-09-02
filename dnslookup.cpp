@@ -10,8 +10,7 @@ void DNSLookup::lookupCName( QString& val )
     mCName = new QDnsLookup
             (
             QDnsLookup::ANY,
-            QString(val),
-            QHostAddress(val)
+            QString(val)
             );
 
     connect
@@ -34,8 +33,7 @@ void DNSLookup::lookupService( QString& val )
     qDebug() << "Looking Service with Name " << lookUp;
 
     mService = new QDnsLookup(QDnsLookup::SRV,
-                         lookUp,
-                         QHostAddress(lookUp));
+                         lookUp);
 
     connect
         (
@@ -55,8 +53,7 @@ void DNSLookup::lookupHttpVis()
     qDebug() << "Looking HTTP VIS with Name " << lookUp;
 
     mHttpVis = new QDnsLookup(QDnsLookup::ANY,
-                         lookUp,
-                         QHostAddress(lookUp));
+                         lookUp);
 
     connect
         (

@@ -1,9 +1,8 @@
 #include "qmlsignalhandler.hpp"
 #include "downloadmanager.h"
 #include <QDebug>
-#include <windows.h> // for Sleep
 #include <stdlib.h>
-
+#include <QProcess>
 static const QString FMDemo1("FM Demo - 1");
 static const QString FMDemo2("FM Demo - 2 ");
 static const QString DABDemo1("DAB Demo - 1");
@@ -13,8 +12,8 @@ static QString FMDemo1_TEXT("fm/ce1/c479/09580/text");
 static QString FMDemo1_IMAGE("fm/ce1/c479/09580/image");
 static QString FMDemo2_Lookup("10570.c372.ce1.fm.radiodns.org");
 static QString DABDemo1_LookUp("0.c221.ce15.ce1.dab.radiodns.org");
-//0.d220.100c.de0.dab.radiodns.org
-//29A9 103.3   10330.29a9.2a0.fm.radiodns.org
+// PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c36b/09630/20160904_PI.xml
+// http://epg.musicradio.com/radiodns/spi/3.1/id/www.capitalfm.com/london/20160906_PI.xml
 
 SignalHandler::SignalHandler
     (
@@ -33,8 +32,8 @@ SignalHandler::SignalHandler
     connect(mTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
 
     // Player which plays te URL.
-    player = new Player();
-
+    //player = new Player();
+    mProcess = new QProcess();
     mDownloader = new MyNetworkAccessManager();
     // Connect Play Button
     QObject *playButton_Object = object->findChild<QObject*>("Play");
@@ -95,7 +94,7 @@ void SignalHandler::OnTimeout()
     QUrl url(urlFormation);
     qDebug() << urlFormation;
     reply = qnam.get(QNetworkRequest(url));
-    connect(reply, &QNetworkReply::finished, this, &httpFinished);
+    connect(reply, &QNetworkReply::finished, this, &SignalHandler::httpFinished);
 
     // Construct a url
     QString urlFormation2 = "http://" +
@@ -108,13 +107,14 @@ void SignalHandler::OnTimeout()
     QUrl url2(urlFormation2);
     qDebug() << urlFormation2;
     imageReply = qnam.get(QNetworkRequest(url2));
-    connect(imageReply, &QNetworkReply::finished, this, &httpImageFinished);
+    connect(imageReply, &QNetworkReply::finished, this, &SignalHandler::httpImageFinished);
 }
 
 void SignalHandler::httpImageFinished()
 {
     qDebug() << "http finished";
-    QString json =  QString::fromStdString(imageReply->readAll().toStdString());
+   // QString json =(reply->readAll());// QString::fromStdString(imageReply->readAll().toStdString());
+    QString json = QString(imageReply->readAll().data());
     qDebug() <<"HTTP RESPONSE : " <<json;
     QJsonDocument d = QJsonDocument::fromJson(json.toUtf8());
     QJsonObject bodyVal = d.object();
@@ -146,7 +146,7 @@ void SignalHandler::httpImageFinished()
 void SignalHandler::httpFinished()
 {
     qDebug() << "http finished";
-    QString json =  QString::fromStdString(reply->readAll().toStdString());
+    QString json(reply->readAll().data());
     qDebug() <<"HTTP RESPONSE : " <<json;
     QJsonDocument d = QJsonDocument::fromJson(json.toUtf8());
     QJsonObject bodyVal = d.object();
@@ -176,12 +176,19 @@ void SignalHandler::httpFinished()
 
 void SignalHandler::OnPlay()
 {
-    player->playUrl(m_CurrentLyPlaying);
+    //player->playUrl(m_CurrentLyPlaying);
+    //mProcess->kill();
+    //qDebug() << "mList[index].playableMedia " << mList[index].playableMedia;
+    QString gstreamerCommand = "gst-launch-0.10 -v souphttpsrc location="
+            + m_CurrentLyPlaying
+            + " iradio-mode=true ! decodebin name=demux ! audioresample ! audioconvert ! autoaudiosink";
+    mProcess->start(gstreamerCommand);
 }
 
 void SignalHandler::OnStop()
 {
-    player->Stop();
+    //player->Stop();
+     mProcess->kill();
 }
 
 void SignalHandler::OnFileDownloaded()
@@ -200,13 +207,19 @@ void SignalHandler::OnFileDownloaded()
 
 
     uint index = 0;
-    index = rand()% mList.size() + 1;
+    //index = rand()% mList.size() + 1;
     bool isIndexValid = false;
     while( index < mList.size() )
     {
         if( mList[index].playableMedia.size() > 0 )
         {
-            player->playUrl(mList[index].playableMedia);
+            //player->playUrl(mList[index].playableMedia);
+            mProcess->kill();
+            qDebug() << "mList[index].playableMedia " << mList[index].playableMedia;
+            QString gstreamerCommand = "gst-launch-0.10 -v souphttpsrc location="
+                    + mList[index].playableMedia
+                    + " iradio-mode=true ! decodebin name=demux ! audioresample ! audioconvert ! autoaudiosink";
+            mProcess->start(gstreamerCommand);
             m_CurrentLyPlaying = mList[index].playableMedia;
             qDebug() << mList[index].playableMedia;
             qDebug() << mList[index].artwork;

@@ -1,12 +1,12 @@
 #include "player.hpp"
 #include <QUrl>
 
-
+#if 0
 bool Player::playUrl(const QString &url)
 {
     _isPlaying = true;
     mPlayer->setMedia(QMediaContent(url));
-    mPlayer->setVolume(50);
+    mPlayer->setVolume(100);
     mPlayer->play();
     qDebug() << "audio = " << mPlayer->isAudioAvailable();
     qDebug() << "mute = " << mPlayer->isMuted();
@@ -47,3 +47,4 @@ Player::Player(QObject *parent)
     connect(mPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
 
 }
+#endif

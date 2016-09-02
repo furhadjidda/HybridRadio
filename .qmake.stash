@@ -1,0 +1,18 @@
+QMAKE_DEFAULT_INCDIRS = \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/include/c++/4.8.3 \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/include/c++/4.8.3/arm-linux-gnueabihf \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/include/c++/4.8.3/backward \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/lib/gcc/arm-linux-gnueabihf/4.8.3/include \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/lib/gcc/arm-linux-gnueabihf/4.8.3/include-fixed \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/include \
+    /home/furhad/raspi/sysroot/usr/include \
+    /home/furhad/raspi/sysroot/usr/include/arm-linux-gnueabihf
+QMAKE_DEFAULT_LIBDIRS = \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/lib/gcc/arm-linux-gnueabihf/4.8.3 \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/lib/gcc/arm-linux-gnueabihf \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/lib/gcc \
+    /home/furhad/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/lib \
+    /home/furhad/raspi/sysroot/lib/arm-linux-gnueabihf \
+    /home/furhad/raspi/sysroot/lib \
+    /home/furhad/raspi/sysroot/usr/lib/arm-linux-gnueabihf \
+    /home/furhad/raspi/sysroot/usr/lib

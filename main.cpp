@@ -15,6 +15,8 @@
 #include "player.hpp"
 #include "datacollecter.hpp"
 #include "dnslookup.hpp"
+
+
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
@@ -30,6 +32,9 @@ int main(int argc, char *argv[]) {
             );
 
     QObject *object = component.create();
+    if (component.isError()) {
+        qWarning() << component.errors();
+    }
 
     SignalHandler handler
             (

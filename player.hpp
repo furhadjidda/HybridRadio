@@ -1,5 +1,6 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
+#if 0
 #include <QMultimedia>
 #include <QMediaPlayer>
 #include <QStringList>
@@ -62,3 +63,4 @@ private:
 
 #endif // PLAYER_HPP
 
+#endif

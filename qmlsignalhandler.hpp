@@ -9,7 +9,7 @@
 #include <QTimer>
 #include <QTimerEvent>
 #include <QtNetwork>
-#include <Qtimer>
+#include <QTimer>
 #include <QTimerEvent>
 #include "player.hpp"
 #include "datacollecter.hpp"
@@ -46,7 +46,7 @@ public slots:
 
 
 private:
-    Player *player;
+   // Player *player;
     QObject *mObject;
     XmlReader *mReader;
     DNSLookup *mDnsLookup;
@@ -60,6 +60,7 @@ private:
     QNetworkAccessManager qnam;
     QNetworkReply *reply;
     QNetworkReply *imageReply;
+    QProcess *mProcess;
 };
 #endif // MAIN_H
 
