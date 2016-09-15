@@ -11,16 +11,18 @@ static QString FMDemo1_LookUp("09580.c479.ce1.fm.radiodns.org");
 static QString FMDemo1_TEXT("fm/ce1/c479/09580/text");
 static QString FMDemo1_IMAGE("fm/ce1/c479/09580/image");
 static QString FMDemo2_Lookup("10570.c372.ce1.fm.radiodns.org");
-static QString DABDemo1_LookUp("0.c221.ce15.ce1.dab.radiodns.org");
+static QString DABDemo1_LookUp("0.c635.c19a.ce1.dab.radiodns.org");
 // PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c36b/09630/20160904_PI.xml
 // http://epg.musicradio.com/radiodns/spi/3.1/id/www.capitalfm.com/london/20160906_PI.xml
+static const quint32 TimerValue = 2000;
 
+//! Default Constructor
 SignalHandler::SignalHandler
     (
-    QObject *object, // Object which can be used to set QML properties.
-    XmlReader *reader,
-    DNSLookup *dnsLookup,
-    DataCollector *collector
+    QObject         *object, // Object which can be used to set QML properties.
+    XmlReader       *reader,
+    DNSLookup       *dnsLookup,
+    DataCollector   *collector
     )
     : mObject( object )
     , mReader( reader )
@@ -29,12 +31,14 @@ SignalHandler::SignalHandler
 {
     // Creating a Timer
     mTimer = new QTimer(this);
-    connect(mTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
+    connect( mTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()) );
 
-    // Player which plays te URL.
-    //player = new Player();
+    // New process that will be used to play gstreamer commands.
     mProcess = new QProcess();
-    mDownloader = new MyNetworkAccessManager();
+
+    // New Downloader
+    mDownloader = new Downloader();
+
     // Connect Play Button
     QObject *playButton_Object = object->findChild<QObject*>("Play");
     QObject::connect
@@ -63,6 +67,8 @@ SignalHandler::SignalHandler
             this,
             SLOT(OnSelectionChanged(QString))
             );
+
+    // Connect File Downloads for SI, XSI and PI
     QObject::connect
             (
             mDnsLookup,
@@ -83,30 +89,32 @@ SignalHandler::SignalHandler
 
 void SignalHandler::OnTimeout()
 {
-    // Construct a url
-    QString urlFormation = "http://" +
+    // Construct a url to request current song
+    QString httpRequestURL = "http://" +
             mDnsLookup->GetHttpTargetName() +
             ":" +
             QString::number(mDnsLookup->GetHttpPortNumber())
             + "/radiodns/vis/vis.json?topic=/topic/"
             + FMDemo1_TEXT;
     mDnsLookup->GetHttpTargetName();
-    QUrl url(urlFormation);
-    qDebug() << urlFormation;
-    reply = qnam.get(QNetworkRequest(url));
+    QUrl url(httpRequestURL);
+    qDebug() << httpRequestURL;
+
+    reply = mHttpRequest.get(QNetworkRequest(url));
     connect(reply, &QNetworkReply::finished, this, &SignalHandler::httpFinished);
 
-    // Construct a url
-    QString urlFormation2 = "http://" +
+    // Construct a url to request current artwork
+    httpRequestURL.clear();
+    httpRequestURL = "http://" +
             mDnsLookup->GetHttpTargetName() +
             ":" +
             QString::number(mDnsLookup->GetHttpPortNumber())
             + "/radiodns/vis/vis.json?topic=/topic/"
             + FMDemo1_IMAGE;
     mDnsLookup->GetHttpTargetName();
-    QUrl url2(urlFormation2);
-    qDebug() << urlFormation2;
-    imageReply = qnam.get(QNetworkRequest(url2));
+    QUrl url2(httpRequestURL);
+    qDebug() << httpRequestURL;
+    imageReply = mHttpRequest.get(QNetworkRequest(url2));
     connect(imageReply, &QNetworkReply::finished, this, &SignalHandler::httpImageFinished);
 }
 
@@ -308,7 +316,7 @@ void SignalHandler::OnFileDownloaded()
                     );
         }
     }
-    mTimer->start(2000);
+    mTimer->start(TimerValue);
 }
 
 
@@ -329,8 +337,6 @@ void SignalHandler::OnSelectionChanged(QString value)
     if( FMDemo1 == value )
     {
         mDnsLookup->lookupCName(FMDemo1_LookUp);
-
-
     }
     else if( FMDemo2 == value )
     {

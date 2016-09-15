@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>PlayStrip.PNG</file>
+        <file>program_guide.qml</file>
     </qresource>
 </RCC>

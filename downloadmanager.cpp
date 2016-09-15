@@ -3,12 +3,12 @@
 #include <QTime>
 
 
-MyNetworkAccessManager::MyNetworkAccessManager()
+Downloader::Downloader()
 {
     mIndex = 0;
 }
 
-void MyNetworkAccessManager::DownloadFile(QString urlPath, bool isSI)
+void Downloader::DownloadFile(QString urlPath, bool isSI)
 {
     if(isSI){}
     m_pBuffer = new QByteArray();
@@ -19,7 +19,7 @@ void MyNetworkAccessManager::DownloadFile(QString urlPath, bool isSI)
     connect(reply,SIGNAL(finished()), this,SLOT(slotFinished()));
 }
 
-MyNetworkAccessManager::~MyNetworkAccessManager()
+Downloader::~Downloader()
 {
     delete m_pBuffer;
     delete reply;
@@ -27,7 +27,7 @@ MyNetworkAccessManager::~MyNetworkAccessManager()
 
 //If the reply is finished, save data in buffer to disk
 //as a png image: google_image_logo.png
-void MyNetworkAccessManager::slotFinished()
+void Downloader::slotFinished()
 {
     QString fileName;
     fileName = "Downloaded_SI.xml";
@@ -47,7 +47,7 @@ void MyNetworkAccessManager::slotFinished()
     }
 }
 
-void MyNetworkAccessManager::slotReadData()
+void Downloader::slotReadData()
 {
     //append data to QByteArray buffer
     qDebug() << "Reading Data";

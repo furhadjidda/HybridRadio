@@ -46,21 +46,20 @@ public slots:
 
 
 private:
-   // Player *player;
-    QObject *mObject;
-    XmlReader *mReader;
-    DNSLookup *mDnsLookup;
-    DataCollector *mCollector;
-    MyNetworkAccessManager *mDownloader;
-    StationList mList;
-    QString m_CurrentLyPlaying;
-    QTimer *mTimer;
+    QObject*        mObject; //! Holds Acces to QML objects
+    XmlReader*      mReader; //! XML Reader to Read/ Parse all the xml file
+    DNSLookup*      mDnsLookup; //! Hold the instance of Dns Lookup
+    DataCollector*  mCollector; //! Holds the instance of Data Collector
+    Downloader*     mDownloader; //! Holds the instance of Downloader
+    StationList     mList; //! Holds the instance of station list
+    QString         m_CurrentLyPlaying; //! Holds Currently playing audio link
+    QTimer*         mTimer; //! Holds the instance of timer.
+    QProcess*       mProcess; //! Holds the Process object.
 
-    //Network manager
-    QNetworkAccessManager qnam;
+    // Members for http requests
+    QNetworkAccessManager mHttpRequest;
     QNetworkReply *reply;
     QNetworkReply *imageReply;
-    QProcess *mProcess;
 };
 #endif // MAIN_H
 

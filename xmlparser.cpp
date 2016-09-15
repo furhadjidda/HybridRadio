@@ -1,6 +1,23 @@
+//!
+//! \file xmlparser.cpp
+//!
+//! \author Furhad Jidda
+//!
+//! \brief This file containg implmentations for
+//! API's and methods to read xml data from SI,
+//! XSI or PI xml files.
+//!
+
 #include "xmlparser.hpp"
 
-XmlReader::XmlReader( DataCollector* collector )
+//!
+//! \brief XmlReader::XmlReader
+//! \param collector
+//!
+XmlReader::XmlReader
+    (
+    DataCollector* collector
+    )
     : mCollector( collector )
 {
     if( nullptr == mCollector )
@@ -9,7 +26,14 @@ XmlReader::XmlReader( DataCollector* collector )
     }
 }
 
-void XmlReader::ReadSiXmlData( const QString& fileName)
+//!
+//! \brief XmlReader::ReadSiXmlData
+//! \param fileName
+//!
+void XmlReader::ReadSiXmlData
+    (
+    const QString& fileName //!<[in] FileName
+    )
 {
     {
         QFile downloadedSiXmlFile(fileName);
