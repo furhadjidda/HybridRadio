@@ -3,6 +3,7 @@ import QtQuick.Window 2.2
 import QtQuick.Controls 1.0
 
 Window {
+    id: root
     width: 800
     height: 460
     visible: true
@@ -161,6 +162,30 @@ Window {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: 20
+        }
+
+        Text {
+            id: text2
+            x: 36
+            y: 348
+            width: 60
+            height: 21
+            text: qsTr("EPG")
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 18
+        }
+
+        MouseArea {
+            id: mouseArea1
+            x: 41
+            y: 352
+            width: 50
+            height: 14
+            onClicked: {
+                var component = Qt.createComponent("child.qml")
+                var window = component.createObject(root)
+            }
         }
     }
 }

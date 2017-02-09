@@ -12,8 +12,15 @@ static QString FMDemo1_TEXT("fm/ce1/c479/09580/text");
 static QString FMDemo1_IMAGE("fm/ce1/c479/09580/image");
 static QString FMDemo2_Lookup("10570.c372.ce1.fm.radiodns.org");
 static QString DABDemo1_LookUp("0.c221.ce15.ce1.dab.radiodns.org");
+static QString DABDemo2_LookUp("0.c2A1.c181.ce1.dab.radiodns.org");
 // PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c36b/09630/20160904_PI.xml
+// PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c479/09580/20160904_PI.xml
 // http://epg.musicradio.com/radiodns/spi/3.1/id/www.capitalfm.com/london/20160906_PI.xml
+// http://epg.musicradio.com/radiodns/spi/3.1/id/london/20160906_PI.xml
+// http://radio-service-information.api.bbci.co.uk/radiodns/spi/3.1/p00fzl86/20170202_PI.xml
+// http://<host>:<port>/radiodns/spi/3.1/<ServiceIdentifier>/<date>_PI.xml
+// http://radio-service-information.api.bbci.co.uk/radiodns/spi/3.1/id/radiodns.api.bbci.co.uk/p00fzl86/20170202_PI.xml
+// http://epg.musicradio.com/radiodns/spi/3.1/id/www.helpmechill.com/chill/20170202_PI.xml
 
 SignalHandler::SignalHandler
     (
@@ -329,8 +336,6 @@ void SignalHandler::OnSelectionChanged(QString value)
     if( FMDemo1 == value )
     {
         mDnsLookup->lookupCName(FMDemo1_LookUp);
-
-
     }
     else if( FMDemo2 == value )
     {
@@ -342,6 +347,6 @@ void SignalHandler::OnSelectionChanged(QString value)
     }
     else if( DABDemo2 == value )
     {
-
+        mDnsLookup->lookupCName(DABDemo2_LookUp);
     }
 }

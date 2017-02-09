@@ -97,6 +97,24 @@ void XmlReader::ReadSiXmlData( const QString& fileName)
                         }
                     }
                 }
+                else if ( reader.name() == "radiodns" )
+                {
+                    foreach(const QXmlStreamAttribute &attr, reader.attributes())
+                    {
+                        if (attr.name().toString() == QLatin1String("fqdn"))
+                        {
+                            QString attribute_value = attr.value().toString();
+                            mCollector->SetFqdn(attribute_value);
+                        }
+
+                        if (attr.name().toString() == QLatin1String("serviceIdentifier"))
+                        {
+                            QString attribute_value = attr.value().toString();
+                            mCollector->SetServiceIdentifier(attribute_value);
+                        }
+                    }
+
+                }
                 else if( reader.name() == "bearer" )
                 {
                     bool id_found = false;
@@ -145,6 +163,6 @@ void XmlReader::ReadSiXmlData( const QString& fileName)
             }
         }
         mCollector->EndUpdate();
-        //mCollector->PrintCompleteList();
+        mCollector->PrintCompleteList();
     }
 }
