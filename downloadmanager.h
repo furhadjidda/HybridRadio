@@ -14,7 +14,7 @@ class MyNetworkAccessManager:public QNetworkAccessManager
 {
   Q_OBJECT
 public:
-  MyNetworkAccessManager();
+  MyNetworkAccessManager(QString fileName);
   ~MyNetworkAccessManager();
   void DownloadFile(QString urlPath,bool isSI = true);
 
@@ -32,6 +32,7 @@ private:
   QByteArray* m_pBuffer;
   QNetworkReply* reply;
   uint mIndex;
+  QString mFileName;
 
 };
 #endif // DOWNLOADMANAGER_H

@@ -9,6 +9,7 @@ Window {
         visible: true
         ListModel {
             id: libraryModel
+            objectName: "listModelObject"
             ListElement {
                 programme: "A Masterpiece"
                 station: "Gabriel"

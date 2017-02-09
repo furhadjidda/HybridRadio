@@ -20,6 +20,7 @@
 class SignalHandler : public QObject
 {
 Q_OBJECT
+
 public:
     SignalHandler
         (
@@ -43,16 +44,22 @@ public slots:
     void OnTimeout();
     void httpFinished();
     void httpImageFinished();
-
+    void SetChildQmlObject(QObject* childObject)
+    {
+        mChildObject = childObject;
+    }
 
 private:
    // Player *player;
     QObject *mObject;
+    QObject *mChildObject;
     XmlReader *mReader;
     DNSLookup *mDnsLookup;
     DataCollector *mCollector;
     MyNetworkAccessManager *mDownloader;
+    MyNetworkAccessManager *mPIDownloader;
     StationList mList;
+    EpgList mEpgList;
     QString m_CurrentLyPlaying;
     QTimer *mTimer;
 
@@ -61,6 +68,9 @@ private:
     QNetworkReply *reply;
     QNetworkReply *imageReply;
     QProcess *mProcess;
+    bool m_IsDownloadedPI;
+    QString FormPIString(QString fqdn, QString serviceIdentifier);
+
 };
 #endif // MAIN_H
 

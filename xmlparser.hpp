@@ -9,6 +9,7 @@ class XmlReader{
 public:
     XmlReader( DataCollector* collector );
     void ReadSiXmlData( const QString& fileName);
+    void ReadPiXmlData( const QString& fileName);
 private:
     DataCollector *mCollector;
 };

@@ -3,8 +3,9 @@
 #include <QTime>
 
 
-MyNetworkAccessManager::MyNetworkAccessManager()
+MyNetworkAccessManager::MyNetworkAccessManager(QString fileName)
 {
+    mFileName = fileName;
     mIndex = 0;
 }
 
@@ -30,7 +31,14 @@ MyNetworkAccessManager::~MyNetworkAccessManager()
 void MyNetworkAccessManager::slotFinished()
 {
     QString fileName;
-    fileName = "Downloaded_SI.xml";
+    if(mFileName.length() == 0)
+    {
+        fileName = "Downloaded_SI.xml";
+    }
+    else
+    {
+        fileName = mFileName;
+    }
 
     QFile file(fileName);
 

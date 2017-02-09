@@ -15,7 +15,13 @@ struct StationData{
     QString serviceIdentifier;
 };
 
+struct EpgData{
+    QString description;
+    QString timeAndDate;
+};
+
 typedef QVector<StationData> StationList;
+typedef QVector<EpgData> EpgList;
 
 class DataCollector{
 
@@ -43,10 +49,24 @@ public:
         data = list;
     }
 
+    void StartEPGUpdate();
+    void CollectNextEPGElement();
+    void SetEPGDescription( const QString& val );
+    void SetEPGTimeAndDate( const QString& val );
+    void EndEPGUpdate();
+    void PrintEPGCompleteList();
+    void GetEPGCompleteList( EpgList& data )
+    {
+        data = epgList;
+    }
 private:
     StationList list;
     bool isListUpdating;
     uint index;
+
+    EpgList epgList;
+    bool isEPGListUpdating;
+    uint epgIndex;
 };
 
 

@@ -36,13 +36,26 @@ int main(int argc, char *argv[]) {
         qWarning() << component.errors();
     }
 
+    QQmlComponent component2
+            (
+            &engine,
+            QUrl(QStringLiteral("qrc:/child.qml"))
+            );
+
+    QObject *object2 = component2.create();
+    if (component2.isError()) {
+        qWarning() << component.errors();
+    }
+
     SignalHandler handler
             (
-                object,
-                &reader,
-                &dns,
-                &collector
-             ); // Handlet that handles the events coming from QML.
+            object,
+            &reader,
+            &dns,
+            &collector
+             ); // Handler that handles the events coming from QML.
+
+    handler.SetChildQmlObject(object2);
 
 
     reader.ReadSiXmlData(QString("myxml.xml"));

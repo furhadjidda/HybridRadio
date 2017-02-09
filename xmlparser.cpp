@@ -8,6 +8,65 @@ XmlReader::XmlReader( DataCollector* collector )
         qCritical() << "Null pointer";
     }
 }
+void XmlReader::ReadPiXmlData( const QString& fileName)
+{
+    QFile downloadedSiXmlFile(fileName);
+    QString siXml;
+    if (downloadedSiXmlFile.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&downloadedSiXmlFile);
+        siXml = in.readAll();
+        qDebug() << "Reading XML file, Size = " << downloadedSiXmlFile.size() << "  Bytes";
+        qDebug() << "Reading XML file, Name = " << fileName ;
+    }
+
+    QXmlStreamReader reader(siXml);
+
+    while(!reader.atEnd() && !reader.hasError())
+    {
+        if(reader.readNext() == QXmlStreamReader::StartElement)
+        {
+            //This Indicates start of the service
+            if( reader.name() == "schedule" )
+            {
+                mCollector->StartEPGUpdate();
+            }
+
+            if( reader.name() == "programme" )
+            {
+                mCollector->CollectNextEPGElement();
+            }
+
+            if( reader.name() == "mediaDescription")
+            {
+                if( reader.readNextStartElement() )
+                {
+                    if( reader.name() == "longDescription" )
+                    {
+                        mCollector->SetEPGDescription(reader.readElementText());
+                    }
+                }
+            }
+
+            if( reader.name() == "location")
+            {
+                if( reader.readNextStartElement() )
+                {
+                    foreach(const QXmlStreamAttribute &attr, reader.attributes())
+                    {
+                        if (attr.name().toString() == QLatin1String("actualTime"))
+                        {
+                            QString attribute_value = attr.value().toString();
+                            mCollector->SetEPGTimeAndDate( attribute_value );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    mCollector->EndEPGUpdate();
+    mCollector->PrintEPGCompleteList();
+}
 
 void XmlReader::ReadSiXmlData( const QString& fileName)
 {

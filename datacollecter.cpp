@@ -1,5 +1,55 @@
 #include "datacollecter.hpp"
 #include <QDebug>
+void DataCollector::StartEPGUpdate()
+{
+    list.clear();
+    if( isEPGListUpdating != true )
+    {
+        isEPGListUpdating = true;
+        EpgData data;
+        epgList.push_back(data);
+        epgIndex = epgList.size();
+    }
+}
+
+void DataCollector::CollectNextEPGElement()
+{
+    EpgData data;
+    epgList.push_back(data);
+    epgIndex = epgList.size();
+
+}
+
+void DataCollector::SetEPGDescription(const QString& val)
+{
+    if( index > 0 )
+    {
+        epgList[epgIndex - 1].description = val;
+    }
+}
+
+void DataCollector::SetEPGTimeAndDate(const QString& val)
+{
+    if( index > 0 )
+    {
+        epgList[epgIndex - 1].timeAndDate = val;
+    }
+}
+
+void DataCollector::EndEPGUpdate()
+{
+    isEPGListUpdating = false;
+}
+
+void DataCollector::PrintEPGCompleteList()
+{
+    for(uint index = 0 ; index < epgList.size(); ++index)
+    {
+        qDebug() << " TAD:" << epgList[index].timeAndDate
+                 << " DSC: " << epgList[index].description;
+    }
+}
+
 void DataCollector::StartUpdate()
 {
     list.clear();

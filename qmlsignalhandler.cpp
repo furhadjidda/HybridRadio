@@ -33,6 +33,7 @@ SignalHandler::SignalHandler
     , mReader( reader )
     , mDnsLookup( dnsLookup )
     , mCollector( collector )
+    , m_IsDownloadedPI( false )
 {
     // Creating a Timer
     mTimer = new QTimer(this);
@@ -41,7 +42,8 @@ SignalHandler::SignalHandler
     // Player which plays te URL.
     //player = new Player();
     mProcess = new QProcess();
-    mDownloader = new MyNetworkAccessManager();
+    mDownloader = new MyNetworkAccessManager("");
+    mPIDownloader = new MyNetworkAccessManager("DownloadPI.xml");
     // Connect Play Button
     QObject *playButton_Object = object->findChild<QObject*>("Play");
     QObject::connect
@@ -85,8 +87,27 @@ SignalHandler::SignalHandler
             this,
             SLOT(OnFileDownloaded())
             );
+
+    QObject::connect
+            (
+            mPIDownloader,
+            SIGNAL(sendDownloadComplete()),
+            this,
+            SLOT(OnFileDownloaded())
+            );
 }
 
+QString SignalHandler::FormPIString(QString fqdn, QString serviceIdentifier)
+{
+    //http://epg.musicradio.com/radiodns/spi/3.1/id/www.helpmechill.com/chill/20170202_PI.xml
+    QString urlFormation = "http://" +
+            mDnsLookup->GetServiceName() +
+            "/radiodns/spi/3.1/id/" +
+            fqdn + "/" + serviceIdentifier + "/20170202_PI.xml";
+    qDebug() << "url Formation for PI xml = " << urlFormation;
+    mPIDownloader->DownloadFile(urlFormation,false);
+    return urlFormation;
+}
 
 void SignalHandler::OnTimeout()
 {
@@ -214,7 +235,7 @@ void SignalHandler::OnFileDownloaded()
 
 
     uint index = 0;
-    //index = rand()% mList.size() + 1;
+    index = rand()% mList.size() + 1;
     bool isIndexValid = false;
     while( index < mList.size() )
     {
@@ -231,6 +252,17 @@ void SignalHandler::OnFileDownloaded()
             qDebug() << mList[index].playableMedia;
             qDebug() << mList[index].artwork;
             qDebug() << mList[index].serviceName;
+            if(!m_IsDownloadedPI)
+            {
+                m_IsDownloadedPI = true;
+                FormPIString(mList[index].fqdn,mList[index].serviceIdentifier);
+            }
+            else
+            {
+                mEpgList.clear();
+                mReader->ReadPiXmlData("DownloadPI.xml");
+                mCollector->GetEPGCompleteList( mEpgList );
+            }
             isIndexValid = true;
             break;
         }
@@ -332,7 +364,7 @@ void SignalHandler::OnFileNameAvailable( QString si, QString xsi )
 void SignalHandler::OnSelectionChanged(QString value)
 {
     qDebug() <<"OnSelectionChanged - "<<value;
-
+    m_IsDownloadedPI = false;
     if( FMDemo1 == value )
     {
         mDnsLookup->lookupCName(FMDemo1_LookUp);
