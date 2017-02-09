@@ -68,6 +68,22 @@ void DataCollector::SetBitrate( const QString& val )
     }
 }
 
+void DataCollector::SetFqdn( const QString& val )
+{
+    if( index > 0 )
+    {
+        list[index - 1].fqdn = val;
+    }
+}
+
+void DataCollector::SetServiceIdentifier( const QString& val )
+{
+    if( index > 0 )
+    {
+        list[index - 1].serviceIdentifier = val;
+    }
+}
+
 void DataCollector::EndUpdate()
 {
     isListUpdating = false;
@@ -79,7 +95,9 @@ void DataCollector::PrintCompleteList()
     {
         qDebug() << " AW:" << list[index].artwork
                  << " PM: " << list[index].playableMedia
-                 << " SN: " << list[index].serviceName;
+                 << " SN: " << list[index].serviceName
+                 << " FQDN: " << list[index].fqdn
+                 << " SI: " << list[index].serviceIdentifier;
     }
 }
 

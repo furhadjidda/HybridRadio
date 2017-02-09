@@ -69,7 +69,7 @@ void DNSLookup::onCNameResponse()
 {
     // Check the lookup succeeded.
     if (mCName->error() != QDnsLookup::NoError) {
-        qWarning("DNS lookup failed");
+        qWarning("onCNameResponse::DNS lookup failed");
         mCName->deleteLater();
         return;
     }
@@ -90,7 +90,7 @@ void DNSLookup::onServiceResponse()
 {
     // Check the lookup succeeded.
     if (mService->error() != QDnsLookup::NoError) {
-        qWarning("DNS lookup failed");
+        qWarning("onServiceResponse::DNS lookup failed");
         mService->deleteLater();
         qDebug() << mService->error();
         return;
@@ -121,7 +121,7 @@ void DNSLookup::onHttpVisResponse()
 {
     // Check the lookup succeeded.
     if (mHttpVis->error() != QDnsLookup::NoError) {
-        qWarning("DNS lookup failed");
+        qWarning("onHttpVisResponse::DNS lookup failed");
         mHttpVis->deleteLater();
         qDebug() << mHttpVis->error();
         return;

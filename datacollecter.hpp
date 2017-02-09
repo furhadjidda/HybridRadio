@@ -11,6 +11,8 @@ struct StationData{
     QString genre;
     QString bitRate;
     QString playableMedia;
+    QString fqdn;
+    QString serviceIdentifier;
 };
 
 typedef QVector<StationData> StationList;
@@ -32,6 +34,8 @@ public:
     void SetDescription( const QString& val );
     void SetGenre( const QString& val );
     void SetBitrate( const QString& val );
+    void SetFqdn( const QString& val );
+    void SetServiceIdentifier( const QString& val );
     void EndUpdate();
     void PrintCompleteList();
     void GetCompleteList( StationList& data )
