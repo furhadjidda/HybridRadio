@@ -263,26 +263,12 @@ void SignalHandler::OnFileDownloaded()
                 mReader->ReadPiXmlData("DownloadPI.xml");
                 mCollector->GetEPGCompleteList( mEpgList );
                 QVariant retValue=0;
-                uint count = 0;
-                foreach( EpgData epgData,mEpgList )
-                {
-                    bool succeeded = QMetaObject::invokeMethod(
-                        mChildObject, "addListElement",
-                                Q_RETURN_ARG(QVariant, retValue),
-                                Q_ARG( QVariant,epgData.description ),
-                                Q_ARG( QVariant, epgData.description ),
-                                Q_ARG( QVariant, epgData.timeAndDate ));
-                    if(!succeeded)
-                    {
-                        qDebug() << "Invokation Failed";
-                    }
-                    else
-                    {
-                        qDebug() << "count" << ++count;
-                    }
-                }
-
-
+                bool succeeded = QMetaObject::invokeMethod(
+                    mChildObject, "addListElement",
+                            Q_RETURN_ARG(QVariant, retValue),
+                            Q_ARG( QVariant, "index" ),
+                            Q_ARG( QVariant, "index" ),
+                            Q_ARG( QVariant, "index" ));
             }
             isIndexValid = true;
             break;

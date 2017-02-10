@@ -10,10 +10,6 @@ Window {
         ListModel {
             id: libraryModel
             objectName: "listModelObject"
-            ListElement {
-                programme: "A Masterpiece"
-                station: "Gabriel"
-            }
         }
 
         TableView {
@@ -40,5 +36,11 @@ Window {
             model: libraryModel
         }
 
+
+        function addListElement(programName,station,when)
+        {
+            libraryModel.append({"programme":programName,"station":station,"when":when})
+            return 0;
+        }
 }
 
