@@ -37,6 +37,11 @@ void XmlReader::ReadPiXmlData( const QString& fileName)
                 mCollector->CollectNextEPGElement();
             }
 
+            if( reader.name() == "longName" )
+            {
+                mCollector->SetEPGLongName( reader.readElementText() );
+            }
+
             if( reader.name() == "mediaDescription")
             {
                 if( reader.readNextStartElement() )
@@ -58,6 +63,12 @@ void XmlReader::ReadPiXmlData( const QString& fileName)
                         {
                             QString attribute_value = attr.value().toString();
                             mCollector->SetEPGTimeAndDate( attribute_value );
+                        }
+
+                        if (attr.name().toString() == QLatin1String("actualDuration"))
+                        {
+                            QString attribute_value = attr.value().toString();
+                            mCollector->SetEPGDuration( attribute_value );
                         }
                     }
                 }

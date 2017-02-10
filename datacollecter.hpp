@@ -17,7 +17,9 @@ struct StationData{
 
 struct EpgData{
     QString description;
+    QString longName;
     QString timeAndDate;
+    QString duration;
 };
 
 typedef QVector<StationData> StationList;
@@ -53,6 +55,8 @@ public:
     void CollectNextEPGElement();
     void SetEPGDescription( const QString& val );
     void SetEPGTimeAndDate( const QString& val );
+    void SetEPGLongName( const QString& val );
+    void SetEPGDuration( const QString& val );
     void EndEPGUpdate();
     void PrintEPGCompleteList();
     void GetEPGCompleteList( EpgList& data )

@@ -232,9 +232,9 @@ void SignalHandler::OnFileDownloaded()
     QObject *StationName = mObject->findChild<QObject*>("StationNameObj");
     QObject *description = mObject->findChild<QObject*>("DescriptionObject");
     QObject *bitRate = mObject->findChild<QObject*>("BitRateObject");
+    QVariant retValue=0;
 
-
-    uint index = 0;
+    int index = 0;
     index = rand()% mList.size() + 1;
     bool isIndexValid = false;
     while( index < mList.size() )
@@ -260,18 +260,23 @@ void SignalHandler::OnFileDownloaded()
             else
             {
                 mEpgList.clear();
+                bool succeeded = QMetaObject::invokeMethod(
+                    mChildObject, "clearListElement",
+                            Q_RETURN_ARG(QVariant, retValue));
+
                 mReader->ReadPiXmlData("DownloadPI.xml");
                 mCollector->GetEPGCompleteList( mEpgList );
-                QVariant retValue=0;
+
                 uint count = 0;
                 foreach( EpgData epgData,mEpgList )
                 {
-                    bool succeeded = QMetaObject::invokeMethod(
+                    succeeded = QMetaObject::invokeMethod(
                         mChildObject, "addListElement",
                                 Q_RETURN_ARG(QVariant, retValue),
-                                Q_ARG( QVariant,epgData.description ),
+                                Q_ARG( QVariant,epgData.longName ),
                                 Q_ARG( QVariant, epgData.description ),
-                                Q_ARG( QVariant, epgData.timeAndDate ));
+                                Q_ARG( QVariant, epgData.timeAndDate ),
+                                Q_ARG( QVariant, epgData.duration ));
                     if(!succeeded)
                     {
                         qDebug() << "Invokation Failed";

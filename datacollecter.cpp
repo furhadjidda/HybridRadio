@@ -2,7 +2,7 @@
 #include <QDebug>
 void DataCollector::StartEPGUpdate()
 {
-    list.clear();
+    epgList.clear();
     if( isEPGListUpdating != true )
     {
         isEPGListUpdating = true;
@@ -36,6 +36,23 @@ void DataCollector::SetEPGTimeAndDate(const QString& val)
     }
 }
 
+
+void DataCollector::SetEPGLongName( const QString& val )
+{
+    if( index > 0 )
+    {
+        epgList[epgIndex - 1].longName = val;
+    }
+}
+
+void DataCollector::SetEPGDuration( const QString& val )
+{
+    if( index > 0 )
+    {
+        epgList[epgIndex - 1].duration = val;
+    }
+}
+
 void DataCollector::EndEPGUpdate()
 {
     isEPGListUpdating = false;
@@ -43,7 +60,7 @@ void DataCollector::EndEPGUpdate()
 
 void DataCollector::PrintEPGCompleteList()
 {
-    for(uint index = 0 ; index < epgList.size(); ++index)
+    for(int index = 0 ; index < epgList.size(); ++index)
     {
         qDebug() << " TAD:" << epgList[index].timeAndDate
                  << " DSC: " << epgList[index].description;
@@ -141,7 +158,7 @@ void DataCollector::EndUpdate()
 
 void DataCollector::PrintCompleteList()
 {
-    for(uint index = 0 ; index < list.size(); ++index)
+    for(int index = 0 ; index < list.size(); ++index)
     {
         qDebug() << " AW:" << list[index].artwork
                  << " PM: " << list[index].playableMedia

@@ -13,19 +13,19 @@ Window {
         }
 
         TableView {
-            x: 77
-            y: 45
-            width: 600
-            height: 291
+            x: 8
+            y: 51
+            width: 784
+            height: 389
             visible: true
             TableViewColumn {
                 role: "programme"
-                title: "Programme Name"
+                title: "Programme Description"
                 width: 200
             }
             TableViewColumn {
-                role: "station"
-                title: "Station Name"
+                role: "pName"
+                title: "Programme Name"
                 width: 200
             }
             TableViewColumn {
@@ -33,13 +33,38 @@ Window {
                 title: "Date And Time"
                 width: 200
             }
+            TableViewColumn {
+                role: "duration"
+                title: "Duration"
+                width: 100
+            }
             model: libraryModel
         }
 
+        Label {
+            id: label1
+            x: 199
+            y: 12
+            width: 377
+            height: 33
+            color: "#1360da"
+            text: qsTr("Electronic Programme Guide")
+            style: Text.Sunken
+            font.bold: true
+            font.underline: false
+            font.pointSize: 15
+            horizontalAlignment: Text.AlignHCenter
+        }
 
-        function addListElement(programName,station,when)
+        function clearListElement()
         {
-            libraryModel.append({"programme":programName,"station":station,"when":when})
+            libraryModel.clear()
+            return 0;
+        }
+
+        function addListElement(programName,description,when,duration)
+        {
+            libraryModel.append({"programme":description,"pName":programName,"when":when,"duration":duration})
             return 0;
         }
 }
