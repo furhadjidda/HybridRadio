@@ -100,10 +100,11 @@ SignalHandler::SignalHandler
 QString SignalHandler::FormPIString(QString fqdn, QString serviceIdentifier)
 {
     //http://epg.musicradio.com/radiodns/spi/3.1/id/www.helpmechill.com/chill/20170202_PI.xml
+    QString date = QDate::currentDate().toString("yyyyMMdd");
     QString urlFormation = "http://" +
             mDnsLookup->GetServiceName() +
             "/radiodns/spi/3.1/id/" +
-            fqdn + "/" + serviceIdentifier + "/20170202_PI.xml";
+            fqdn + "/" + serviceIdentifier + "/" + date +"_PI.xml";
     qDebug() << "url Formation for PI xml = " << urlFormation;
     mPIDownloader->DownloadFile(urlFormation,false);
     return urlFormation;
