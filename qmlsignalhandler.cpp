@@ -206,7 +206,8 @@ void SignalHandler::httpFinished()
 void SignalHandler::OnPlay()
 {
     //player->playUrl(m_CurrentLyPlaying);
-    //mProcess->kill();
+    mProcess->kill();
+    mProcess->waitForFinished();
     //qDebug() << "mList[index].playableMedia " << mList[index].playableMedia;
     QString gstreamerCommand = "gst-launch-0.10 -v souphttpsrc location="
             + m_CurrentLyPlaying
@@ -218,6 +219,7 @@ void SignalHandler::OnStop()
 {
     //player->Stop();
      mProcess->kill();
+     mProcess->waitForFinished();
 }
 
 void SignalHandler::OnFileDownloaded()
@@ -244,6 +246,7 @@ void SignalHandler::OnFileDownloaded()
         {
             //player->playUrl(mList[index].playableMedia);
             mProcess->kill();
+            mProcess->waitForFinished();
             qDebug() << "mList[index].playableMedia " << mList[index].playableMedia;
             QString gstreamerCommand = "gst-launch-0.10 -v souphttpsrc location="
                     + mList[index].playableMedia
