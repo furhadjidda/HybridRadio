@@ -3,7 +3,7 @@ unix:!android {
         qnx {
             target.path = /tmp/$${TARGET}/bin
         } else {
-            target.path = /opt/$${TARGET}/bin
+            target.path = /home/pi/qt-apps/$${TARGET}/bin
         }
         export(target.path)
     }

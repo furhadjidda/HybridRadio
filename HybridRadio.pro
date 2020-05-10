@@ -5,7 +5,7 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     player.cpp \
-    xmlparser.cpp \
+    XmlReader.cpp \
     datacollecter.cpp \
     qmlsignalhandler.cpp \
     dnslookup.cpp \
@@ -20,7 +20,7 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    xmlparser.hpp \
+    XmlReader.h \
     downloadmanager.h \
     player.hpp \
     datacollecter.hpp \
