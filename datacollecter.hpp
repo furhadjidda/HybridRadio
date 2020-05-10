@@ -3,6 +3,16 @@
 
 #include <QString>
 #include <QVector>
+#include <stdint.h>
+
+//! Structure having bearer information
+typedef struct {
+    QString mId;
+    QString mCost;
+    QString mMimeValue;
+    std::uint32_t mBitRate;
+    std::uint32_t mOffset;
+}BearerInfo;
 
 struct StationData{
     QString serviceName;
@@ -13,6 +23,7 @@ struct StationData{
     QString playableMedia;
     QString fqdn;
     QString serviceIdentifier;
+    QVector<BearerInfo> mBearerInfo;
 };
 
 struct EpgData{
@@ -39,6 +50,7 @@ public:
     void SetServiceName( const QString& val );
     void SetArtwork( const QString& val );
     void SetPlayableMedia( const QString& val );
+    void SetBearerInfo( const QVector<BearerInfo>& val );
     void SetDescription( const QString& val );
     void SetGenre( const QString& val );
     void SetBitrate( const QString& val );

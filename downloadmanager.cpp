@@ -58,6 +58,5 @@ void MyNetworkAccessManager::slotFinished()
 void MyNetworkAccessManager::slotReadData()
 {
     //append data to QByteArray buffer
-    qDebug() << "Reading Data";
     *m_pBuffer += reply->readAll();
 }

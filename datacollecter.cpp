@@ -111,6 +111,14 @@ void DataCollector::SetPlayableMedia(const QString& val)
     }
 }
 
+void DataCollector::SetBearerInfo(const QVector<BearerInfo>& val)
+{
+    if( index > 0 )
+    {
+        list[index - 1].mBearerInfo = val;
+    }
+}
+
 void DataCollector::SetDescription( const QString& val )
 {
     if( index > 0 )

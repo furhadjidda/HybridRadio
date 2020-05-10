@@ -11,9 +11,9 @@
 #include <QDebug>
 #include "downloadmanager.h"
 #include "qmlsignalhandler.hpp"
-#include "xmlparser.hpp"
+#include "XmlReader.h"
 #include "player.hpp"
-#include "datacollecter.hpp"
+//#include "datacollecter.hpp"
 #include "dnslookup.hpp"
 
 
@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine   engine;
-    DataCollector           collector;              // Instance which collects the metadata and
+    //DataCollector           collector;              // Instance which collects the metadata and
                                                     // services from the SI /XSI files.
-    XmlReader               reader( &collector );   // Reads the SI/XSI xml files.
+    XmlReader               reader;   // Reads the SI/XSI xml files.
     DNSLookup dns;
     QQmlComponent component
             (
@@ -36,29 +36,12 @@ int main(int argc, char *argv[]) {
         qWarning() << component.errors();
     }
 
-    QQmlComponent component2
-            (
-            &engine,
-            QUrl(QStringLiteral("qrc:/child.qml"))
-            );
-
-    QObject *object2 = component2.create();
-    if (component2.isError()) {
-        qWarning() << component.errors();
-    }
-
     SignalHandler handler
             (
             object,
             &reader,
-            &dns,
-            &collector
+            &dns
              ); // Handler that handles the events coming from QML.
-
-    handler.SetChildQmlObject(object2);
-
-
-    reader.ReadSiXmlData(QString("myxml.xml"));
 
     return app.exec();
 }

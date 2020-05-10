@@ -12,10 +12,12 @@
 #include <QTimer>
 #include <QTimerEvent>
 #include "player.hpp"
-#include "datacollecter.hpp"
+//#include "datacollecter.hpp"
 #include "dnslookup.hpp"
-#include "xmlparser.hpp"
+#include "XmlReader.h"
 #include "downloadmanager.h"
+#include <vector>
+#include <bits/stdc++.h>
 
 class SignalHandler : public QObject
 {
@@ -26,8 +28,8 @@ public:
         (
         QObject *object,
         XmlReader *reader,
-        DNSLookup *dnsLookup,
-        DataCollector *collector
+        DNSLookup *dnsLookup
+        //DataCollector *collector
         );
     virtual ~SignalHandler(){}
 
@@ -37,6 +39,9 @@ signals:
 
 public slots:
     void OnPlay();
+    void OnNext();
+    void OnPrevious();
+    void OnSelect( int aIndex );
     void OnSelectionChanged( QString value );
     void OnFileNameAvailable( QString si, QString xsi );
     void OnFileDownloaded();
@@ -48,21 +53,23 @@ public slots:
     {
         mChildObject = childObject;
     }
+    void mediaStatusChanged(QMediaPlayer::State val);
 
 private:
-   // Player *player;
+    Player *player;
     QObject *mObject;
     QObject *mChildObject;
     XmlReader *mReader;
     DNSLookup *mDnsLookup;
-    DataCollector *mCollector;
+    //DataCollector *mCollector;
     MyNetworkAccessManager *mDownloader;
     MyNetworkAccessManager *mPIDownloader;
-    StationList mList;
+    SiDataList mList;
     EpgList mEpgList;
     QString m_CurrentLyPlaying;
     QTimer *mTimer;
-
+    QString mCurrentSelection;
+    QString mCurrentBearer;
     //Network manager
     QNetworkAccessManager qnam;
     QNetworkReply *reply;
@@ -70,6 +77,38 @@ private:
     QProcess *mProcess;
     bool m_IsDownloadedPI;
     QString FormPIString(QString fqdn, QString serviceIdentifier);
+    // Topic Handling
+    QString mTextTopic;
+    QString mImageTopic;
+
+    typedef struct{
+        QString mBand;
+        QString mFrequency;
+        QString mPi;
+        QString mSid;
+        QString mScids;
+        QString mGcc;
+
+        void SplitBearerString( QString& data)
+        {
+            QRegExp rx("(\\.|\\:)"); //RegEx for ' ' or ',' or '.' or ':' or '\t'
+            QStringList  query= data.split(rx);
+            if(query.size() == 4)
+            {
+                int lastIndex = query.size() - 1;
+                mFrequency = query.at(lastIndex);
+                mPi = query.at(--lastIndex);
+                mGcc = query.at(--lastIndex);
+                mBand = query.at(--lastIndex);
+            }
+            qDebug() << "@@ Splitting Data mBand " << mBand;
+            qDebug() << "@@ Splitting Data mPi " << mPi;
+            qDebug() << "@@ Splitting Data mGcc " << mGcc;
+            qDebug() << "@@ Splitting Data mFrequency " << mFrequency;
+
+        }
+
+    }BearerSplit;
 
 };
 #endif // MAIN_H

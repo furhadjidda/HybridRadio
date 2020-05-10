@@ -1,6 +1,6 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
-#if 0
+#if 1
 #include <QMultimedia>
 #include <QMediaPlayer>
 #include <QStringList>
@@ -47,11 +47,19 @@ public slots:
      {
          qDebug()<<"media status Changed "<<val;
      }
+     void mediaStateChanged(QMediaPlayer::State val)
+     {
+         qDebug()<<"media status Changed "<<val;
+         emit signalMediaStatusChanged(val);
+     }
      void durationChanged(qint64 duration)
      {
          qDebug()<<"Duration "<<duration;
 
      }
+
+signals:
+     void signalMediaStatusChanged(QMediaPlayer::State val);
 
 
 private:

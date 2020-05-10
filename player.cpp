@@ -1,7 +1,7 @@
 #include "player.hpp"
 #include <QUrl>
 
-#if 0
+#if 1
 bool Player::playUrl(const QString &url)
 {
     _isPlaying = true;
@@ -45,6 +45,8 @@ Player::Player(QObject *parent)
     connect(mPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
 
     connect(mPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
+    //mediaStateChanged(QMediaPlayer::State val)
+    connect(mPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(mediaStateChanged(QMediaPlayer::State)));
 
 }
 #endif
