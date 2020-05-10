@@ -3,5 +3,7 @@
         <file>main.qml</file>
         <file>PlayStrip.PNG</file>
         <file>child.qml</file>
+        <file>music-2756904_1280.png</file>
+        <file>images.jpeg</file>
     </qresource>
 </RCC>
