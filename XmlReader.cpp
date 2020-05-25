@@ -265,16 +265,17 @@ void XmlReader::ReadSiXmlData
             {
                 bool id_found = false;
                 bool bearer_found = false;
-                BearerInfo data = {};
+                BearerInfo data;
                 siList[index].mBearerInfo.push_back( data );
                 int bearerIndex = siList[index].mBearerInfo.size() - 1;
+                QString idCache("");
 
                 Q_FOREACH( const QXmlStreamAttribute &attr, reader.attributes() )
                 {
                     if ( attr.name().toString() == QLatin1String("bitrate") )
-                    {
+                    {                        
                         QString attribute_value = attr.value().toString();
-                        if( attribute_value == "128" )
+                        if( attribute_value == "128" || attribute_value == "112" )
                         {
                             siList[index].mBitRate = attribute_value;
                             id_found = true;
@@ -291,14 +292,25 @@ void XmlReader::ReadSiXmlData
                         {
                             siList[index].mBearerInfo[bearerIndex].mMimeValue = attr.value().toString();
                         }
-                        if( attribute_value == "73" )
+                        if( attribute_value == "73" || attribute_value == "80"  )
                         {
+
                             id_found = true;
                             //siList[index].mMimeType = attribute_value;
+                            if(!idCache.isEmpty())
+                            {
+                                siList[index].mPlayableMedia = idCache;
+                                idCache = "";
+                            }
                         }
                         else if( attribute_value == "30" )
                         {
                             bearer_found = true;
+                            if(!idCache.isEmpty())
+                            {
+                                siList[index].mBearerInfo[bearerIndex].mId = idCache;
+                                idCache = "";
+                            }
                         }
                         else
                         {
@@ -309,6 +321,8 @@ void XmlReader::ReadSiXmlData
                     else if ( attr.name().toString() == QLatin1String("id") )
                     {
                         QString attribute_value = attr.value().toString();
+                        idCache = attribute_value;
+                        qDebug() << "id " << attribute_value;
                         if( true == id_found )
                         {
                             siList[index].mPlayableMedia = attribute_value;

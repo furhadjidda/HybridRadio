@@ -1,8 +1,11 @@
 import QtQuick 2.3
 import QtQuick.Window 2.2
-import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.3
 import QtQuick.Extras 1.4
+import Qt.labs.calendar 1.0
+import QtQuick.Controls 2.0
+import Qt.labs.qmlmodels 1.0
+
 
 Window {
     id: root
@@ -83,20 +86,26 @@ Window {
 
         ComboBox {
             id: comboBox1
+            currentIndex: 0
             objectName: "selection"
             x: 531
             y: 27
-            width: 145
-            height: 20
-            clip: false
-            opacity: 0.8
-            activeFocusOnPress: true
-            model: [ "", "UK", "DE"]
+            //model: ["", "UK", "DE"]
+            model: ListModel {
+                  id: cbItems
+                  ListElement { text: ""}
+                  ListElement { text: "UK"}
+                  ListElement { text: "UK-DAB"}
+                  ListElement { text: "DE" }
+              }
             signal sendSelectionChanged(string data)
-            onCurrentIndexChanged:
-            {
-                sendSelectionChanged(comboBox1.currentText)
-            }
+             onCurrentIndexChanged:
+             {
+                 console.log("\n\n selected = "+ cbItems.get(currentIndex).text )
+                 sendSelectionChanged(cbItems.get(currentIndex).text)
+                 //console.log("\n\n selected = "+ currentText )
+                 //sendSelectionChanged(currentText)
+             }
         }
 
         Image {
@@ -230,24 +239,12 @@ Window {
             font.pixelSize: 18
         }
 
-        MouseArea {
-            id: mouseArea1
-            x: 41
-            y: 352
-            width: 50
-            height: 14
-            onClicked: {
-                var component = Qt.createComponent("child.qml")
-                var window = component.createObject(root)
-            }
-        }
-
         ListModel {
             id: libraryModel
             objectName: "listModelObject"
         }
 
-        TableView {
+/*        TableView {
             id: tableView
             objectName: "ServiceListTableObject"
             x: 711
@@ -273,7 +270,7 @@ Window {
             onClicked: {
                 selectIndex(row)
             }
-        }
+        }*/
 
         Text {
             id: mediastatus
@@ -288,15 +285,78 @@ Window {
             font.pixelSize: 15
         }
 
+        Text {
+            id: additionalInfo
+            objectName: "additionalInfo"
+            x: 465
+            y: 418
+            width: 231
+            height: 61
+            text: qsTr("Additional Info")
+            wrapMode: Text.WordWrap
+            font.pixelSize: 15
+        }
+
+        Component {
+            id: programmeDelegate
+            Item {
+                width: 180; height: 40
+                Row {
+                    Text {
+                        id: itemText
+                        text: name
+                        color: "#f829ea"
+                        font.pixelSize: 15
+                        textFormat: Text.RichText
+                        MouseArea {
+                            width: 180; height: 40
+                            onClicked: {
+                                listView.currentIndex = index
+                                listView.selectIndex(index)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        ListModel {
+            id: programListModel
+            objectName: "programListModel"
+            ListElement {
+                name: "Station"
+                genre: "Station"
+            }
+
+        }
+
+        ListView {
+            id: listView
+            objectName: "ServiceListTableObject"
+            signal selectIndex( int index)
+            x: 720
+            y: 84
+            width: 282
+            height: 413
+            keyNavigationWraps: true
+            pixelAligned: false
+            highlight: Rectangle { color: "lightsteelblue"}
+            focus: true
+            delegate: programmeDelegate
+            model: programListModel
+        }
+
         function clearListElement()
         {
-            libraryModel.clear()
+            programListModel.clear()
+            //libraryModel.clear()
             return 0;
         }
 
         function addListElement(serviceName,genre)
         {
-            libraryModel.append({"programme":serviceName,"Genre":genre})
+            programListModel.append({"name":serviceName,"genre":genre})
+            //libraryModel.append({"programme":serviceName,"Genre":genre})
             return 0;
         }
     }

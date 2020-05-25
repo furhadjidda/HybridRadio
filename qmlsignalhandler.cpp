@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <QProcess>
 static const QString FMDemo1("UK");
+static const QString DabDemo1("UK-DAB");
 static const QString FMDemo2("DE");
 
 static QString FMDemo1_LookUp("09580.c479.ce1.fm.radiodns.org");
@@ -13,11 +14,17 @@ static QString FMDemo1_bearer("fm:ce1.c479.09580");
 
 static QString FMDemo2_Lookup("10420.d389.de0.fm.radiodns.org");
 static QString FMDemo2_TEXT("fm/de0/d389/10420/text");
-static QString FMDemo2_IMAGE("fm/de0/d389/10420/text");
+static QString FMDemo2_IMAGE("fm/de0/d389/10420/image");
 static QString FMDemo2_bearer("fm:de0.d389.10420");
 
-const int sTimerValue = 5000;
+// [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
+// dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
+static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
+static QString DABDemo2_TEXT("dab/ce1/c1ce/c7d8/text");
+static QString DABDemo2_IMAGE("dab/ce1/c1ce/c7d8/image");
+static QString DABDemo2_bearer("dab:ce1.c1ce.c7d8.0");
 
+const int sTimerValue = 5000;
 
 // PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c36b/09630/20160904_PI.xml
 // PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c479/09580/20160904_PI.xml
@@ -38,7 +45,6 @@ SignalHandler::SignalHandler
     : mObject( object )
     , mReader( reader )
     , mDnsLookup( dnsLookup )
-    //, mCollector( collector )
     , m_IsDownloadedPI( false )
 {
     // Creating a Timer
@@ -323,6 +329,7 @@ void SignalHandler::OnSelect( int aIndex )
 {
     if( mList[aIndex].mBearerInfo.size() > 0 )
     {
+        mTimer->stop();
         player->Stop();
         m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
         qDebug() << "$$ Selecting " + m_CurrentLyPlaying + "@ index " + aIndex;
@@ -353,87 +360,9 @@ void SignalHandler::OnSelect( int aIndex )
                 mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
                 mTextTopic = textQuery;
                 mImageTopic = imageQuery;
-
-                QObject *artWork = mObject->findChild<QObject*>("artWork");
-                QObject *StationName = mObject->findChild<QObject*>("StationNameObj");
-                QObject *description = mObject->findChild<QObject*>("DescriptionObject");
-                QObject *bitRate = mObject->findChild<QObject*>("BitRateObject");
-                QVariant retValue=0;
-                artWork->setProperty
-                        (
-                        "source",
-                        mList[aIndex].mArtwork
-                        );
-
-                QQmlProperty
-                        (
-                        artWork,
-                        "source"
-                        )
-                        .write
-                        (
-                        mList[aIndex].mArtwork
-                        );
-
-                if(StationName)
-                {
-                    StationName->setProperty
-                            (
-                            "text",
-                            QVariant(mList[aIndex].mServiceName)
-                            );
-
-                    QQmlProperty
-                            (
-                            StationName,
-                            "text"
-                            )
-                            .write
-                            (
-                            mList[aIndex].mServiceName
-                            );
-                }
-
-                if( description )
-                {
-                    description->setProperty
-                            (
-                            "text",
-                            QVariant(mList[aIndex].mDescription)
-                            );
-
-                    QQmlProperty
-                            (
-                            description,
-                            "text"
-                            )
-                            .write
-                            (
-                            mList[aIndex].mDescription
-                            );
-                }
-
-
-                if( bitRate )
-                {
-                    QString bitRateValue("BitRate:");
-                    bitRateValue.append(mList[aIndex].mBitRate);
-                    bitRate->setProperty
-                            (
-                            "text",
-                            QVariant(bitRateValue)
-                            );
-
-                    QQmlProperty
-                            (
-                            bitRate,
-                            "text"
-                            )
-                            .write
-                            (
-                            bitRateValue
-                            );
-                }
+                // This updates the UI with the findings
+                UpdateUIFromList( aIndex );
+                mTimer->start(sTimerValue);
                 break;
             }
         }
@@ -445,11 +374,6 @@ void SignalHandler::OnFileDownloaded()
     mList.clear();
     mReader->ReadSiXmlData("Downloaded_SI.xml",mList);
     qDebug() << "List Size" << mList.size();
-
-    QObject *artWork = mObject->findChild<QObject*>("artWork");
-    QObject *StationName = mObject->findChild<QObject*>("StationNameObj");
-    QObject *description = mObject->findChild<QObject*>("DescriptionObject");
-    QObject *bitRate = mObject->findChild<QObject*>("BitRateObject");
     QVariant retValue=0;
 
     int dataIndex = 0;
@@ -463,7 +387,7 @@ void SignalHandler::OnFileDownloaded()
             {
                 if( mCurrentBearer == mList[index].mBearerInfo[bearerIndex].mId )
                 {
-                    qDebug() << "[HYB_RADIO] BearerUri = " << FMDemo1_bearer;
+                    qDebug() << "[HYB_RADIO] BearerUri = " << mCurrentBearer;
                     qDebug() << "[HYB_RADIO] Media " << mList[index].mPlayableMedia;
                     player->playUrl( mList[index].mPlayableMedia.toUtf8().constData() );
                     m_CurrentLyPlaying = mList[index].mPlayableMedia;
@@ -498,10 +422,26 @@ void SignalHandler::OnFileDownloaded()
 
     if( isIndexValid )
     {
+        UpdateUIFromList( dataIndex );
+    }
+
+    mTimer->start(sTimerValue);
+}
+
+void SignalHandler::UpdateUIFromList( int aIndex )
+{
+    QObject *artWork = mObject->findChild<QObject*>("artWork");
+    QObject *StationName = mObject->findChild<QObject*>("StationNameObj");
+    QObject *description = mObject->findChild<QObject*>("DescriptionObject");
+    QObject *bitRate = mObject->findChild<QObject*>("BitRateObject");
+    QObject *moreInfo = mObject->findChild<QObject*>("additionalInfo");
+
+    if( artWork )
+    {
         artWork->setProperty
                 (
                 "source",
-                mList[dataIndex].mArtwork
+                mList[aIndex].mArtwork
                 );
 
         QQmlProperty
@@ -511,70 +451,94 @@ void SignalHandler::OnFileDownloaded()
                 )
                 .write
                 (
-                mList[dataIndex].mArtwork
+                mList[aIndex].mArtwork
+                );
+    }
+
+    if( StationName )
+    {
+        StationName->setProperty
+                (
+                "text",
+                QVariant(mList[aIndex].mServiceName)
                 );
 
-        if(StationName)
-        {
-            StationName->setProperty
-                    (
-                    "text",
-                    QVariant(mList[dataIndex].mServiceName)
-                    );
-
-            QQmlProperty
-                    (
-                    StationName,
-                    "text"
-                    )
-                    .write
-                    (
-                    mList[dataIndex].mServiceName
-                    );
-        }
-
-        if( description )
-        {
-            description->setProperty
-                    (
-                    "text",
-                    QVariant(mList[dataIndex].mDescription)
-                    );
-
-            QQmlProperty
-                    (
-                    description,
-                    "text"
-                    )
-                    .write
-                    (
-                    mList[dataIndex].mDescription
-                    );
-        }
-
-
-        if( bitRate )
-        {
-            QString bitRateValue("BitRate:");
-            bitRateValue.append(mList[dataIndex].mBitRate);
-            bitRate->setProperty
-                    (
-                    "text",
-                    QVariant(bitRateValue)
-                    );
-
-            QQmlProperty
-                    (
-                    bitRate,
-                    "text"
-                    )
-                    .write
-                    (
-                    bitRateValue
-                    );
-        }
+        QQmlProperty
+                (
+                StationName,
+                "text"
+                )
+                .write
+                (
+                mList[aIndex].mServiceName
+                );
     }
-    mTimer->start(sTimerValue);
+
+    if( description )
+    {
+        description->setProperty
+                (
+                "text",
+                QVariant(mList[aIndex].mDescription)
+                );
+
+        QQmlProperty
+                (
+                description,
+                "text"
+                )
+                .write
+                (
+                mList[aIndex].mDescription
+                );
+    }
+
+
+    if( bitRate )
+    {
+        QString bitRateValue("BitRate:");
+        bitRateValue.append(mList[aIndex].mBitRate);
+        bitRate->setProperty
+                (
+                "text",
+                QVariant(bitRateValue)
+                );
+
+        QQmlProperty
+                (
+                bitRate,
+                "text"
+                )
+                .write
+                (
+                bitRateValue
+                );
+    }
+
+    if( moreInfo )
+    {
+        QString data("Bearer Info: ");
+        for (auto val : mList[aIndex].mBearerInfo) {
+            data.append(val.mId);
+            data.append(" ; ");
+        }
+
+        moreInfo->setProperty
+                (
+                "text",
+                QVariant(data)
+                );
+
+        QQmlProperty
+                (
+                moreInfo,
+                "text"
+                )
+                .write
+                (
+                data
+                );
+    }
 }
 
 
@@ -606,5 +570,12 @@ void SignalHandler::OnSelectionChanged(QString value)
         mDnsLookup->lookupCName(FMDemo2_Lookup);
         mImageTopic = FMDemo2_IMAGE;
         mTextTopic = FMDemo2_TEXT;
+    }
+    else if( DabDemo1 == value )
+    {
+        mCurrentBearer = DABDemo2_bearer;
+        mDnsLookup->lookupCName(DABDemo2_Lookup);
+        mImageTopic = DABDemo2_IMAGE;
+        mTextTopic = DABDemo2_TEXT;
     }
 }

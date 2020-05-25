@@ -12,12 +12,9 @@
 #include <QTimer>
 #include <QTimerEvent>
 #include "player.hpp"
-//#include "datacollecter.hpp"
 #include "dnslookup.hpp"
 #include "XmlReader.h"
 #include "downloadmanager.h"
-#include <vector>
-#include <bits/stdc++.h>
 
 class SignalHandler : public QObject
 {
@@ -29,7 +26,6 @@ public:
         QObject *object,
         XmlReader *reader,
         DNSLookup *dnsLookup
-        //DataCollector *collector
         );
     virtual ~SignalHandler(){}
 
@@ -49,19 +45,15 @@ public slots:
     void OnTimeout();
     void httpFinished();
     void httpImageFinished();
-    void SetChildQmlObject(QObject* childObject)
-    {
-        mChildObject = childObject;
-    }
     void mediaStatusChanged(QMediaPlayer::State val);
 
 private:
+    QString FormPIString(QString fqdn, QString serviceIdentifier);
+    void UpdateUIFromList( int aIndex );
     Player *player;
     QObject *mObject;
-    QObject *mChildObject;
     XmlReader *mReader;
     DNSLookup *mDnsLookup;
-    //DataCollector *mCollector;
     MyNetworkAccessManager *mDownloader;
     MyNetworkAccessManager *mPIDownloader;
     SiDataList mList;
@@ -75,8 +67,7 @@ private:
     QNetworkReply *reply;
     QNetworkReply *imageReply;
     QProcess *mProcess;
-    bool m_IsDownloadedPI;
-    QString FormPIString(QString fqdn, QString serviceIdentifier);
+    bool m_IsDownloadedPI;    
     // Topic Handling
     QString mTextTopic;
     QString mImageTopic;
@@ -101,13 +92,15 @@ private:
                 mGcc = query.at(--lastIndex);
                 mBand = query.at(--lastIndex);
             }
+
             qDebug() << "@@ Splitting Data mBand " << mBand;
             qDebug() << "@@ Splitting Data mPi " << mPi;
             qDebug() << "@@ Splitting Data mGcc " << mGcc;
             qDebug() << "@@ Splitting Data mFrequency " << mFrequency;
+            qDebug() << "@@ Splitting Data mScids " << mFrequency;
+            qDebug() << "@@ Splitting Data mSid " << mFrequency;
 
         }
-
     }BearerSplit;
 
 };

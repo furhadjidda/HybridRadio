@@ -18,11 +18,11 @@ typedef QVector<EpgStruct> EpgList;
 
 //! Structure having bearer information
 typedef struct {
-    QString mId;
-    QString mCost;
-    QString mMimeValue;
-    std::uint32_t mBitRate;
-    std::uint32_t mOffset;
+    QString mId{""};
+    QString mCost{""};
+    QString mMimeValue{""};
+    std::uint32_t mBitRate{0};
+    std::uint32_t mOffset{0};
 }BearerInfo;
 
 //! Structure containing interactive link information.

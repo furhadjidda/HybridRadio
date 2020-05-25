@@ -13,7 +13,6 @@
 #include "qmlsignalhandler.hpp"
 #include "XmlReader.h"
 #include "player.hpp"
-//#include "datacollecter.hpp"
 #include "dnslookup.hpp"
 
 
@@ -21,8 +20,6 @@ int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine   engine;
-    //DataCollector           collector;              // Instance which collects the metadata and
-                                                    // services from the SI /XSI files.
     XmlReader               reader;   // Reads the SI/XSI xml files.
     DNSLookup dns;
     QQmlComponent component
