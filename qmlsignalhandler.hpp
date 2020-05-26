@@ -15,6 +15,7 @@
 #include "dnslookup.hpp"
 #include "XmlReader.h"
 #include "downloadmanager.h"
+#include "lookuphelper.hpp"
 
 class SignalHandler : public QObject
 {
@@ -79,28 +80,25 @@ private:
         QString mSid;
         QString mScids;
         QString mGcc;
+        QString mEid;
 
-        void SplitBearerString( QString& data)
+        void SplitBearerString
+            (
+            const QString& data,
+            StationInformation& aStationInfo,
+            QString& aGcc
+            )
         {
-            QRegExp rx("(\\.|\\:)"); //RegEx for ' ' or ',' or '.' or ':' or '\t'
-            QStringList  query= data.split(rx);
-            if(query.size() == 4)
-            {
-                int lastIndex = query.size() - 1;
-                mFrequency = query.at(lastIndex);
-                mPi = query.at(--lastIndex);
-                mGcc = query.at(--lastIndex);
-                mBand = query.at(--lastIndex);
-            }
-
-            qDebug() << "@@ Splitting Data mBand " << mBand;
-            qDebug() << "@@ Splitting Data mPi " << mPi;
-            qDebug() << "@@ Splitting Data mGcc " << mGcc;
-            qDebug() << "@@ Splitting Data mFrequency " << mFrequency;
-            qDebug() << "@@ Splitting Data mScids " << mFrequency;
-            qDebug() << "@@ Splitting Data mSid " << mFrequency;
-
+            DeconstructBearer(aStationInfo, aGcc, data);
+            mBand = aStationInfo.mBand;
+            mFrequency = aStationInfo.mFrequency;
+            mPi = QString::number( aStationInfo.mPi, 16);
+            mSid = QString::number( aStationInfo.mSid, 16);
+            mScids = QString::number( aStationInfo.mScids, 16);
+            mGcc = aGcc;
+            mEid = QString::number( aStationInfo.mEid, 16);
         }
+
     }BearerSplit;
 
 };

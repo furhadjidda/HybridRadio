@@ -4,9 +4,9 @@ QT += qml quick multimedia network core
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    player.cpp \
     XmlReader.cpp \
-    datacollecter.cpp \
+    lookuphelper.cpp \
+    player.cpp \
     qmlsignalhandler.cpp \
     dnslookup.cpp \
     downloadmanager.cpp
@@ -22,8 +22,8 @@ include(deployment.pri)
 HEADERS += \
     XmlReader.h \
     downloadmanager.h \
+    lookuphelper.hpp \
     player.hpp \
-    datacollecter.hpp \
     dnslookup.hpp \
     qmlsignalhandler.hpp
 

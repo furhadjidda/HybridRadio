@@ -3,26 +3,10 @@
 #include <QDebug>
 #include <stdlib.h>
 #include <QProcess>
+#include "lookuphelper.hpp"
 static const QString FMDemo1("UK");
 static const QString DabDemo1("UK-DAB");
 static const QString FMDemo2("DE");
-
-static QString FMDemo1_LookUp("09580.c479.ce1.fm.radiodns.org");
-static QString FMDemo1_TEXT("fm/ce1/c479/09580/text");
-static QString FMDemo1_IMAGE("fm/ce1/c479/09580/image");
-static QString FMDemo1_bearer("fm:ce1.c479.09580");
-
-static QString FMDemo2_Lookup("10420.d389.de0.fm.radiodns.org");
-static QString FMDemo2_TEXT("fm/de0/d389/10420/text");
-static QString FMDemo2_IMAGE("fm/de0/d389/10420/image");
-static QString FMDemo2_bearer("fm:de0.d389.10420");
-
-// [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
-// dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
-static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
-static QString DABDemo2_TEXT("dab/ce1/c1ce/c7d8/text");
-static QString DABDemo2_IMAGE("dab/ce1/c1ce/c7d8/image");
-static QString DABDemo2_bearer("dab:ce1.c1ce.c7d8.0");
 
 const int sTimerValue = 5000;
 
@@ -242,24 +226,27 @@ void SignalHandler::httpImageFinished()
     QString value = bodyVal["body"].toString();
     QString artLink = value.remove(0,5);
     qDebug() << "ART : "<< artLink;
-    QObject *artWork = mObject->findChild<QObject*>("artWork");
-    if( artWork )
+    if( 0 != artLink.size() )
     {
-        artWork->setProperty
-                (
-                "source",
-                artLink
-                );
+        QObject *artWork = mObject->findChild<QObject*>("artWork");
+        if( artWork )
+        {
+            artWork->setProperty
+                    (
+                    "source",
+                    artLink
+                    );
 
-        QQmlProperty
-                (
-                artWork,
-                "source"
-                )
-                .write
-                (
-                artLink
-                );
+            QQmlProperty
+                    (
+                    artWork,
+                    "source"
+                    )
+                    .write
+                    (
+                    artLink
+                    );
+        }
     }
 }
 
@@ -334,29 +321,24 @@ void SignalHandler::OnSelect( int aIndex )
         m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
         qDebug() << "$$ Selecting " + m_CurrentLyPlaying + "@ index " + aIndex;
         player->playUrl(m_CurrentLyPlaying.toUtf8().constData());
+
         BearerSplit data;
+
         for(int index =0; index < mList[aIndex].mBearerInfo.size(); ++index)
         {
             if( mList[aIndex].mBearerInfo[index].mId.length() > 0 )
             {
                 qDebug() << mList[aIndex].mBearerInfo[index].mId;
-                data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId);
-                QString textQuery( data.mBand +
-                                   '/' +
-                                   data.mGcc +
-                                   '/' +
-                                   data.mPi +
-                                   '/' +
-                                   data.mFrequency +
-                                   "/text");
-                QString imageQuery( data.mBand +
-                                   '/' +
-                                   data.mGcc +
-                                   '/' +
-                                   data.mPi +
-                                   '/' +
-                                   data.mFrequency +
-                                   "/image");
+                StationInformation station;
+                QString gcc;
+                data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station,gcc);
+
+                QString textQuery;
+                ConstructTopic( station, gcc, "text", textQuery );
+
+                QString imageQuery;
+                ConstructTopic( station, gcc, "image", imageQuery );
+
                 mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
                 mTextTopic = textQuery;
                 mImageTopic = imageQuery;
@@ -559,23 +541,56 @@ void SignalHandler::OnSelectionChanged(QString value)
     mCurrentSelection = value;
     if( FMDemo1 == value )
     {
-        mDnsLookup->lookupCName(FMDemo1_LookUp);
-        mCurrentBearer = FMDemo1_bearer;
-        mImageTopic = FMDemo1_IMAGE;
-        mTextTopic = FMDemo1_TEXT;
+        StationInformation data;
+        QString fqdn;
+        data.PopulateFmFields(9580,0xc479);
+        ConstructFqdn(data,"ce1",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"ce1",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"ce1","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"ce1","text",mTextTopic);
     }
     else if( FMDemo2 == value )
     {
-        mCurrentBearer = FMDemo2_bearer;
-        mDnsLookup->lookupCName(FMDemo2_Lookup);
-        mImageTopic = FMDemo2_IMAGE;
-        mTextTopic = FMDemo2_TEXT;
+        StationInformation data;
+        QString fqdn;
+        data.PopulateFmFields(10420,0xd389);
+        ConstructFqdn(data,"de0",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"de0",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"de0","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"ce1","text",mTextTopic);
     }
     else if( DabDemo1 == value )
     {
-        mCurrentBearer = DABDemo2_bearer;
-        mDnsLookup->lookupCName(DABDemo2_Lookup);
-        mImageTopic = DABDemo2_IMAGE;
-        mTextTopic = DABDemo2_TEXT;
+        // [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
+        // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
+        //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
+        StationInformation data;
+        QString fqdn;
+        data.PopulateDabFields(0xc7d8,0,0xc1ce);
+        ConstructFqdn(data,"ce1",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"de0",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"de0","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"ce1","text",mTextTopic);
     }
 }

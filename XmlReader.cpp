@@ -195,7 +195,7 @@ void XmlReader::ReadSiXmlData
                                 // 800x800 for station logo.
                                 // Eventually we will have options to select
                                 // from different resolutions available.
-                                if( attribute_value == "800" )
+                                if( attribute_value == "800" || attribute_value == "600" || attribute_value == "128")
                                 {
                                     art_found = true;
                                 }
@@ -303,7 +303,7 @@ void XmlReader::ReadSiXmlData
                                 idCache = "";
                             }
                         }
-                        else if( attribute_value == "30" )
+                        else if( attribute_value == "30" || attribute_value == "40")
                         {
                             bearer_found = true;
                             if(!idCache.isEmpty())
@@ -322,7 +322,7 @@ void XmlReader::ReadSiXmlData
                     {
                         QString attribute_value = attr.value().toString();
                         idCache = attribute_value;
-                        qDebug() << "id " << attribute_value;
+                        //qDebug() << "id " << attribute_value;
                         if( true == id_found )
                         {
                             siList[index].mPlayableMedia = attribute_value;
