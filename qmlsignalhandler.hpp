@@ -51,24 +51,24 @@ public slots:
 private:
     QString FormPIString(QString fqdn, QString serviceIdentifier);
     void UpdateUIFromList( int aIndex );
-    Player *player;
-    QObject *mObject;
-    XmlReader *mReader;
-    DNSLookup *mDnsLookup;
-    MyNetworkAccessManager *mDownloader;
-    MyNetworkAccessManager *mPIDownloader;
+    Player* mPlayer;
+    QObject* mUIObject;
+    XmlReader* mReader;
+    DNSLookup* mDnsLookup;
+    DownloadManager* mServiceInformationDownloader;
+    DownloadManager* mProgramInformationDownloader;
     SiDataList mList;
     EpgList mEpgList;
     QString m_CurrentLyPlaying;
-    QTimer *mTimer;
+    QTimer* mTimer;
     QString mCurrentSelection;
     QString mCurrentBearer;
     //Network manager
     QNetworkAccessManager qnam;
-    QNetworkReply *reply;
-    QNetworkReply *imageReply;
-    QProcess *mProcess;
-    bool m_IsDownloadedPI;    
+    QNetworkReply* reply;
+    QNetworkReply* imageReply;
+    //QProcess *mProcess;
+
     // Topic Handling
     QString mTextTopic;
     QString mImageTopic;

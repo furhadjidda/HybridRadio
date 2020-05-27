@@ -10,12 +10,13 @@
 #include <QtNetwork>
 
 
-class MyNetworkAccessManager:public QNetworkAccessManager
+class DownloadManager
+        :public QNetworkAccessManager
 {
   Q_OBJECT
 public:
-  MyNetworkAccessManager(QString fileName);
-  ~MyNetworkAccessManager();
+  DownloadManager(QString fileName);
+  ~DownloadManager();
   void DownloadFile(QString urlPath,bool isSI = true);
 
 signals:

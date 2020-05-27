@@ -227,18 +227,6 @@ Window {
             font.pixelSize: 17
         }
 
-        Text {
-            id: text2
-            x: 36
-            y: 539
-            width: 60
-            height: 21
-            text: qsTr("EPG")
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 18
-        }
-
         ListModel {
             id: libraryModel
             objectName: "listModelObject"
@@ -300,19 +288,36 @@ Window {
         Component {
             id: programmeDelegate
             Item {
-                width: 180; height: 40
+                width: 282; height: 60
                 Row {
-                    Text {
-                        id: itemText
-                        text: name
-                        color: "#f829ea"
-                        font.pixelSize: 15
-                        textFormat: Text.RichText
-                        MouseArea {
-                            width: 180; height: 40
-                            onClicked: {
-                                listView.currentIndex = index
-                                listView.selectIndex(index)
+                    Rectangle {
+                        width: 282; height: 60
+                        color: index % 2 == 0 ? "Light Blue" : "Light Pink"
+                        Image {
+                            id: image2
+                            x: 5
+                            y: 5
+                            width: 50
+                            height: 50
+                            opacity: 1
+                            source: image
+                        }
+                        Text {
+                            id: itemText
+                            text: name
+                            x: 60
+                            y: 5
+                            color: "Black"
+                            font.pixelSize: 13
+                            width: 220
+                            wrapMode: Text.WordWrap
+                            textFormat: Text.RichText
+                            MouseArea {
+                                width: 282; height: 60
+                                onClicked: {
+                                    listView.currentIndex = index
+                                    listView.selectIndex(index)
+                                }
                             }
                         }
                     }
@@ -326,6 +331,7 @@ Window {
             ListElement {
                 name: "Station"
                 genre: "Station"
+                image: ""
             }
 
         }
@@ -353,9 +359,9 @@ Window {
             return 0;
         }
 
-        function addListElement(serviceName,genre)
+        function addListElement(serviceName,genre,imagePath)
         {
-            programListModel.append({"name":serviceName,"genre":genre})
+            programListModel.append({"name":serviceName,"genre":genre,"image":imagePath})
             //libraryModel.append({"programme":serviceName,"Genre":genre})
             return 0;
         }

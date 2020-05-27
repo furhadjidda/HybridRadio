@@ -4,11 +4,15 @@
 #include <stdlib.h>
 #include <QProcess>
 #include "lookuphelper.hpp"
-static const QString FMDemo1("UK");
-static const QString DabDemo1("UK-DAB");
-static const QString FMDemo2("DE");
+
+static const QString Selecttion_UK_FM("UK");
+static const QString Selecttion_UK_DAB("UK-DAB");
+static const QString Selecttion_DE_FM("DE");
 
 const int sTimerValue = 5000;
+
+static const QString ServiceInformationFileName("RadioDns_ServiceInformation.xml");
+static const QString ProgramInformationFileName("RadioDns_ProgramInformation.xml");
 
 // PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c36b/09630/20160904_PI.xml
 // PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c479/09580/20160904_PI.xml
@@ -26,24 +30,29 @@ SignalHandler::SignalHandler
     DNSLookup *dnsLookup
     //DataCollector *collector
     )
-    : mObject( object )
+    : mUIObject( object )
     , mReader( reader )
     , mDnsLookup( dnsLookup )
-    , m_IsDownloadedPI( false )
 {
     // Creating a Timer
     mTimer = new QTimer(this);
-    connect(mTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
+    QObject::connect
+            (
+            mTimer,
+            SIGNAL(timeout()),
+            this,
+            SLOT(OnTimeout())
+            );
 
     // Player which plays te URL.
-    player = new Player();
-    mProcess = new QProcess();
-    mDownloader = new MyNetworkAccessManager("");
-    mPIDownloader = new MyNetworkAccessManager("DownloadPI.xml");
+    mPlayer = new Player();
+    //mProcess = new QProcess();
+    mServiceInformationDownloader = new DownloadManager( ServiceInformationFileName );
+    mProgramInformationDownloader = new DownloadManager(ProgramInformationFileName);
     // Connect Play Button
     QObject::connect
             (
-            player,
+            mPlayer,
             SIGNAL(signalMediaStatusChanged(QMediaPlayer::State)),
             this,
             SLOT(mediaStatusChanged(QMediaPlayer::State))
@@ -113,7 +122,7 @@ SignalHandler::SignalHandler
 
     QObject::connect
             (
-            mDownloader,
+            mServiceInformationDownloader,
             SIGNAL(sendDownloadComplete()),
             this,
             SLOT(OnFileDownloaded())
@@ -121,7 +130,7 @@ SignalHandler::SignalHandler
 
     QObject::connect
             (
-            mPIDownloader,
+            mProgramInformationDownloader,
             SIGNAL(sendDownloadComplete()),
             this,
             SLOT(OnFileDownloaded())
@@ -150,7 +159,7 @@ void SignalHandler::mediaStatusChanged(QMediaPlayer::State val)
 
     }
 
-    QObject *mediaStatus = mObject->findChild<QObject*>("MediaStatus");
+    QObject *mediaStatus = mUIObject->findChild<QObject*>("MediaStatus");
     if( mediaStatus )
     {
         mediaStatus->setProperty
@@ -180,7 +189,7 @@ QString SignalHandler::FormPIString(QString fqdn, QString serviceIdentifier)
             "/radiodns/spi/3.1/id/" +
             fqdn + "/" + serviceIdentifier + "/" + date +"_PI.xml";
     qDebug() << "url Formation for PI xml = " << urlFormation;
-    mPIDownloader->DownloadFile(urlFormation,false);
+    mProgramInformationDownloader->DownloadFile(urlFormation,false);
     return urlFormation;
 }
 
@@ -228,7 +237,7 @@ void SignalHandler::httpImageFinished()
     qDebug() << "ART : "<< artLink;
     if( 0 != artLink.size() )
     {
-        QObject *artWork = mObject->findChild<QObject*>("artWork");
+        QObject *artWork = mUIObject->findChild<QObject*>("artWork");
         if( artWork )
         {
             artWork->setProperty
@@ -261,7 +270,7 @@ void SignalHandler::httpFinished()
     QString value = bodyVal["body"].toString();
     QString SongName = value.remove(0,5);
     qDebug() << "SONG : "<< SongName;
-    QObject *songName = mObject->findChild<QObject*>("SongObject");
+    QObject *songName = mUIObject->findChild<QObject*>("SongObject");
     if( songName )
     {
         songName->setProperty
@@ -284,21 +293,20 @@ void SignalHandler::httpFinished()
 
 void SignalHandler::OnPlay()
 {
-    player->playUrl(m_CurrentLyPlaying);
-    mProcess->kill();
-    mProcess->waitForFinished();
-    //qDebug() << "mList[index].playableMedia " << mList[index].playableMedia;
-    QString gstreamerCommand = "gst-launch-0.10 -v souphttpsrc location="
-            + m_CurrentLyPlaying
-            + " iradio-mode=true ! decodebin name=demux ! audioresample ! audioconvert ! autoaudiosink";
+    mPlayer->playUrl(m_CurrentLyPlaying);
+    //mProcess->kill();
+    //mProcess->waitForFinished();
+    //QString gstreamerCommand = "gst-launch-0.10 -v souphttpsrc location="
+    //        + m_CurrentLyPlaying
+    //        + " iradio-mode=true ! decodebin name=demux ! audioresample ! audioconvert ! autoaudiosink";
     //mProcess->start(gstreamerCommand);
 }
 
 void SignalHandler::OnStop()
 {
-     player->Stop();
-     mProcess->kill();
-     mProcess->waitForFinished();
+     mPlayer->Stop();
+     //mProcess->kill();
+     //mProcess->waitForFinished();
 }
 
 
@@ -317,10 +325,10 @@ void SignalHandler::OnSelect( int aIndex )
     if( mList[aIndex].mBearerInfo.size() > 0 )
     {
         mTimer->stop();
-        player->Stop();
+        mPlayer->Stop();
         m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
         qDebug() << "$$ Selecting " + m_CurrentLyPlaying + "@ index " + aIndex;
-        player->playUrl(m_CurrentLyPlaying.toUtf8().constData());
+        mPlayer->playUrl(m_CurrentLyPlaying.toUtf8().constData());
 
         BearerSplit data;
 
@@ -354,13 +362,13 @@ void SignalHandler::OnSelect( int aIndex )
 void SignalHandler::OnFileDownloaded()
 {
     mList.clear();
-    mReader->ReadSiXmlData("Downloaded_SI.xml",mList);
+    mReader->ReadSiXmlData(ServiceInformationFileName,mList);
     qDebug() << "List Size" << mList.size();
     QVariant retValue=0;
 
     int dataIndex = 0;
     bool isIndexValid = false;
-    player->Stop();
+    mPlayer->Stop();
     for( int index = 0; index < mList.size(); ++index )
     {
         if( mList[index].mBearerInfo.size() > 0 )
@@ -371,7 +379,7 @@ void SignalHandler::OnFileDownloaded()
                 {
                     qDebug() << "[HYB_RADIO] BearerUri = " << mCurrentBearer;
                     qDebug() << "[HYB_RADIO] Media " << mList[index].mPlayableMedia;
-                    player->playUrl( mList[index].mPlayableMedia.toUtf8().constData() );
+                    mPlayer->playUrl( mList[index].mPlayableMedia.toUtf8().constData() );
                     m_CurrentLyPlaying = mList[index].mPlayableMedia;
                     isIndexValid = true;
                     dataIndex = index;
@@ -381,8 +389,9 @@ void SignalHandler::OnFileDownloaded()
         }
     }
 
+    // Adding data from the Service informaiton to the list
     bool succeeded = false;
-    QObject *RectBoxObj= mObject->findChild<QObject*>("RectBox");
+    QObject *RectBoxObj= mUIObject->findChild<QObject*>("RectBox");
 
     succeeded = QMetaObject::invokeMethod(
         RectBoxObj, "clearListElement",
@@ -394,7 +403,8 @@ void SignalHandler::OnFileDownloaded()
             RectBoxObj, "addListElement",
                     Q_RETURN_ARG(QVariant, retValue),
                     Q_ARG( QVariant, val.mServiceName ),
-                    Q_ARG( QVariant, val.mGenre ));
+                    Q_ARG( QVariant, val.mGenre ),
+                    Q_ARG( QVariant, val.mArtwork ));
 
         if(!succeeded)
         {
@@ -412,11 +422,11 @@ void SignalHandler::OnFileDownloaded()
 
 void SignalHandler::UpdateUIFromList( int aIndex )
 {
-    QObject *artWork = mObject->findChild<QObject*>("artWork");
-    QObject *StationName = mObject->findChild<QObject*>("StationNameObj");
-    QObject *description = mObject->findChild<QObject*>("DescriptionObject");
-    QObject *bitRate = mObject->findChild<QObject*>("BitRateObject");
-    QObject *moreInfo = mObject->findChild<QObject*>("additionalInfo");
+    QObject *artWork = mUIObject->findChild<QObject*>("artWork");
+    QObject *StationName = mUIObject->findChild<QObject*>("StationNameObj");
+    QObject *description = mUIObject->findChild<QObject*>("DescriptionObject");
+    QObject *bitRate = mUIObject->findChild<QObject*>("BitRateObject");
+    QObject *moreInfo = mUIObject->findChild<QObject*>("additionalInfo");
 
     if( artWork )
     {
@@ -530,16 +540,15 @@ void SignalHandler::OnFileNameAvailable( QString si, QString xsi )
     qDebug() << "FileName=" << si;
     qDebug() << "FileName=" << xsi;
 
-    mDownloader->DownloadFile( si );
+    mServiceInformationDownloader->DownloadFile( si );
 }
 
 
 void SignalHandler::OnSelectionChanged(QString value)
 {
     qDebug() <<"OnSelectionChanged - "<<value;
-    m_IsDownloadedPI = false;
     mCurrentSelection = value;
-    if( FMDemo1 == value )
+    if( Selecttion_UK_FM == value )
     {
         StationInformation data;
         QString fqdn;
@@ -556,7 +565,7 @@ void SignalHandler::OnSelectionChanged(QString value)
         mTextTopic.clear();
         ConstructTopic(data,"ce1","text",mTextTopic);
     }
-    else if( FMDemo2 == value )
+    else if( Selecttion_DE_FM == value )
     {
         StationInformation data;
         QString fqdn;
@@ -573,7 +582,7 @@ void SignalHandler::OnSelectionChanged(QString value)
         mTextTopic.clear();
         ConstructTopic(data,"ce1","text",mTextTopic);
     }
-    else if( DabDemo1 == value )
+    else if( Selecttion_UK_DAB == value )
     {
         // [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
         // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
