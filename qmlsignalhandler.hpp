@@ -51,6 +51,7 @@ public slots:
 private:
     QString FormPIString(QString fqdn, QString serviceIdentifier);
     void UpdateUIFromList( int aIndex );
+    void ShowNoAudioStreamAvaialablePopup( bool val );
     Player* mPlayer;
     QObject* mUIObject;
     XmlReader* mReader;

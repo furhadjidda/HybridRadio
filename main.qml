@@ -66,7 +66,6 @@ Window {
             objectName: "selection"
             x: 531
             y: 27
-            //model: ["", "UK", "DE"]
             model: ListModel {
                   id: cbItems
                   ListElement { text: ""}
@@ -77,10 +76,7 @@ Window {
             signal sendSelectionChanged(string data)
              onCurrentIndexChanged:
              {
-                 console.log("\n\n selected = "+ cbItems.get(currentIndex).text )
                  sendSelectionChanged(cbItems.get(currentIndex).text)
-                 //console.log("\n\n selected = "+ currentText )
-                 //sendSelectionChanged(currentText)
              }
         }
 
@@ -239,14 +235,14 @@ Window {
 
             parent: Overlay.overlay
 
-            x: Math.round((parent.width - width) / 2)
+            x: Math.round((parent.width - 300 - width) / 2)
             y: Math.round((parent.height - height) / 2)
-            width: 300
-            height: 300
+            width: 350
+            height: 150
 
             Rectangle{
-                width: 500
-                height: 200
+                width: 350
+                height: 150
                 anchors.fill: parent
                 color: "light blue"
                 Image {
@@ -265,7 +261,7 @@ Window {
                 }
             }
 
-            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent | Popup.CloseOnReleaseOutside | Popup.CloseOnReleaseOutsideParent
         }
 
         Component {

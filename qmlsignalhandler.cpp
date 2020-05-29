@@ -322,31 +322,15 @@ void SignalHandler::OnPrevious()
 
 void SignalHandler::OnSelect( int aIndex )
 {
+
     if ( mList[aIndex].mPlayableMedia.size() == 0 )
     {
-        QVariant retValue=0;
-        QObject *RectBoxObj= mUIObject->findChild<QObject*>("RectBox");
-        bool succeeded = QMetaObject::invokeMethod(
-            RectBoxObj, "displayPopUp",
-                    Q_RETURN_ARG(QVariant, retValue));
 
-        if(!succeeded)
-        {
-            qDebug() << "Invokation Failed";
-        }
+        ShowNoAudioStreamAvaialablePopup( true );
     }
     else
     {
-        QVariant retValue=0;
-        QObject *RectBoxObj= mUIObject->findChild<QObject*>("RectBox");
-        bool succeeded = QMetaObject::invokeMethod(
-            RectBoxObj, "hidePopUp",
-                    Q_RETURN_ARG(QVariant, retValue));
-
-        if(!succeeded)
-        {
-            qDebug() << "Invokation Failed";
-        }
+        ShowNoAudioStreamAvaialablePopup( false );
     }
 
     //if( mList[aIndex].mBearerInfo.size() > 0 )
@@ -394,7 +378,7 @@ void SignalHandler::OnFileDownloaded()
     mReader->ReadSiXmlData(ServiceInformationFileName,mList);
     qDebug() << "List Size" << mList.size();
     QVariant retValue=0;
-
+    m_CurrentLyPlaying = "";
     int dataIndex = 0;
     bool isIndexValid = false;
     mPlayer->Stop();
@@ -418,9 +402,19 @@ void SignalHandler::OnFileDownloaded()
         }
     }
 
-    // Adding data from the Service informaiton to the list
+    if ( m_CurrentLyPlaying.size() == 0 )
+    {
+
+        ShowNoAudioStreamAvaialablePopup( true );
+    }
+    else
+    {
+        ShowNoAudioStreamAvaialablePopup( false );
+    }
+
+
     bool succeeded = false;
-    QObject *RectBoxObj= mUIObject->findChild<QObject*>("RectBox");
+    QObject *RectBoxObj = mUIObject->findChild<QObject*>("RectBox");
 
     succeeded = QMetaObject::invokeMethod(
         RectBoxObj, "clearListElement",
@@ -450,6 +444,35 @@ void SignalHandler::OnFileDownloaded()
     }
 
     mTimer->start(sTimerValue);
+}
+
+void SignalHandler::ShowNoAudioStreamAvaialablePopup( bool val )
+{
+    QVariant retValue=0;
+    QObject *RectBoxObj= mUIObject->findChild<QObject*>("RectBox");
+    if ( val )
+    {
+
+        bool succeeded = QMetaObject::invokeMethod(
+            RectBoxObj, "displayPopUp",
+                    Q_RETURN_ARG(QVariant, retValue));
+
+        if(!succeeded)
+        {
+            qDebug() << "Invokation Failed";
+        }
+    }
+    else
+    {
+        bool succeeded = QMetaObject::invokeMethod(
+            RectBoxObj, "hidePopUp",
+                    Q_RETURN_ARG(QVariant, retValue));
+
+        if(!succeeded)
+        {
+            qDebug() << "Invokation Failed";
+        }
+    }
 }
 
 void SignalHandler::UpdateUIFromList( int aIndex )
