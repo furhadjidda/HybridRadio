@@ -265,10 +265,8 @@ void XmlReader::ReadSiXmlData
             {
                 bool id_found = false;
                 bool bearer_found = false;
-                BearerInfo data;
-                siList[index].mBearerInfo.push_back( data );
-                int bearerIndex = siList[index].mBearerInfo.size() - 1;
                 QString idCache("");
+                int bearerIndex = -1;
 
                 Q_FOREACH( const QXmlStreamAttribute &attr, reader.attributes() )
                 {
@@ -287,20 +285,17 @@ void XmlReader::ReadSiXmlData
                     }
                     else if ( attr.name().toString() == QLatin1String("cost") )
                     {
-                        QString attribute_value = attr.value().toString();
-                        if( bearerIndex >= 0 )
-                        {
-                            siList[index].mBearerInfo[bearerIndex].mMimeValue = attr.value().toString();
-                        }
-                        if( attribute_value == "73" || attribute_value == "80"  )
+                        QString attribute_value = attr.value().toString();                        
+
+                        if( attribute_value == "73" || attribute_value == "80" || attribute_value == "70" )
                         {
 
                             id_found = true;
-                            //siList[index].mMimeType = attribute_value;
                             if(!idCache.isEmpty())
                             {
                                 siList[index].mPlayableMedia = idCache;
                                 idCache = "";
+                                id_found = false;
                             }
                         }
                         else if( attribute_value == "30" || attribute_value == "40")
@@ -308,8 +303,14 @@ void XmlReader::ReadSiXmlData
                             bearer_found = true;
                             if(!idCache.isEmpty())
                             {
+
+                                BearerInfo data;
+                                siList[index].mBearerInfo.push_back( data );
+                                bearerIndex = siList[index].mBearerInfo.size() - 1;
+
                                 siList[index].mBearerInfo[bearerIndex].mId = idCache;
                                 idCache = "";
+                                bearer_found = false;
                             }
                         }
                         else
@@ -322,15 +323,18 @@ void XmlReader::ReadSiXmlData
                     {
                         QString attribute_value = attr.value().toString();
                         idCache = attribute_value;
-                        //qDebug() << "id " << attribute_value;
                         if( true == id_found )
                         {
                             siList[index].mPlayableMedia = attribute_value;
                         }
-                        if( bearerIndex >= 0 && bearer_found )
+                        if( bearer_found )
                         {
+
+                            BearerInfo data;
+                            siList[index].mBearerInfo.push_back( data );
+                            bearerIndex = siList[index].mBearerInfo.size() - 1;
+
                             siList[index].mBearerInfo[bearerIndex].mId = attr.value().toString();
-                            //qDebug() << "Addding " << siList[index].mBearerInfo[bearerIndex].mId;
                         }
                     }
                     else
@@ -349,5 +353,40 @@ void XmlReader::ReadSiXmlData
             }
         }
     }
+}
+
+void XmlReader::PrintSiData( const SiDataList& aSiList )
+{
+    QString filename="SiData.txt";
+    QFile file( filename );
+    if ( file.open(QIODevice::ReadWrite) )
+    {
+        QTextStream stream( &file );
+        int index = 0;
+        for(SiData data: aSiList)
+        {
+             stream << "[" << index << "]"
+                    << " mServiceName = " << data.mServiceName
+                    << " mPlayableMedia = " << data.mPlayableMedia
+                    << " mFqdn = " << data.mFqdn
+                    << " mServiceIdentifier = " << data.mServiceIdentifier
+                    << " mArtwork = " << data.mArtwork
+                    << endl;
+            int bearerIndex = 0;
+            for( BearerInfo bearerData: data.mBearerInfo )
+            {
+                stream << "\t[" << bearerIndex << "]"
+                       << "\t mId = " << bearerData.mId
+                       << "\t mCost = " << bearerData.mCost
+                       << "\t mBitRate = " << bearerData.mBitRate
+                       << endl;
+                ++bearerIndex;
+            }
+             ++index;
+            stream << endl << endl;
+        }
+    }
+
+    file.close();
 }
 

@@ -75,6 +75,7 @@ public:
         const QString& fileName,
         SiDataList& epgList
         );
+    void PrintSiData( const SiDataList& aSiList );
 };
 
 #endif // XMLREADER_H

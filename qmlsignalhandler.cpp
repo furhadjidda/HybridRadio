@@ -322,17 +322,47 @@ void SignalHandler::OnPrevious()
 
 void SignalHandler::OnSelect( int aIndex )
 {
-    if( mList[aIndex].mBearerInfo.size() > 0 )
+    if ( mList[aIndex].mPlayableMedia.size() == 0 )
+    {
+        QVariant retValue=0;
+        QObject *RectBoxObj= mUIObject->findChild<QObject*>("RectBox");
+        bool succeeded = QMetaObject::invokeMethod(
+            RectBoxObj, "displayPopUp",
+                    Q_RETURN_ARG(QVariant, retValue));
+
+        if(!succeeded)
+        {
+            qDebug() << "Invokation Failed";
+        }
+    }
+    else
+    {
+        QVariant retValue=0;
+        QObject *RectBoxObj= mUIObject->findChild<QObject*>("RectBox");
+        bool succeeded = QMetaObject::invokeMethod(
+            RectBoxObj, "hidePopUp",
+                    Q_RETURN_ARG(QVariant, retValue));
+
+        if(!succeeded)
+        {
+            qDebug() << "Invokation Failed";
+        }
+    }
+
+    //if( mList[aIndex].mBearerInfo.size() > 0 )
     {
         mTimer->stop();
         mPlayer->Stop();
         m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
-        qDebug() << "$$ Selecting " + m_CurrentLyPlaying + "@ index " + aIndex;
+        qDebug() << "$$ Selecting " + m_CurrentLyPlaying + "@ index " << aIndex;
+        qDebug() << "$$ mList[aIndex].mBearerInfo.size() = " << mList[aIndex].mBearerInfo.size();
         mPlayer->playUrl(m_CurrentLyPlaying.toUtf8().constData());
+        // This updates the UI with the findings
+        UpdateUIFromList( aIndex );
 
         BearerSplit data;
 
-        for(int index =0; index < mList[aIndex].mBearerInfo.size(); ++index)
+        for(int index = 0; index < mList[aIndex].mBearerInfo.size(); ++index)
         {
             if( mList[aIndex].mBearerInfo[index].mId.length() > 0 )
             {
@@ -350,8 +380,7 @@ void SignalHandler::OnSelect( int aIndex )
                 mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
                 mTextTopic = textQuery;
                 mImageTopic = imageQuery;
-                // This updates the UI with the findings
-                UpdateUIFromList( aIndex );
+
                 mTimer->start(sTimerValue);
                 break;
             }
@@ -399,16 +428,19 @@ void SignalHandler::OnFileDownloaded()
 
     foreach( SiData val,mList )
     {
-        succeeded = QMetaObject::invokeMethod(
-            RectBoxObj, "addListElement",
-                    Q_RETURN_ARG(QVariant, retValue),
-                    Q_ARG( QVariant, val.mServiceName ),
-                    Q_ARG( QVariant, val.mGenre ),
-                    Q_ARG( QVariant, val.mArtwork ));
-
-        if(!succeeded)
+        //if ( val.mBearerInfo.size() > 0 )
         {
-            qDebug() << "Invokation Failed";
+            succeeded = QMetaObject::invokeMethod(
+                RectBoxObj, "addListElement",
+                        Q_RETURN_ARG(QVariant, retValue),
+                        Q_ARG( QVariant, val.mServiceName ),
+                        Q_ARG( QVariant, val.mGenre ),
+                        Q_ARG( QVariant, val.mArtwork ));
+
+            if(!succeeded)
+            {
+                qDebug() << "Invokation Failed";
+            }
         }
     }
 
@@ -422,6 +454,7 @@ void SignalHandler::OnFileDownloaded()
 
 void SignalHandler::UpdateUIFromList( int aIndex )
 {
+    qDebug() << "Updating UI";
     QObject *artWork = mUIObject->findChild<QObject*>("artWork");
     QObject *StationName = mUIObject->findChild<QObject*>("StationNameObj");
     QObject *description = mUIObject->findChild<QObject*>("DescriptionObject");
