@@ -27,10 +27,7 @@ public:
     Player(QObject *parent = 0);
 
 public slots:
-     void positionChanged(qint64 val)
-     {
-         qDebug()<<"position Changed"<<val;
-     }
+
      void volumeChanged(int val)
      {
          qDebug()<<"volume Changed "<<val;

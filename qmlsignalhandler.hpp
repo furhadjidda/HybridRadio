@@ -43,9 +43,10 @@ public slots:
     void OnFileNameAvailable( QString si, QString xsi );
     void OnFileDownloaded();
     void OnStop();
-    void OnTimeout();
-    void httpFinished();
-    void httpImageFinished();
+    void OnHttpTextTimeout();
+    void OnHttpImageTimeout();
+    void HttpTextResponseReceived();
+    void HttpImageResponseReceived();
     void mediaStatusChanged(QMediaPlayer::State val);
 
 private:
@@ -61,18 +62,21 @@ private:
     SiDataList mList;
     EpgList mEpgList;
     QString m_CurrentLyPlaying;
-    QTimer* mTimer;
+    QTimer* mHttpTextTimer;
+    QTimer* mHttpImageTimer;
     QString mCurrentSelection;
     QString mCurrentBearer;
     //Network manager
-    QNetworkAccessManager qnam;
-    QNetworkReply* reply;
-    QNetworkReply* imageReply;
+    QNetworkAccessManager mNetworkManager;
+    QNetworkReply* mTextReply;
+    QNetworkReply* mImageReply;
     //QProcess *mProcess;
 
     // Topic Handling
     QString mTextTopic;
     QString mImageTopic;
+    QVariantMap mLastHttpTextResponse;
+    QVariantMap mLastHttpImageResponse;
 
     typedef struct{
         QString mBand;

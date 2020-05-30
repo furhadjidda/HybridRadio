@@ -233,8 +233,6 @@ Window {
         Popup {
             id: popup
 
-            parent: Overlay.overlay
-
             x: Math.round((parent.width - 300 - width) / 2)
             y: Math.round((parent.height - height) / 2)
             width: 350
@@ -331,6 +329,7 @@ Window {
             delegate: programmeDelegate
             model: programListModel
         }
+
 
         function displayPopUp()
         {

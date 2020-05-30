@@ -34,7 +34,6 @@ Player::Player(QObject *parent)
     connect(mPlayer, static_cast<void(QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error),
         [=](QMediaPlayer::Error error){ qDebug() << "Error = " << error; });
 
-    connect(mPlayer, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
 
     connect(mPlayer, SIGNAL(volumeChanged(int)), this, SLOT(volumeChanged(int)));
 

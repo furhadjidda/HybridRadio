@@ -8,7 +8,8 @@
 static const QString Selecttion_UK_FM("UK");
 static const QString Selecttion_UK_DAB("UK-DAB");
 static const QString Selecttion_DE_FM("DE");
-
+static const QString RadioVISMessageID("RadioVIS-Message-ID");
+static const QString RadioVISTriggerTime("RadioVIS-Trigger-Time");
 const int sTimerValue = 5000;
 
 static const QString ServiceInformationFileName("RadioDns_ServiceInformation.xml");
@@ -35,13 +36,21 @@ SignalHandler::SignalHandler
     , mDnsLookup( dnsLookup )
 {
     // Creating a Timer
-    mTimer = new QTimer(this);
+    mHttpTextTimer = new QTimer(this);
+    mHttpImageTimer = new QTimer(this);
     QObject::connect
             (
-            mTimer,
+            mHttpTextTimer,
             SIGNAL(timeout()),
             this,
-            SLOT(OnTimeout())
+            SLOT(OnHttpTextTimeout())
+            );
+    QObject::connect
+            (
+            mHttpImageTimer,
+            SIGNAL(timeout()),
+            this,
+            SLOT(OnHttpImageTimeout())
             );
 
     // Player which plays te URL.
@@ -140,6 +149,7 @@ SignalHandler::SignalHandler
 void SignalHandler::mediaStatusChanged(QMediaPlayer::State val)
 {
     QString status("");
+
     switch (val)
     {
         case QMediaPlayer::State::PlayingState :
@@ -178,6 +188,7 @@ void SignalHandler::mediaStatusChanged(QMediaPlayer::State val)
                 status
                 );
     }
+
 }
 
 QString SignalHandler::FormPIString(QString fqdn, QString serviceIdentifier)
@@ -193,52 +204,84 @@ QString SignalHandler::FormPIString(QString fqdn, QString serviceIdentifier)
     return urlFormation;
 }
 
-void SignalHandler::OnTimeout()
+void SignalHandler::OnHttpTextTimeout()
 {
-    QString text = mTextTopic;
-    QString image = mImageTopic;
+    // Construct a url for text topic
+    mHttpTextTimer->stop();
+    QString lastTextId = mLastHttpTextResponse.find( RadioVISMessageID ).value().toString(); // This is mandatory if not initial request;
+    if( 0 != lastTextId.size() )
+    {
+        lastTextId = lastTextId.remove(0,3);
+        lastTextId = "&last_id=" + lastTextId;
+    }
+    QString httpTextReq = "http://" +
+                           mDnsLookup->GetHttpTargetName() + ":" +
+                           QString::number(mDnsLookup->GetHttpPortNumber())
+                           + "/radiodns/vis/vis.json?topic=/topic/"+ mTextTopic + lastTextId;
 
-    // Construct a url
-    QString urlFormation = "http://" +
-            mDnsLookup->GetHttpTargetName() +
-            ":" +
-            QString::number(mDnsLookup->GetHttpPortNumber())
-            + "/radiodns/vis/vis.json?topic=/topic/"
-            + text;
     mDnsLookup->GetHttpTargetName();
-    QUrl url(urlFormation);
-    qDebug() << urlFormation;
-    reply = qnam.get(QNetworkRequest(url));
-    connect(reply, &QNetworkReply::finished, this, &SignalHandler::httpFinished);
+    QUrl httpTextUrlReq( httpTextReq );
+    qDebug() << httpTextReq;
+    mTextReply = mNetworkManager.get( QNetworkRequest( httpTextUrlReq ) );
 
-    // Construct a url
-    QString urlFormation2 = "http://" +
-            mDnsLookup->GetHttpTargetName() +
-            ":" +
-            QString::number(mDnsLookup->GetHttpPortNumber())
-            + "/radiodns/vis/vis.json?topic=/topic/"
-            + image;
-    mDnsLookup->GetHttpTargetName();
-    QUrl url2(urlFormation2);
-    qDebug() << urlFormation2;
-    imageReply = qnam.get(QNetworkRequest(url2));
-    connect(imageReply, &QNetworkReply::finished, this, &SignalHandler::httpImageFinished);
+    QObject::connect
+            (
+            mTextReply,
+            &QNetworkReply::finished,
+            this,
+            &SignalHandler::HttpTextResponseReceived
+            );
 }
 
-void SignalHandler::httpImageFinished()
+void SignalHandler::OnHttpImageTimeout()
 {
-    qDebug() << "http finished";
-    QString json = QString(imageReply->readAll().data());
-    qDebug() <<"HTTP RESPONSE : " <<json;
-    QJsonDocument d = QJsonDocument::fromJson(json.toUtf8());
-    QJsonObject bodyVal = d.object();
-    QString value = bodyVal["body"].toString();
+    // Construct a url for image topic
+    mHttpImageTimer->stop();
+
+    // Construct a url
+    QString lastImageId = mLastHttpImageResponse.find( RadioVISMessageID ).value().toString(); // This is mandatory if not initial request;
+    if( 0 != lastImageId.size() )
+    {
+        lastImageId = lastImageId.remove(0,3);
+        lastImageId = "&last_id=" + lastImageId;
+    }
+    QString httpImageReq = "http://" +
+                            mDnsLookup->GetHttpTargetName() + ":" +
+                            QString::number(mDnsLookup->GetHttpPortNumber())
+                            + "/radiodns/vis/vis.json?topic=/topic/" + mImageTopic + lastImageId;
+
+    mDnsLookup->GetHttpTargetName();
+    QUrl httpImageUrlReq( httpImageReq );
+    qDebug() << httpImageReq;
+    mImageReply = mNetworkManager.get( QNetworkRequest( httpImageUrlReq ) );
+    QObject::connect
+            (
+            mImageReply,
+            &QNetworkReply::finished,
+            this,
+            &SignalHandler::HttpImageResponseReceived
+            );
+}
+
+void SignalHandler::HttpImageResponseReceived()
+{
+    mHttpImageTimer->start( sTimerValue );
+    QString imageJson = QString(mImageReply->readAll().data());
+    qDebug() <<"Http Image Response : " << imageJson << endl;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson( imageJson.toUtf8() );
+    QJsonObject jsonObject = jsonDoc.object();
+    QVariantMap jsonQVariantMap = jsonObject.toVariantMap();
+    QVariantMap  jsonHeaderMap = jsonQVariantMap["headers"].toMap();
+    mLastHttpImageResponse = jsonHeaderMap;
+
+
+    QString value = jsonObject["body"].toString();
     QString artLink = value.remove(0,5);
-    qDebug() << "ART : "<< artLink;
+
     if( 0 != artLink.size() )
     {
         QObject *artWork = mUIObject->findChild<QObject*>("artWork");
-        if( artWork )
+        //if( artWork )
         {
             artWork->setProperty
                     (
@@ -260,16 +303,22 @@ void SignalHandler::httpImageFinished()
 }
 
 
-void SignalHandler::httpFinished()
+void SignalHandler::HttpTextResponseReceived()
 {
-    qDebug() << "http finished";
-    QString json(reply->readAll().data());
-    qDebug() <<"HTTP RESPONSE : " <<json;
-    QJsonDocument d = QJsonDocument::fromJson(json.toUtf8());
-    QJsonObject bodyVal = d.object();
-    QString value = bodyVal["body"].toString();
+    mHttpTextTimer->start( sTimerValue );
+    QString textJson( mTextReply->readAll().data() );
+
+    qDebug() <<"Http Text Response : " << textJson << endl;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(textJson.toUtf8());
+    QJsonObject jsonObject = jsonDoc.object();
+    QVariantMap jsonQVariantMap = jsonObject.toVariantMap();
+    QVariantMap  jsonHeaderMap = jsonQVariantMap["headers"].toMap();
+    mLastHttpTextResponse = jsonHeaderMap;
+
+    // Extracting body
+    QString value = jsonObject["body"].toString();
     QString SongName = value.remove(0,5);
-    qDebug() << "SONG : "<< SongName;
+
     QObject *songName = mUIObject->findChild<QObject*>("SongObject");
     if( songName )
     {
@@ -322,6 +371,8 @@ void SignalHandler::OnPrevious()
 
 void SignalHandler::OnSelect( int aIndex )
 {
+    mLastHttpTextResponse.clear();
+    mLastHttpImageResponse.clear();
 
     if ( mList[aIndex].mPlayableMedia.size() == 0 )
     {
@@ -335,7 +386,8 @@ void SignalHandler::OnSelect( int aIndex )
 
     //if( mList[aIndex].mBearerInfo.size() > 0 )
     {
-        mTimer->stop();
+        mHttpTextTimer->stop();
+        mHttpImageTimer->stop();
         mPlayer->Stop();
         m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
         qDebug() << "$$ Selecting " + m_CurrentLyPlaying + "@ index " << aIndex;
@@ -355,17 +407,14 @@ void SignalHandler::OnSelect( int aIndex )
                 QString gcc;
                 data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station,gcc);
 
-                QString textQuery;
-                ConstructTopic( station, gcc, "text", textQuery );
-
-                QString imageQuery;
-                ConstructTopic( station, gcc, "image", imageQuery );
+                ConstructTopic( station, gcc, "text", mTextTopic );
+                ConstructTopic( station, gcc, "image", mImageTopic );
 
                 mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
-                mTextTopic = textQuery;
-                mImageTopic = imageQuery;
 
-                mTimer->start(sTimerValue);
+
+                mHttpTextTimer->start( sTimerValue );
+                mHttpImageTimer->start( sTimerValue );
                 break;
             }
         }
@@ -374,6 +423,8 @@ void SignalHandler::OnSelect( int aIndex )
 
 void SignalHandler::OnFileDownloaded()
 {
+    mLastHttpTextResponse.clear();
+    mLastHttpImageResponse.clear();
     mList.clear();
     mReader->ReadSiXmlData(ServiceInformationFileName,mList);
     qDebug() << "List Size" << mList.size();
@@ -443,7 +494,8 @@ void SignalHandler::OnFileDownloaded()
         UpdateUIFromList( dataIndex );
     }
 
-    mTimer->start(sTimerValue);
+    mHttpTextTimer->start(sTimerValue);
+    mHttpImageTimer->start(sTimerValue);
 }
 
 void SignalHandler::ShowNoAudioStreamAvaialablePopup( bool val )
