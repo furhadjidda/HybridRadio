@@ -17,7 +17,8 @@ class DownloadManager
 public:
   DownloadManager(QString fileName);
   ~DownloadManager();
-  void DownloadFile(QString urlPath,bool isSI = true);
+  void DownloadFile(QString urlPath);
+  void SetFileName( const QString& aFileName );
 
 signals:
   void sendDownloadComplete();

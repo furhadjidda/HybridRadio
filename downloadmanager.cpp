@@ -9,9 +9,8 @@ DownloadManager::DownloadManager(QString fileName)
     mIndex = 0;
 }
 
-void DownloadManager::DownloadFile(QString urlPath, bool isSI)
+void DownloadManager::DownloadFile(QString urlPath)
 {
-    if(isSI){}
     m_pBuffer = new QByteArray();
     QUrl url = QUrl(urlPath);
     QNetworkRequest req(url);
@@ -24,6 +23,11 @@ DownloadManager::~DownloadManager()
 {
     delete m_pBuffer;
     delete reply;
+}
+
+void DownloadManager::SetFileName( const QString& aFileName )
+{
+    mFileName = aFileName;
 }
 
 //If the reply is finished, save data in buffer to disk

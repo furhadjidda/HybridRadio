@@ -29,124 +29,22 @@ SignalHandler::SignalHandler
     QObject *object, // Object which can be used to set QML properties.
     XmlReader *reader,
     DNSLookup *dnsLookup
-    //DataCollector *collector
     )
     : mUIObject( object )
     , mReader( reader )
     , mDnsLookup( dnsLookup )
 {
-    // Creating a Timer
-    mHttpTextTimer = new QTimer(this);
-    mHttpImageTimer = new QTimer(this);
-    QObject::connect
-            (
-            mHttpTextTimer,
-            SIGNAL(timeout()),
-            this,
-            SLOT(OnHttpTextTimeout())
-            );
-    QObject::connect
-            (
-            mHttpImageTimer,
-            SIGNAL(timeout()),
-            this,
-            SLOT(OnHttpImageTimeout())
-            );
 
-    // Player which plays te URL.
+    // Creating a Timer
+    mHttpTextTimer = new QTimer( this );
+    mHttpImageTimer = new QTimer( this );
     mPlayer = new Player();
-    //mProcess = new QProcess();
     mServiceInformationDownloader = new DownloadManager( ServiceInformationFileName );
     mProgramInformationDownloader = new DownloadManager(ProgramInformationFileName);
-    // Connect Play Button
-    QObject::connect
-            (
-            mPlayer,
-            SIGNAL(signalMediaStatusChanged(QMediaPlayer::State)),
-            this,
-            SLOT(mediaStatusChanged(QMediaPlayer::State))
-            );
-
-    QObject *playButton_Object = object->findChild<QObject*>("Play");
-    QObject::connect
-            (
-            playButton_Object,
-            SIGNAL(sendPlay()),
-            this,
-            SLOT(OnPlay())
-            );
-
-    QObject *stopButton_Object = object->findChild<QObject*>("Stop");
-    QObject::connect
-            (
-            stopButton_Object,
-            SIGNAL(sendStop()),
-            this,
-            SLOT(OnStop())
-            );
-
-    QObject *nextButton_Object = object->findChild<QObject*>("Next");
-    QObject::connect
-            (
-            nextButton_Object,
-            SIGNAL(sendNext()),
-            this,
-            SLOT(OnNext())
-            );
-
-    QObject *previousButton_Object = object->findChild<QObject*>("Previous");
-    QObject::connect
-            (
-            previousButton_Object,
-            SIGNAL(sendPrevious()),
-            this,
-            SLOT(OnPrevious())
-            );
-
-    QObject *onSelect_Object = object->findChild<QObject*>("ServiceListTableObject");
-    QObject::connect
-            (
-            onSelect_Object,
-            SIGNAL(selectIndex(int)),
-            this,
-            SLOT(OnSelect(int))
-            );
-
-    // Connect Selection Combo Box
-    QObject *comboBox_Object = object->findChild<QObject*>("selection");
-    QObject::connect
-            (
-            comboBox_Object,
-            SIGNAL(sendSelectionChanged(QString)),
-            this,
-            SLOT(OnSelectionChanged(QString))
-            );
-    QObject::connect
-            (
-            mDnsLookup,
-            SIGNAL(sendSIAndEPGFileNames(QString,QString)),
-            this,
-            SLOT(OnFileNameAvailable(QString,QString))
-            );
-
-    QObject::connect
-            (
-            mServiceInformationDownloader,
-            SIGNAL(sendDownloadComplete()),
-            this,
-            SLOT(OnFileDownloaded())
-            );
-
-    QObject::connect
-            (
-            mProgramInformationDownloader,
-            SIGNAL(sendDownloadComplete()),
-            this,
-            SLOT(OnFileDownloaded())
-            );
+    ConnectSignals();
 }
 
-void SignalHandler::mediaStatusChanged(QMediaPlayer::State val)
+void SignalHandler::MediaStatusChanged(QMediaPlayer::State val)
 {
     QString status("");
 
@@ -168,30 +66,11 @@ void SignalHandler::mediaStatusChanged(QMediaPlayer::State val)
             break;
 
     }
-
-    QObject *mediaStatus = mUIObject->findChild<QObject*>("MediaStatus");
-    if( mediaStatus )
-    {
-        mediaStatus->setProperty
-                (
-                "text",
-                status
-                );
-
-        QQmlProperty
-                (
-                mediaStatus,
-                "text"
-                )
-                .write
-                (
-                status
-                );
-    }
+    mUiHandler.SetMediaStatusValue( status );
 
 }
 
-QString SignalHandler::FormPIString(QString fqdn, QString serviceIdentifier)
+QString SignalHandler::DownloadProgramInformation(QString fqdn, QString serviceIdentifier)
 {
     //http://epg.musicradio.com/radiodns/spi/3.1/id/www.helpmechill.com/chill/20170202_PI.xml
     QString date = QDate::currentDate().toString("yyyyMMdd");
@@ -200,7 +79,9 @@ QString SignalHandler::FormPIString(QString fqdn, QString serviceIdentifier)
             "/radiodns/spi/3.1/id/" +
             fqdn + "/" + serviceIdentifier + "/" + date +"_PI.xml";
     qDebug() << "url Formation for PI xml = " << urlFormation;
-    mProgramInformationDownloader->DownloadFile(urlFormation,false);
+    QString fileNameFormation = serviceIdentifier + "_" + date + ".xml";
+    mProgramInformationDownloader->SetFileName( fileNameFormation );
+    mProgramInformationDownloader->DownloadFile( urlFormation );
     return urlFormation;
 }
 
@@ -268,6 +149,12 @@ void SignalHandler::HttpImageResponseReceived()
     mHttpImageTimer->start( sTimerValue );
     QString imageJson = QString(mImageReply->readAll().data());
     qDebug() <<"Http Image Response : " << imageJson << endl;
+
+    if( 0 == imageJson.size() )
+    {
+        return;
+    }
+
     QJsonDocument jsonDoc = QJsonDocument::fromJson( imageJson.toUtf8() );
     QJsonObject jsonObject = jsonDoc.object();
     QVariantMap jsonQVariantMap = jsonObject.toVariantMap();
@@ -277,29 +164,7 @@ void SignalHandler::HttpImageResponseReceived()
 
     QString value = jsonObject["body"].toString();
     QString artLink = value.remove(0,5);
-
-    if( 0 != artLink.size() )
-    {
-        QObject *artWork = mUIObject->findChild<QObject*>("artWork");
-        //if( artWork )
-        {
-            artWork->setProperty
-                    (
-                    "source",
-                    artLink
-                    );
-
-            QQmlProperty
-                    (
-                    artWork,
-                    "source"
-                    )
-                    .write
-                    (
-                    artLink
-                    );
-        }
-    }
+    mUiHandler.SetArtworkValue( artLink );
 }
 
 
@@ -309,6 +174,10 @@ void SignalHandler::HttpTextResponseReceived()
     QString textJson( mTextReply->readAll().data() );
 
     qDebug() <<"Http Text Response : " << textJson << endl;
+    if( 0 == textJson.size() )
+    {
+        return;
+    }
     QJsonDocument jsonDoc = QJsonDocument::fromJson(textJson.toUtf8());
     QJsonObject jsonObject = jsonDoc.object();
     QVariantMap jsonQVariantMap = jsonObject.toVariantMap();
@@ -319,25 +188,8 @@ void SignalHandler::HttpTextResponseReceived()
     QString value = jsonObject["body"].toString();
     QString SongName = value.remove(0,5);
 
-    QObject *songName = mUIObject->findChild<QObject*>("SongObject");
-    if( songName )
-    {
-        songName->setProperty
-                (
-                "text",
-                QVariant(SongName)
-                );
+    mUiHandler.SetSongNameValue( SongName );
 
-        QQmlProperty
-                (
-                songName,
-                "text"
-                )
-                .write
-                (
-                SongName
-                );
-    }
 }
 
 void SignalHandler::OnPlay()
@@ -384,6 +236,12 @@ void SignalHandler::OnSelect( int aIndex )
         ShowNoAudioStreamAvaialablePopup( false );
     }
 
+    if( aIndex > mList.size() - 1 )
+    {
+        qWarning() << "List Size = " << mList.size() << "is not in range with Index = " << aIndex;
+        return;
+    }
+
     //if( mList[aIndex].mBearerInfo.size() > 0 )
     {
         mHttpTextTimer->stop();
@@ -395,7 +253,7 @@ void SignalHandler::OnSelect( int aIndex )
         mPlayer->playUrl(m_CurrentLyPlaying.toUtf8().constData());
         // This updates the UI with the findings
         UpdateUIFromList( aIndex );
-
+        DownloadProgramInformation( mList[aIndex].mFqdn, mList[aIndex].mServiceIdentifier );
         BearerSplit data;
 
         for(int index = 0; index < mList[aIndex].mBearerInfo.size(); ++index)
@@ -421,17 +279,16 @@ void SignalHandler::OnSelect( int aIndex )
     }
 }
 
-void SignalHandler::OnFileDownloaded()
+void SignalHandler::OnServiceInformationDownloaded()
 {
     mLastHttpTextResponse.clear();
     mLastHttpImageResponse.clear();
     mList.clear();
     mReader->ReadSiXmlData(ServiceInformationFileName,mList);
     qDebug() << "List Size" << mList.size();
-    QVariant retValue=0;
     m_CurrentLyPlaying = "";
     int dataIndex = 0;
-    bool isIndexValid = false;
+
     mPlayer->Stop();
     for( int index = 0; index < mList.size(); ++index )
     {
@@ -445,8 +302,9 @@ void SignalHandler::OnFileDownloaded()
                     qDebug() << "[HYB_RADIO] Media " << mList[index].mPlayableMedia;
                     mPlayer->playUrl( mList[index].mPlayableMedia.toUtf8().constData() );
                     m_CurrentLyPlaying = mList[index].mPlayableMedia;
-                    isIndexValid = true;
                     dataIndex = index;
+                    UpdateUIFromList( dataIndex );
+                    //DownloadProgramInformation( mList[index].mFqdn, mList[index].mServiceIdentifier );
                     break;
                 }
             }
@@ -464,189 +322,164 @@ void SignalHandler::OnFileDownloaded()
     }
 
 
-    bool succeeded = false;
-    QObject *RectBoxObj = mUIObject->findChild<QObject*>("RectBox");
-
-    succeeded = QMetaObject::invokeMethod(
-        RectBoxObj, "clearListElement",
-                Q_RETURN_ARG(QVariant, retValue));
-
+    mUiHandler.QmlMethodInvokeclearListElement();
     foreach( SiData val,mList )
     {
-        //if ( val.mBearerInfo.size() > 0 )
-        {
-            succeeded = QMetaObject::invokeMethod(
-                RectBoxObj, "addListElement",
-                        Q_RETURN_ARG(QVariant, retValue),
-                        Q_ARG( QVariant, val.mServiceName ),
-                        Q_ARG( QVariant, val.mGenre ),
-                        Q_ARG( QVariant, val.mArtwork ));
-
-            if(!succeeded)
-            {
-                qDebug() << "Invokation Failed";
-            }
-        }
-    }
-
-    if( isIndexValid )
-    {
-        UpdateUIFromList( dataIndex );
+        mUiHandler.QmlMethodInvokeaddListElement( val );
     }
 
     mHttpTextTimer->start(sTimerValue);
     mHttpImageTimer->start(sTimerValue);
 }
 
+void SignalHandler::OnProgramInformationDownloaded()
+{
+    qDebug() << "OnProgramInformationDownloaded\n";
+    // To Implement
+}
+
 void SignalHandler::ShowNoAudioStreamAvaialablePopup( bool val )
 {
-    QVariant retValue=0;
-    QObject *RectBoxObj= mUIObject->findChild<QObject*>("RectBox");
     if ( val )
     {
 
-        bool succeeded = QMetaObject::invokeMethod(
-            RectBoxObj, "displayPopUp",
-                    Q_RETURN_ARG(QVariant, retValue));
-
-        if(!succeeded)
-        {
-            qDebug() << "Invokation Failed";
-        }
+        mUiHandler.QmlMethodInvokeMethoddisplayPopUp();
     }
     else
     {
-        bool succeeded = QMetaObject::invokeMethod(
-            RectBoxObj, "hidePopUp",
-                    Q_RETURN_ARG(QVariant, retValue));
-
-        if(!succeeded)
-        {
-            qDebug() << "Invokation Failed";
-        }
+        mUiHandler.QmlMethodInvokeMethodhidePopUp();
     }
+}
+
+void SignalHandler::ConnectSignals()
+{
+    QObject::connect
+            (
+            mHttpTextTimer,
+            SIGNAL(timeout()),
+            this,
+            SLOT(OnHttpTextTimeout())
+            );
+    QObject::connect
+            (
+            mHttpImageTimer,
+            SIGNAL(timeout()),
+            this,
+            SLOT(OnHttpImageTimeout())
+            );
+
+    QObject::connect
+            (
+            mPlayer,
+            SIGNAL(signalMediaStatusChanged(QMediaPlayer::State)),
+            this,
+            SLOT(MediaStatusChanged(QMediaPlayer::State))
+            );
+
+    // Connect Play Button
+    QObject *playButton_Object = mUIObject->findChild<QObject*>("Play");
+    QObject::connect
+            (
+            playButton_Object,
+            SIGNAL(sendPlay()),
+            this,
+            SLOT(OnPlay())
+            );
+
+    QObject *stopButton_Object = mUIObject->findChild<QObject*>("Stop");
+    QObject::connect
+            (
+            stopButton_Object,
+            SIGNAL(sendStop()),
+            this,
+            SLOT(OnStop())
+            );
+
+    QObject *nextButton_Object = mUIObject->findChild<QObject*>("Next");
+    QObject::connect
+            (
+            nextButton_Object,
+            SIGNAL(sendNext()),
+            this,
+            SLOT(OnNext())
+            );
+
+    QObject *previousButton_Object = mUIObject->findChild<QObject*>("Previous");
+    QObject::connect
+            (
+            previousButton_Object,
+            SIGNAL(sendPrevious()),
+            this,
+            SLOT(OnPrevious())
+            );
+
+    QObject *onSelect_Object = mUIObject->findChild<QObject*>("ServiceListTableObject");
+    QObject::connect
+            (
+            onSelect_Object,
+            SIGNAL(selectIndex(int)),
+            this,
+            SLOT(OnSelect(int))
+            );
+
+    // Connect Selection Combo Box
+    QObject *comboBox_Object = mUIObject->findChild<QObject*>("selection");
+    QObject::connect
+            (
+            comboBox_Object,
+            SIGNAL(sendSelectionChanged(QString)),
+            this,
+            SLOT(OnSelectionChanged(QString))
+            );
+    QObject::connect
+            (
+            mDnsLookup,
+            SIGNAL(sendSIAndEPGFileNames(QString,QString)),
+            this,
+            SLOT(OnFileNameAvailable(QString,QString))
+            );
+
+    // Connect Downloader
+    QObject::connect
+            (
+            mServiceInformationDownloader,
+            SIGNAL(sendDownloadComplete()),
+            this,
+            SLOT(OnServiceInformationDownloaded())
+            );
+
+    QObject::connect
+            (
+            mProgramInformationDownloader,
+            SIGNAL(sendDownloadComplete()),
+            this,
+            SLOT(OnProgramInformationDownloaded())
+            );
+
 }
 
 void SignalHandler::UpdateUIFromList( int aIndex )
 {
     qDebug() << "Updating UI";
-    QObject *artWork = mUIObject->findChild<QObject*>("artWork");
-    QObject *StationName = mUIObject->findChild<QObject*>("StationNameObj");
-    QObject *description = mUIObject->findChild<QObject*>("DescriptionObject");
-    QObject *bitRate = mUIObject->findChild<QObject*>("BitRateObject");
-    QObject *moreInfo = mUIObject->findChild<QObject*>("additionalInfo");
+    mUiHandler.SetArtworkValue( mList[aIndex].mArtwork );
+    mUiHandler.SetStationNameValue( mList[aIndex].mServiceName );
+    mUiHandler.SetStationDescriptionValue( mList[aIndex].mDescription );
+    mUiHandler.SetBitrateValue( mList[aIndex].mBitRate );
 
-    if( artWork )
-    {
-        artWork->setProperty
-                (
-                "source",
-                mList[aIndex].mArtwork
-                );
-
-        QQmlProperty
-                (
-                artWork,
-                "source"
-                )
-                .write
-                (
-                mList[aIndex].mArtwork
-                );
+    QString data("Bearer Info: ");
+    for (auto val : mList[aIndex].mBearerInfo) {
+        data.append(val.mId);
+        data.append(" ; ");
     }
-
-    if( StationName )
-    {
-        StationName->setProperty
-                (
-                "text",
-                QVariant(mList[aIndex].mServiceName)
-                );
-
-        QQmlProperty
-                (
-                StationName,
-                "text"
-                )
-                .write
-                (
-                mList[aIndex].mServiceName
-                );
-    }
-
-    if( description )
-    {
-        description->setProperty
-                (
-                "text",
-                QVariant(mList[aIndex].mDescription)
-                );
-
-        QQmlProperty
-                (
-                description,
-                "text"
-                )
-                .write
-                (
-                mList[aIndex].mDescription
-                );
-    }
-
-
-    if( bitRate )
-    {
-        QString bitRateValue("BitRate:");
-        bitRateValue.append(mList[aIndex].mBitRate);
-        bitRate->setProperty
-                (
-                "text",
-                QVariant(bitRateValue)
-                );
-
-        QQmlProperty
-                (
-                bitRate,
-                "text"
-                )
-                .write
-                (
-                bitRateValue
-                );
-    }
-
-    if( moreInfo )
-    {
-        QString data("Bearer Info: ");
-        for (auto val : mList[aIndex].mBearerInfo) {
-            data.append(val.mId);
-            data.append(" ; ");
-        }
-
-        moreInfo->setProperty
-                (
-                "text",
-                QVariant(data)
-                );
-
-        QQmlProperty
-                (
-                moreInfo,
-                "text"
-                )
-                .write
-                (
-                data
-                );
-    }
+    mUiHandler.SetMoreInfoValue( data );
 }
 
 
 void SignalHandler::OnFileNameAvailable( QString si, QString xsi )
 {
-    qDebug() << "Received";
-    qDebug() << "FileName=" << si;
-    qDebug() << "FileName=" << xsi;
+    qDebug() << "FileName Received";
+    qDebug() << "SI FileName=" << si;
+    qDebug() << "XSI FileName=" << xsi;
 
     mServiceInformationDownloader->DownloadFile( si );
 }

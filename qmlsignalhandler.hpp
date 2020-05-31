@@ -16,6 +16,7 @@
 #include "XmlReader.h"
 #include "downloadmanager.h"
 #include "lookuphelper.hpp"
+#include "UiHandler.hpp"
 
 class SignalHandler : public QObject
 {
@@ -41,42 +42,48 @@ public slots:
     void OnSelect( int aIndex );
     void OnSelectionChanged( QString value );
     void OnFileNameAvailable( QString si, QString xsi );
-    void OnFileDownloaded();
+    void OnServiceInformationDownloaded();
+    void OnProgramInformationDownloaded();
     void OnStop();
     void OnHttpTextTimeout();
     void OnHttpImageTimeout();
     void HttpTextResponseReceived();
     void HttpImageResponseReceived();
-    void mediaStatusChanged(QMediaPlayer::State val);
+    void MediaStatusChanged(QMediaPlayer::State val);
 
 private:
-    QString FormPIString(QString fqdn, QString serviceIdentifier);
+    QString DownloadProgramInformation(QString fqdn, QString serviceIdentifier);
     void UpdateUIFromList( int aIndex );
     void ShowNoAudioStreamAvaialablePopup( bool val );
+    void ConnectSignals();
+
     Player* mPlayer;
     QObject* mUIObject;
     XmlReader* mReader;
     DNSLookup* mDnsLookup;
     DownloadManager* mServiceInformationDownloader;
     DownloadManager* mProgramInformationDownloader;
-    SiDataList mList;
-    EpgList mEpgList;
-    QString m_CurrentLyPlaying;
     QTimer* mHttpTextTimer;
     QTimer* mHttpImageTimer;
-    QString mCurrentSelection;
-    QString mCurrentBearer;
     //Network manager
     QNetworkAccessManager mNetworkManager;
     QNetworkReply* mTextReply;
     QNetworkReply* mImageReply;
-    //QProcess *mProcess;
 
+
+    SiDataList mList;
+    EpgList mEpgList;
+    QString m_CurrentLyPlaying;
+    QString mCurrentSelection;
+    QString mCurrentBearer;
     // Topic Handling
     QString mTextTopic;
     QString mImageTopic;
     QVariantMap mLastHttpTextResponse;
     QVariantMap mLastHttpImageResponse;
+
+    // UI Handler
+    UiHandler mUiHandler{ mUIObject };
 
     typedef struct{
         QString mBand;

@@ -4,6 +4,7 @@ QT += qml quick multimedia network core
 CONFIG += c++11
 
 SOURCES += main.cpp \
+    UiHandler.cpp \
     XmlReader.cpp \
     lookuphelper.cpp \
     player.cpp \
@@ -20,6 +21,8 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
+    HybridRadioCommonTypes.hpp \
+    UiHandler.hpp \
     XmlReader.h \
     downloadmanager.h \
     lookuphelper.hpp \
