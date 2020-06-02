@@ -24,6 +24,9 @@ public:
     void QmlMethodInvokeMethoddisplayPopUp();
     void QmlMethodInvokeMethodhidePopUp();
 
+    void QmlMethodInvokeclearProgramElement();
+    void QmlMethodInvokeaddProgramElement( const EpgStruct& aValue );
+
 
 private:
     QObject* mUiObject;

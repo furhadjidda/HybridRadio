@@ -21,7 +21,7 @@ public:
   void SetFileName( const QString& aFileName );
 
 signals:
-  void sendDownloadComplete();
+  void sendDownloadComplete( const QString& aFilePath );
 
 private slots:
 

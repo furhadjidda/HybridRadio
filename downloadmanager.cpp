@@ -44,14 +44,14 @@ void DownloadManager::slotFinished()
         fileName = mFileName;
     }
 
-    QFile file(fileName);
+    QFile file( fileName );
 
     if(file.open(QIODevice::WriteOnly))
     {
         file.write(*m_pBuffer);
         file.close();
         qDebug() << "Downloaded the File !!";
-        emit sendDownloadComplete();
+        emit sendDownloadComplete( fileName );
     }
     else
     {

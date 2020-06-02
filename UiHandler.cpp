@@ -42,6 +42,10 @@ void UiHandler::SetStationNameValue( const QVariant& aValue )
 
 void UiHandler::SetArtworkValue( const QVariant& aValue )
 {
+    if( 0 == aValue.toString().size() )
+    {
+        return;
+    }
     QObject *artWork = mUiObject->findChild<QObject*>("artWork");
 
     if( artWork )
@@ -247,6 +251,43 @@ void UiHandler::QmlMethodInvokeMethodhidePopUp()
                         (
                         RectBoxObj, "hidePopUp",
                         Q_RETURN_ARG(QVariant, retValue)
+                        );
+
+    if(!succeeded)
+    {
+        qWarning() << "Invokation Failed";
+    }
+}
+
+void UiHandler::QmlMethodInvokeclearProgramElement()
+{
+    QVariant retValue = 0;
+    QObject *RectBoxObj = mUiObject->findChild<QObject*>("RectBox");
+    bool succeeded = QMetaObject::invokeMethod
+                        (
+                        RectBoxObj,
+                        "clearProgramElementsElement",
+                        Q_RETURN_ARG(QVariant, retValue)
+                        );
+
+    if(!succeeded)
+    {
+        qWarning() << "Invokation Failed";
+    }
+}
+
+
+void UiHandler::QmlMethodInvokeaddProgramElement( const EpgStruct& aValue )
+{
+    QVariant retValue = 0;
+    QObject *RectBoxObj = mUiObject->findChild<QObject*>("RectBox");
+    bool succeeded = QMetaObject::invokeMethod
+                        (
+                        RectBoxObj, "addProgramElement",
+                        Q_RETURN_ARG(QVariant, retValue),
+                        Q_ARG( QVariant, aValue.mLongName ),
+                        Q_ARG( QVariant, aValue.mArt ),
+                        Q_ARG( QVariant, aValue.mTimeAndDate )
                         );
 
     if(!succeeded)

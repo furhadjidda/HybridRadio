@@ -113,6 +113,10 @@ void XmlReader::ReadPiXmlData
                         {
                             QString attribute_value = attr.value().toString();
                             epgList[index].mTimeAndDate = attribute_value;
+                            QString time;
+                            QString date;
+                            TimeDateParser( epgList[index].mTimeAndDate, time, date );
+                            epgList[index].mTimeAndDate = time;
                         }
                         else if ( attr.name().toString() == QLatin1String("actualDuration") )
                         {

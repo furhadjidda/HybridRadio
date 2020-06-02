@@ -42,20 +42,23 @@ public slots:
     void OnSelect( int aIndex );
     void OnSelectionChanged( QString value );
     void OnFileNameAvailable( QString si, QString xsi );
-    void OnServiceInformationDownloaded();
-    void OnProgramInformationDownloaded();
+    void OnServiceInformationDownloaded( const QString& aFilePath );
+    void OnProgramInformationDownloaded( const QString& aFilePath );
     void OnStop();
     void OnHttpTextTimeout();
     void OnHttpImageTimeout();
     void HttpTextResponseReceived();
     void HttpImageResponseReceived();
     void MediaStatusChanged(QMediaPlayer::State val);
+    void RequestHttpText();
+    void RequestHttpImage();
 
 private:
     QString DownloadProgramInformation(QString fqdn, QString serviceIdentifier);
     void UpdateUIFromList( int aIndex );
     void ShowNoAudioStreamAvaialablePopup( bool val );
     void ConnectSignals();
+    void ClearMetaData();
 
     Player* mPlayer;
     QObject* mUIObject;

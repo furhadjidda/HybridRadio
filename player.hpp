@@ -32,10 +32,7 @@ public slots:
      {
          qDebug()<<"volume Changed "<<val;
      }
-     void audioAvailableChanged(bool val)
-     {
-         qDebug()<<"audio avail Changed "<<val;
-     }
+
      void mutedChanged(bool val)
      {
          qDebug()<<"mute Changed "<<val;
@@ -44,15 +41,22 @@ public slots:
      {
          qDebug()<<"media status Changed "<<val;
      }
-     void mediaStateChanged(QMediaPlayer::State val)
-     {
-         qDebug()<<"media status Changed "<<val;
-         emit signalMediaStatusChanged(val);
-     }
+
      void durationChanged(qint64 duration)
      {
          qDebug()<<"Duration "<<duration;
 
+     }
+
+     void audioAvailableChanged(bool val)
+     {
+         qDebug()<<"audio avail Changed "<<val;
+     }
+
+     void mediaStateChanged(QMediaPlayer::State val)
+     {
+         //qDebug()<<"media status Changed "<<val;
+         emit signalMediaStatusChanged(val);
      }
 
 signals:

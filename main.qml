@@ -84,7 +84,7 @@ Window {
             id: image2
             x: 36
             y: 477
-            width: 404
+            width: 376
             height: 73
             clip: false
             opacity: 1
@@ -93,7 +93,7 @@ Window {
             MouseArea {
                 id: stopMouseArea
                 objectName: "Stop"
-                x: 254
+                x: 229
                 y: 0
                 width: 63
                 height: 73
@@ -118,8 +118,8 @@ Window {
             MouseArea {
                 id: mouseAreaNext
                 objectName: "Next"
-                x: 323
-                y: 2
+                x: 295
+                y: 5
                 width: 73
                 height: 63
                 signal sendNext()
@@ -131,7 +131,7 @@ Window {
             MouseArea {
                 id: mouseAreaPrev
                 objectName: "Previous"
-                x: 173
+                x: 154
                 y: 2
                 width: 69
                 height: 71
@@ -318,10 +318,10 @@ Window {
             id: listView
             objectName: "ServiceListTableObject"
             signal selectIndex( int index)
-            x: 720
-            y: 84
+            x: 721
+            y: 38
             width: 282
-            height: 432
+            height: 371
             keyNavigationWraps: true
             pixelAligned: false
             highlight: Rectangle { color: "lightsteelblue"}
@@ -330,6 +330,77 @@ Window {
             model: programListModel
         }
 
+        // This is for EPG
+        Component {
+            id: programmeInformationDelegate
+            Item {
+                width: 200; height: 116
+                Column {
+                    Rectangle {
+                        width: 200; height: 116
+                        color: index % 2 == 0 ? "Dark Gray" : "Light Gray"
+                        Text {
+                            id: programText
+                            text: name
+                            font.family: "Tahoma"
+                            x: 5
+                            y: 4
+                            color: "Black"
+                            font.pixelSize: 13
+                            width: 200
+                            wrapMode: Text.WordWrap
+                            textFormat: Text.RichText
+                        }
+                        Image {
+                            id: image2
+                            x: 5
+                            y: 21
+                            width: 85
+                            height: 85
+                            opacity: 1
+                            source: image
+                        }
+                        Text {
+                            id: duration
+                            text: time
+                            font.family: "Tahoma"
+                            x: 80
+                            y: 60
+                            color: "Black"
+                            font.pixelSize: 13
+                            width: 100
+                            wrapMode: Text.WordWrap
+                            textFormat: Text.RichText
+                        }
+                    }
+                }
+            }
+        }
+
+        ListModel {
+            id: programInfoModel
+            objectName: "programInfoModel"
+            ListElement {
+                name: "Station"
+                time: "Station"
+                image: ""
+            }
+
+        }
+
+
+        ListView {
+            id: programView
+            x: 456
+            y: 469
+            width: 547
+            height: 116
+            orientation: ListView.Horizontal
+            flickableDirection: Flickable.HorizontalFlick
+            pixelAligned: false
+            model: programInfoModel
+            delegate: programmeInformationDelegate
+        }
 
         function displayPopUp()
         {
@@ -349,6 +420,18 @@ Window {
         function addListElement(serviceName,genre,imagePath)
         {
             programListModel.append({"name":serviceName,"genre":genre,"image":imagePath})
+            return 0;
+        }
+
+        function clearProgramElementsElement()
+        {
+            programInfoModel.clear()
+            return 0;
+        }
+
+        function addProgramElement(programName,image,timeAndDate)
+        {
+            programInfoModel.append({"name":programName,"image":image,"time":timeAndDate})
             return 0;
         }
     }

@@ -10,7 +10,7 @@ static const QString Selecttion_UK_DAB("UK-DAB");
 static const QString Selecttion_DE_FM("DE");
 static const QString RadioVISMessageID("RadioVIS-Message-ID");
 static const QString RadioVISTriggerTime("RadioVIS-Trigger-Time");
-const int sTimerValue = 5000;
+const int sTimerValue = 10000;
 
 static const QString ServiceInformationFileName("RadioDns_ServiceInformation.xml");
 static const QString ProgramInformationFileName("RadioDns_ProgramInformation.xml");
@@ -87,13 +87,31 @@ QString SignalHandler::DownloadProgramInformation(QString fqdn, QString serviceI
 
 void SignalHandler::OnHttpTextTimeout()
 {
+    RequestHttpText();
+}
+
+void SignalHandler::RequestHttpText()
+{
     // Construct a url for text topic
-    mHttpTextTimer->stop();
-    QString lastTextId = mLastHttpTextResponse.find( RadioVISMessageID ).value().toString(); // This is mandatory if not initial request;
-    if( 0 != lastTextId.size() )
+    QVariantMap::const_iterator iter = mLastHttpTextResponse.find( RadioVISMessageID );
+
+    QString lastTextId("");
+    if( iter.value().canConvert(QMetaType::QString) )
+    {
+        lastTextId = iter.value().toString(); // This is mandatory if not initial request;
+    }
+    else
+    {
+        qWarning() << ">> Http Text Timeout";
+    }
+    if( 0 != lastTextId.size() && "ID:" == lastTextId.mid(0,3))
     {
         lastTextId = lastTextId.remove(0,3);
         lastTextId = "&last_id=" + lastTextId;
+    }
+    else
+    {
+        lastTextId = "";
     }
     QString httpTextReq = "http://" +
                            mDnsLookup->GetHttpTargetName() + ":" +
@@ -114,17 +132,38 @@ void SignalHandler::OnHttpTextTimeout()
             );
 }
 
+
+
+
 void SignalHandler::OnHttpImageTimeout()
 {
-    // Construct a url for image topic
-    mHttpImageTimer->stop();
+    RequestHttpImage();
+}
 
-    // Construct a url
-    QString lastImageId = mLastHttpImageResponse.find( RadioVISMessageID ).value().toString(); // This is mandatory if not initial request;
-    if( 0 != lastImageId.size() )
+void SignalHandler::RequestHttpImage()
+{
+    // Construct a url for image topic
+    QVariantMap::const_iterator iter = mLastHttpImageResponse.find( RadioVISMessageID );
+
+    QString lastImageId("");
+    if( iter.value().canConvert(QMetaType::QString) )
     {
+        lastImageId = iter.value().toString(); // This is mandatory if not initial request;
+    }
+    else
+    {
+        qWarning() << ">> Http Image Timeout";
+    }
+
+    if( 0 != lastImageId.size() && "ID:" == lastImageId.mid(0,3) )
+    {
+        qDebug() << "lastImageId = " << lastImageId;
         lastImageId = lastImageId.remove(0,3);
         lastImageId = "&last_id=" + lastImageId;
+    }
+    else
+    {
+        lastImageId = "";
     }
     QString httpImageReq = "http://" +
                             mDnsLookup->GetHttpTargetName() + ":" +
@@ -149,17 +188,26 @@ void SignalHandler::HttpImageResponseReceived()
     mHttpImageTimer->start( sTimerValue );
     QString imageJson = QString(mImageReply->readAll().data());
     qDebug() <<"Http Image Response : " << imageJson << endl;
+    mLastHttpImageResponse.clear();
 
     if( 0 == imageJson.size() )
     {
         return;
     }
 
-    QJsonDocument jsonDoc = QJsonDocument::fromJson( imageJson.toUtf8() );
+    QJsonParseError jsonError;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson( imageJson.toUtf8(), &jsonError );
+    if (jsonError.error != QJsonParseError::NoError)
+    {
+        qWarning() << "Error in Reading Json" << jsonError.errorString();
+    }
     QJsonObject jsonObject = jsonDoc.object();
     QVariantMap jsonQVariantMap = jsonObject.toVariantMap();
     QVariantMap  jsonHeaderMap = jsonQVariantMap["headers"].toMap();
-    mLastHttpImageResponse = jsonHeaderMap;
+    if( !jsonHeaderMap.empty() )
+    {
+        mLastHttpImageResponse = jsonHeaderMap;
+    }
 
 
     QString value = jsonObject["body"].toString();
@@ -172,17 +220,25 @@ void SignalHandler::HttpTextResponseReceived()
 {
     mHttpTextTimer->start( sTimerValue );
     QString textJson( mTextReply->readAll().data() );
-
+    mLastHttpTextResponse.clear();
     qDebug() <<"Http Text Response : " << textJson << endl;
     if( 0 == textJson.size() )
     {
         return;
     }
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(textJson.toUtf8());
+    QJsonParseError jsonError;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson( textJson.toUtf8(), &jsonError );
+    if (jsonError.error != QJsonParseError::NoError)
+    {
+        qWarning() << "Error in Reading Json" << jsonError.errorString();
+    }
     QJsonObject jsonObject = jsonDoc.object();
     QVariantMap jsonQVariantMap = jsonObject.toVariantMap();
     QVariantMap  jsonHeaderMap = jsonQVariantMap["headers"].toMap();
-    mLastHttpTextResponse = jsonHeaderMap;
+    if( !jsonHeaderMap.empty() )
+    {
+        mLastHttpTextResponse = jsonHeaderMap;
+    }
 
     // Extracting body
     QString value = jsonObject["body"].toString();
@@ -225,16 +281,9 @@ void SignalHandler::OnSelect( int aIndex )
 {
     mLastHttpTextResponse.clear();
     mLastHttpImageResponse.clear();
+    ClearMetaData();
 
-    if ( mList[aIndex].mPlayableMedia.size() == 0 )
-    {
-
-        ShowNoAudioStreamAvaialablePopup( true );
-    }
-    else
-    {
-        ShowNoAudioStreamAvaialablePopup( false );
-    }
+    ShowNoAudioStreamAvaialablePopup( (mList[aIndex].mPlayableMedia.size() == 0) );
 
     if( aIndex > mList.size() - 1 )
     {
@@ -270,7 +319,8 @@ void SignalHandler::OnSelect( int aIndex )
 
                 mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
 
-
+                RequestHttpImage();
+                RequestHttpText();
                 mHttpTextTimer->start( sTimerValue );
                 mHttpImageTimer->start( sTimerValue );
                 break;
@@ -279,13 +329,14 @@ void SignalHandler::OnSelect( int aIndex )
     }
 }
 
-void SignalHandler::OnServiceInformationDownloaded()
+void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
 {
     mLastHttpTextResponse.clear();
     mLastHttpImageResponse.clear();
     mList.clear();
     mReader->ReadSiXmlData(ServiceInformationFileName,mList);
-    qDebug() << "List Size" << mList.size();
+    qDebug() << "List Size = " << mList.size();
+    qDebug() << "aFilePath = " << aFilePath;
     m_CurrentLyPlaying = "";
     int dataIndex = 0;
 
@@ -304,22 +355,14 @@ void SignalHandler::OnServiceInformationDownloaded()
                     m_CurrentLyPlaying = mList[index].mPlayableMedia;
                     dataIndex = index;
                     UpdateUIFromList( dataIndex );
-                    //DownloadProgramInformation( mList[index].mFqdn, mList[index].mServiceIdentifier );
+                    DownloadProgramInformation( mList[index].mFqdn, mList[index].mServiceIdentifier );
                     break;
                 }
             }
         }
     }
 
-    if ( m_CurrentLyPlaying.size() == 0 )
-    {
-
-        ShowNoAudioStreamAvaialablePopup( true );
-    }
-    else
-    {
-        ShowNoAudioStreamAvaialablePopup( false );
-    }
+    ShowNoAudioStreamAvaialablePopup( ( m_CurrentLyPlaying.size() == 0 ) );
 
 
     mUiHandler.QmlMethodInvokeclearListElement();
@@ -332,10 +375,23 @@ void SignalHandler::OnServiceInformationDownloaded()
     mHttpImageTimer->start(sTimerValue);
 }
 
-void SignalHandler::OnProgramInformationDownloaded()
+void SignalHandler::OnProgramInformationDownloaded( const QString& aFilePath )
 {
     qDebug() << "OnProgramInformationDownloaded\n";
-    // To Implement
+    if( 0 == aFilePath.size() )
+    {
+        qWarning() << "Program information file size is empty";
+    }
+    mUiHandler.QmlMethodInvokeclearProgramElement();
+    EpgList data;
+    mReader->ReadPiXmlData( aFilePath, data );
+    qDebug() << "List Size = " << data.size();
+    qDebug() << "aFilePath = " << aFilePath;
+
+    for( EpgStruct val : data )
+    {
+        mUiHandler.QmlMethodInvokeaddProgramElement( val );
+    }
 }
 
 void SignalHandler::ShowNoAudioStreamAvaialablePopup( bool val )
@@ -443,17 +499,17 @@ void SignalHandler::ConnectSignals()
     QObject::connect
             (
             mServiceInformationDownloader,
-            SIGNAL(sendDownloadComplete()),
+            SIGNAL(sendDownloadComplete( const QString& )),
             this,
-            SLOT(OnServiceInformationDownloaded())
+            SLOT(OnServiceInformationDownloaded( const QString& ))
             );
 
     QObject::connect
             (
             mProgramInformationDownloader,
-            SIGNAL(sendDownloadComplete()),
+            SIGNAL(sendDownloadComplete( const QString& )),
             this,
-            SLOT(OnProgramInformationDownloaded())
+            SLOT(OnProgramInformationDownloaded( const QString& ))
             );
 
 }
@@ -471,6 +527,16 @@ void SignalHandler::UpdateUIFromList( int aIndex )
         data.append(val.mId);
         data.append(" ; ");
     }
+    mUiHandler.SetMoreInfoValue( data );
+}
+
+void SignalHandler::ClearMetaData()
+{
+    mUiHandler.SetStationNameValue( "" );
+    mUiHandler.SetStationDescriptionValue( "" );
+    mUiHandler.SetBitrateValue( "" );
+
+    QString data("Bearer Info: ");
     mUiHandler.SetMoreInfoValue( data );
 }
 

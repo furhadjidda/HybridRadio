@@ -35,15 +35,15 @@ Player::Player(QObject *parent)
         [=](QMediaPlayer::Error error){ qDebug() << "Error = " << error; });
 
 
-    connect(mPlayer, SIGNAL(volumeChanged(int)), this, SLOT(volumeChanged(int)));
+    //connect(mPlayer, SIGNAL(volumeChanged(int)), this, SLOT(volumeChanged(int)));
 
     connect(mPlayer, SIGNAL(audioAvailableChanged(bool)), this, SLOT(audioAvailableChanged(bool)));
 
-    connect(mPlayer, SIGNAL(mutedChanged(bool)), this, SLOT(mutedChanged(bool)));
+    //connect(mPlayer, SIGNAL(mutedChanged(bool)), this, SLOT(mutedChanged(bool)));
 
-    connect(mPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
+    //connect(mPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
 
-    connect(mPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
+    //connect(mPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
     //mediaStateChanged(QMediaPlayer::State val)
     connect(mPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(mediaStateChanged(QMediaPlayer::State)));
 
