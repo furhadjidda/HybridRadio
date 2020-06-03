@@ -68,10 +68,14 @@ Window {
             y: 27
             model: ListModel {
                   id: cbItems
-                  ListElement { text: ""}
-                  ListElement { text: "UK"}
-                  ListElement { text: "UK-DAB"}
-                  ListElement { text: "DE" }
+                  ListElement { text: ""}                  
+                  ListElement { text: "88.1-c202-uk-bbc2" } // new
+                  ListElement { text: "93.1-c203-bbc3" } // new
+                  ListElement { text: "93.2-c204-bbc4" } // new
+                  ListElement { text: "95.8-c479-fm-uk"}
+                  ListElement { text: "97.7-c201-radio1" } // new
+                  ListElement { text: "104.2-d389-de" } // new
+                  ListElement { text: "c7d8-c1ce-0-dab-uk"}
               }
             signal sendSelectionChanged(string data)
              onCurrentIndexChanged:
@@ -395,6 +399,12 @@ Window {
             y: 469
             width: 547
             height: 116
+            layer.enabled: false
+            highlightRangeMode: ListView.ApplyRange
+            snapMode: ListView.SnapToItem
+            cacheBuffer: 20
+            keyNavigationWraps: true
+            boundsBehavior: Flickable.StopAtBounds
             orientation: ListView.Horizontal
             flickableDirection: Flickable.HorizontalFlick
             pixelAligned: false

@@ -5,9 +5,15 @@
 #include <QProcess>
 #include "lookuphelper.hpp"
 
-static const QString Selecttion_UK_FM("UK");
-static const QString Selecttion_UK_DAB("UK-DAB");
-static const QString Selecttion_DE_FM("DE");
+static const QString Selecttion_UK_FM("95.8-c479-fm-uk");
+static const QString Selecttion_UK_DAB("c7d8-c1ce-0-dab-uk");
+static const QString Selecttion_DE_FM("104.2-d389-de");
+// New
+static const QString SelectRadio1("97.7-c201-radio1");
+static const QString SelectBBC2("88.1-c202-uk-bbc2");
+static const QString SelectBBC3("93.1-c203-bbc3");
+static const QString SelectBBC4("93.2-c204-bbc4");
+
 static const QString RadioVISMessageID("RadioVIS-Message-ID");
 static const QString RadioVISTriggerTime("RadioVIS-Trigger-Time");
 const int sTimerValue = 10000;
@@ -96,8 +102,11 @@ void SignalHandler::RequestHttpText()
     QVariantMap::const_iterator iter = mLastHttpTextResponse.find( RadioVISMessageID );
 
     QString lastTextId("");
-    if( iter.value().canConvert(QMetaType::QString) )
+    if( iter.value().canConvert( QMetaType::QString ) && ( QVariant::String == iter.value().type() ) )
     {
+        // potential place of crash ??
+        qDebug() << "key = " << iter.key();
+        qDebug() << "value = " << iter.value();
         lastTextId = iter.value().toString(); // This is mandatory if not initial request;
     }
     else
@@ -146,7 +155,7 @@ void SignalHandler::RequestHttpImage()
     QVariantMap::const_iterator iter = mLastHttpImageResponse.find( RadioVISMessageID );
 
     QString lastImageId("");
-    if( iter.value().canConvert(QMetaType::QString) )
+    if( iter.value().canConvert(QMetaType::QString) && ( QVariant::String == iter.value().type() ) )
     {
         lastImageId = iter.value().toString(); // This is mandatory if not initial request;
     }
@@ -605,6 +614,74 @@ void SignalHandler::OnSelectionChanged(QString value)
 
         mImageTopic.clear();
         ConstructTopic(data,"de0","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"de0","text",mTextTopic);
+    }
+    else if( SelectRadio1 == value )
+    {
+        StationInformation data;
+        QString fqdn;
+        data.PopulateFmFields(9770,0xc201);
+        ConstructFqdn(data,"ce1",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"ce1",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"ce1","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"ce1","text",mTextTopic);
+    }
+    else if( SelectBBC2 == value )
+    {
+        StationInformation data;
+        QString fqdn;
+        data.PopulateFmFields(8810,0xc202);
+        ConstructFqdn(data,"ce1",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"ce1",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"ce1","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"ce1","text",mTextTopic);
+    }
+    else if( SelectBBC3 == value )
+    {
+        StationInformation data;
+        QString fqdn;
+        data.PopulateFmFields(9310,0xc203);
+        ConstructFqdn(data,"ce1",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"ce1",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"ce1","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"ce1","text",mTextTopic);
+    }
+    else if( SelectBBC4 == value )
+    {
+        StationInformation data;
+        QString fqdn;
+        data.PopulateFmFields(9320,0xc204);
+        ConstructFqdn(data,"ce1",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"ce1",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"ce1","image",mImageTopic);
 
         mTextTopic.clear();
         ConstructTopic(data,"ce1","text",mTextTopic);

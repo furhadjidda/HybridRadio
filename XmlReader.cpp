@@ -190,6 +190,7 @@ void XmlReader::ReadSiXmlData
                     if( reader.name() == "multimedia" )
                     {
                         bool art_found  = false;
+                        QString artCache("");
                         Q_FOREACH( const QXmlStreamAttribute &attr, reader.attributes() )
                         {
                             if ( attr.name().toString() == QLatin1String("height") )
@@ -202,6 +203,12 @@ void XmlReader::ReadSiXmlData
                                 if( attribute_value == "800" || attribute_value == "600" || attribute_value == "128")
                                 {
                                     art_found = true;
+                                    if( !artCache.isEmpty() )
+                                    {
+                                        siList[index].mArtwork = artCache;
+                                        art_found = false;
+                                        artCache = "";
+                                    }
                                 }
                                 else
                                 {
@@ -214,6 +221,12 @@ void XmlReader::ReadSiXmlData
                                 if( attribute_value == "logo_unrestricted" )
                                 {
                                     art_found = true;
+                                    if( !artCache.isEmpty() )
+                                    {
+                                        siList[index].mArtwork = artCache;
+                                        art_found = false;
+                                        artCache = "";
+                                    }
                                 }
                                 else
                                 {
@@ -221,10 +234,11 @@ void XmlReader::ReadSiXmlData
                                 }
                             }
                             else if ( attr.name().toString() == QLatin1String("url") )
-                            {
+                            {                                
+                                QString attribute_value = attr.value().toString();
+                                artCache = attribute_value;
                                 if( art_found == true )
                                 {
-                                    QString attribute_value = attr.value().toString();
                                     siList[index].mArtwork = attribute_value;
                                 }
                             }
