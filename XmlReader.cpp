@@ -291,7 +291,7 @@ void XmlReader::ReadSiXmlData
                     if ( attr.name().toString() == QLatin1String("bitrate") )
                     {                        
                         QString attribute_value = attr.value().toString();
-                        if( attribute_value == "128" || attribute_value == "112" )
+                        if( attribute_value == "128" || attribute_value == "112" || attribute_value == "48" )
                         {
                             siList[index].mBitRate = attribute_value;
                             id_found = true;
@@ -305,7 +305,7 @@ void XmlReader::ReadSiXmlData
                     {
                         QString attribute_value = attr.value().toString();                        
 
-                        if( attribute_value == "73" || attribute_value == "80" || attribute_value == "70" )
+                        if( attribute_value == "73" || attribute_value == "80" || attribute_value == "70" || attribute_value == "110" || attribute_value == "120")
                         {
 
                             id_found = true;
@@ -316,7 +316,7 @@ void XmlReader::ReadSiXmlData
                                 id_found = false;
                             }
                         }
-                        else if( attribute_value == "30" || attribute_value == "40")
+                        else if( attribute_value == "30" || attribute_value == "40" || attribute_value == "100" || attribute_value == "101")
                         {
                             bearer_found = true;
                             if(!idCache.isEmpty())

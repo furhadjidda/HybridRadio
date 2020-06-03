@@ -64,8 +64,10 @@ Window {
             id: comboBox1
             currentIndex: 0
             objectName: "selection"
-            x: 531
+            x: 456
             y: 27
+            width: 240
+            height: 31
             model: ListModel {
                   id: cbItems
                   ListElement { text: ""}                  
@@ -76,6 +78,8 @@ Window {
                   ListElement { text: "97.7-c201-radio1" } // new
                   ListElement { text: "104.2-d389-de" } // new
                   ListElement { text: "c7d8-c1ce-0-dab-uk"}
+                  ListElement { text: "73978-292-fm-usa"}
+                  ListElement { text: "111a-f003-1f0-dab-au"}
               }
             signal sendSelectionChanged(string data)
              onCurrentIndexChanged:

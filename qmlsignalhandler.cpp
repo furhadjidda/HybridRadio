@@ -13,6 +13,8 @@ static const QString SelectRadio1("97.7-c201-radio1");
 static const QString SelectBBC2("88.1-c202-uk-bbc2");
 static const QString SelectBBC3("93.1-c203-bbc3");
 static const QString SelectBBC4("93.2-c204-bbc4");
+static const QString SelectCoxMedia1("73978-292-fm-usa");
+static const QString SelectAustralia ("111a-f003-1f0-dab-au");
 
 static const QString RadioVISMessageID("RadioVIS-Message-ID");
 static const QString RadioVISTriggerTime("RadioVIS-Trigger-Time");
@@ -685,5 +687,43 @@ void SignalHandler::OnSelectionChanged(QString value)
 
         mTextTopic.clear();
         ConstructTopic(data,"ce1","text",mTextTopic);
+    }
+    else if( SelectCoxMedia1 == value )
+    {
+        StationInformation data;
+        QString fqdn;
+        data.PopulateIbocFields(0x7426,0,"292");
+        ConstructFqdn(data,"",fqdn);
+        qDebug() << fqdn;
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"","text",mTextTopic);
+    }
+    else if( SelectAustralia == value )
+    {
+        // [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
+        // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
+        //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
+        StationInformation data;
+        QString fqdn;
+        data.PopulateDabFields(0x111a,0,0xf003);
+        ConstructFqdn(data,"1f0",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"1f0",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"1f0","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"1f0","text",mTextTopic);
     }
 }

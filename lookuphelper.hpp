@@ -11,7 +11,7 @@ typedef struct{
     qint32 mSid{0};
     qint32 mScids{0};
     qint32 mEid{0};
-    qint32 mIbocTxId{0};
+    QString mIbocTxId{""};
     QString mIbocCountryCode{""};
     qint32 mIbocHdId{0};
     QString mGcc{""};
@@ -55,7 +55,14 @@ typedef struct{
         )
     {
         mBand = "hd";
-        mIbocTxId = aIbocTxId;
+        if(aIbocTxId <= 0xFFFF )
+        {
+            mIbocTxId = "0" + QString::number(aIbocTxId,16);
+        }
+        else
+        {
+            mIbocTxId = QString::number(aIbocTxId,16);
+        }
         mIbocHdId = aIbocHdId;
         mIbocCountryCode = aIbocCountryCode;
     }

@@ -41,9 +41,14 @@ void ConstructFqdn
         }
         else if( HdBand == aStationInfo.mBand )
         {
+            QString ibocHdId("");
+            if( 0 != aStationInfo.mIbocHdId )
+            {
+                ibocHdId = QString::number( aStationInfo.mIbocHdId, 10 ) + ".";
+            }
             //[<mId>.]<tx>.<cc>.hd.radiodns.org
-            returnValue = QString::number( aStationInfo.mIbocHdId, 10 ) + "."
-                   + QString::number( aStationInfo.mIbocTxId, 10 ) + "."
+            returnValue = ibocHdId
+                   + aStationInfo.mIbocTxId + "."
                    + aStationInfo.mIbocCountryCode + "."
                    + aStationInfo.mBand + "."
                    + RadioDnsPostFix;
@@ -84,11 +89,16 @@ void ConstructServiceIdentifier
         }
         else if( HdBand == aStationInfo.mBand )
         {
+            QString ibocHdId("");
+            if( 0 != aStationInfo.mIbocHdId )
+            {
+                ibocHdId = "/" + QString::number( aStationInfo.mIbocHdId, 10 );
+            }
             // hd/<cc>/<tx>[/<mId>]
             returnValue = aStationInfo.mBand + "/"
                    + aStationInfo.mIbocCountryCode + "/"
-                   + QString::number( aStationInfo.mIbocTxId, 10 ) + "/"
-                   + QString::number( aStationInfo.mIbocHdId, 10 );
+                   + aStationInfo.mIbocTxId
+                   + ibocHdId;
             return;
 
         }
@@ -130,11 +140,16 @@ void ConstructBearerUri
         }
         else if( HdBand == aStationInfo.mBand )
         {
+            QString ibocHdId("");
+            if( 0 != aStationInfo.mIbocHdId )
+            {
+                ibocHdId = "." + QString::number( aStationInfo.mIbocHdId, 10 );
+            }
             // hd:<cc>.<tx>[.<mId>]
             returnValue = aStationInfo.mBand + ":"
                    + aStationInfo.mIbocCountryCode + "."
-                   + QString::number( aStationInfo.mIbocTxId, 10 ) + "."
-                   + QString::number( aStationInfo.mIbocHdId, 10 );
+                   + aStationInfo.mIbocTxId
+                   + ibocHdId;
             return;
 
         }
