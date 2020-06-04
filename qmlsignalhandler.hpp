@@ -59,6 +59,7 @@ private:
     void ShowNoAudioStreamAvaialablePopup( bool val );
     void ConnectSignals();
     void ClearMetaData();
+    void PlayAtIndex( const qint16 aIndex );
 
     Player* mPlayer;
     QObject* mUIObject;
@@ -84,6 +85,7 @@ private:
     QString mImageTopic;
     QVariantMap mLastHttpTextResponse;
     QVariantMap mLastHttpImageResponse;
+    qint16 mCurrentPlayingIndex{0};
 
     // UI Handler
     UiHandler mUiHandler{ mUIObject };

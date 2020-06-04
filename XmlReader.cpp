@@ -6,6 +6,7 @@
 #include <QXmlStreamAttributes>
 #include <QFile>
 #include <QDebug>
+#include <QtAlgorithms>
 
 /**
   @brief Constructor
@@ -371,6 +372,7 @@ void XmlReader::ReadSiXmlData
             }
         }
     }
+    //qSort( siList.begin(),siList.end(), SiData::SortingComparison );
 }
 
 void XmlReader::PrintSiData( const SiDataList& aSiList )

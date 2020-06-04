@@ -15,6 +15,7 @@ static const QString SelectBBC3("93.1-c203-bbc3");
 static const QString SelectBBC4("93.2-c204-bbc4");
 static const QString SelectCoxMedia1("73978-292-fm-usa");
 static const QString SelectAustralia ("111a-f003-1f0-dab-au");
+static const QString SelectNorway ("f204-f801-fe2-dab-norway");
 
 static const QString RadioVISMessageID("RadioVIS-Message-ID");
 static const QString RadioVISTriggerTime("RadioVIS-Trigger-Time");
@@ -90,6 +91,7 @@ QString SignalHandler::DownloadProgramInformation(QString fqdn, QString serviceI
     QString fileNameFormation = serviceIdentifier + "_" + date + ".xml";
     mProgramInformationDownloader->SetFileName( fileNameFormation );
     mProgramInformationDownloader->DownloadFile( urlFormation );
+    mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     return urlFormation;
 }
 
@@ -280,15 +282,25 @@ void SignalHandler::OnStop()
 
 void SignalHandler::OnNext()
 {
-
+    ++mCurrentPlayingIndex;
+    if( mCurrentPlayingIndex > mList.size() - 1 )
+    {
+        mCurrentPlayingIndex = 0;
+    }
+    PlayAtIndex( mCurrentPlayingIndex );
 }
 
 void SignalHandler::OnPrevious()
 {
-
+    --mCurrentPlayingIndex;
+    if( mCurrentPlayingIndex < 0 )
+    {
+        mCurrentPlayingIndex = mList.size() - 1;
+    }
+    PlayAtIndex( mCurrentPlayingIndex );
 }
 
-void SignalHandler::OnSelect( int aIndex )
+void SignalHandler::PlayAtIndex( const qint16 aIndex )
 {
     mLastHttpTextResponse.clear();
     mLastHttpImageResponse.clear();
@@ -320,7 +332,6 @@ void SignalHandler::OnSelect( int aIndex )
         {
             if( mList[aIndex].mBearerInfo[index].mId.length() > 0 )
             {
-                qDebug() << mList[aIndex].mBearerInfo[index].mId;
                 StationInformation station;
                 QString gcc;
                 data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station,gcc);
@@ -329,7 +340,7 @@ void SignalHandler::OnSelect( int aIndex )
                 ConstructTopic( station, gcc, "image", mImageTopic );
 
                 mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
-
+                mCurrentPlayingIndex = aIndex;
                 RequestHttpImage();
                 RequestHttpText();
                 mHttpTextTimer->start( sTimerValue );
@@ -338,6 +349,11 @@ void SignalHandler::OnSelect( int aIndex )
             }
         }
     }
+}
+
+void SignalHandler::OnSelect( int aIndex )
+{
+    PlayAtIndex( aIndex );
 }
 
 void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
@@ -349,7 +365,6 @@ void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
     qDebug() << "List Size = " << mList.size();
     qDebug() << "aFilePath = " << aFilePath;
     m_CurrentLyPlaying = "";
-    int dataIndex = 0;
 
     mPlayer->Stop();
     for( int index = 0; index < mList.size(); ++index )
@@ -364,8 +379,8 @@ void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
                     qDebug() << "[HYB_RADIO] Media " << mList[index].mPlayableMedia;
                     mPlayer->playUrl( mList[index].mPlayableMedia.toUtf8().constData() );
                     m_CurrentLyPlaying = mList[index].mPlayableMedia;
-                    dataIndex = index;
-                    UpdateUIFromList( dataIndex );
+                    mCurrentPlayingIndex = index;
+                    UpdateUIFromList( index );
                     DownloadProgramInformation( mList[index].mFqdn, mList[index].mServiceIdentifier );
                     break;
                 }
@@ -402,6 +417,11 @@ void SignalHandler::OnProgramInformationDownloaded( const QString& aFilePath )
     for( EpgStruct val : data )
     {
         mUiHandler.QmlMethodInvokeaddProgramElement( val );
+    }
+
+    if( data.size() > 0 )
+    {
+       mUiHandler.QmlMethodInvokeMethodDisplayEpgPresentImage();
     }
 }
 
@@ -694,7 +714,6 @@ void SignalHandler::OnSelectionChanged(QString value)
         QString fqdn;
         data.PopulateIbocFields(0x7426,0,"292");
         ConstructFqdn(data,"",fqdn);
-        qDebug() << fqdn;
         mDnsLookup->lookupCName(fqdn);
 
         mCurrentBearer.clear();
@@ -725,5 +744,26 @@ void SignalHandler::OnSelectionChanged(QString value)
 
         mTextTopic.clear();
         ConstructTopic(data,"1f0","text",mTextTopic);
+    }
+    else if( SelectNorway == value )
+    {
+        // [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
+        // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
+        //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
+        StationInformation data;
+        QString fqdn;
+        data.PopulateDabFields(0xf204,0,0xf801);
+        ConstructFqdn(data,"fe2",fqdn);
+        mDnsLookup->lookupCName(fqdn);
+        qDebug() << fqdn;
+
+        mCurrentBearer.clear();
+        ConstructBearerUri(data,"fe2",mCurrentBearer);
+
+        mImageTopic.clear();
+        ConstructTopic(data,"fe2","image",mImageTopic);
+
+        mTextTopic.clear();
+        ConstructTopic(data,"fe2","text",mTextTopic);
     }
 }

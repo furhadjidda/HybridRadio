@@ -243,6 +243,7 @@ void UiHandler::QmlMethodInvokeMethoddisplayPopUp()
     }
 }
 
+
 void UiHandler::QmlMethodInvokeMethodhidePopUp()
 {
     QVariant retValue=0;
@@ -250,6 +251,38 @@ void UiHandler::QmlMethodInvokeMethodhidePopUp()
     bool succeeded = QMetaObject::invokeMethod
                         (
                         RectBoxObj, "hidePopUp",
+                        Q_RETURN_ARG(QVariant, retValue)
+                        );
+
+    if(!succeeded)
+    {
+        qWarning() << "Invokation Failed";
+    }
+}
+
+void UiHandler::QmlMethodInvokeMethodDisplayEpgPresentImage()
+{
+    QVariant retValue=0;
+    QObject *RectBoxObj= mUiObject->findChild<QObject*>("RectBox");
+    bool succeeded = QMetaObject::invokeMethod
+                        (
+                        RectBoxObj, "displayEpgImage",
+                        Q_RETURN_ARG(QVariant, retValue)
+                        );
+
+    if(!succeeded)
+    {
+        qWarning() << "Invokation Failed";
+    }
+}
+
+void UiHandler::QmlMethodInvokeMethodHideEpgPresentImage()
+{
+    QVariant retValue=0;
+    QObject *RectBoxObj= mUiObject->findChild<QObject*>("RectBox");
+    bool succeeded = QMetaObject::invokeMethod
+                        (
+                        RectBoxObj, "hideEpgImage",
                         Q_RETURN_ARG(QVariant, retValue)
                         );
 

@@ -32,7 +32,7 @@ typedef struct {
 }LinkInfo;
 
 //! Structure to hold Service Information
-typedef struct {
+struct SiData{
     QString mServiceName;
     QString mArtwork;
     QString mDescription;
@@ -44,7 +44,12 @@ typedef struct {
     QString mServiceIdentifier;
     QVector<BearerInfo> mBearerInfo;
     LinkInfo mLinkeInfo;
-}SiData;
+
+    static bool SortingComparison( const SiData& aArg1, const SiData& aArg2 )
+    {
+        return QString::compare(aArg2.mServiceName, aArg1.mServiceName);
+    }
+};
 
 //! List of each Service Information read from the xml file
 typedef QVector<SiData> SiDataList;

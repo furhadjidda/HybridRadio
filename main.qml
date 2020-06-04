@@ -34,19 +34,19 @@ Window {
             y: 109
             width: 240
             height: 240
+            fillMode: Image.Stretch
             z: 1
-
             antialiasing: true
             clip: true
-            source: "images.jpeg"
+            source: "default-art.jpg"
         }
 
         Text {
             id: text1
             objectName: "StationNameObj"
-            x: 41
+            x: 13
             y: 65
-            width: 376
+            width: 437
             height: 85
             color: "#061a7e"
             text: "StationName"
@@ -64,10 +64,8 @@ Window {
             id: comboBox1
             currentIndex: 0
             objectName: "selection"
-            x: 456
-            y: 27
-            width: 240
-            height: 31
+            font.pixelSize: 17
+            wheelEnabled: true
             model: ListModel {
                   id: cbItems
                   ListElement { text: ""}                  
@@ -80,8 +78,13 @@ Window {
                   ListElement { text: "c7d8-c1ce-0-dab-uk"}
                   ListElement { text: "73978-292-fm-usa"}
                   ListElement { text: "111a-f003-1f0-dab-au"}
+                  ListElement { text: "f204-f801-fe2-dab-norway"}
               }
             signal sendSelectionChanged(string data)
+            x: 456
+            y: 27
+            width: 208
+            height: 31
              onCurrentIndexChanged:
              {
                  sendSelectionChanged(cbItems.get(currentIndex).text)
@@ -90,10 +93,10 @@ Window {
 
         Image {
             id: image2
-            x: 36
-            y: 477
-            width: 376
-            height: 73
+            x: 8
+            y: 478
+            width: 442
+            height: 97
             clip: false
             opacity: 1
             source: "PlayStrip.PNG"
@@ -101,10 +104,10 @@ Window {
             MouseArea {
                 id: stopMouseArea
                 objectName: "Stop"
-                x: 229
-                y: 0
-                width: 63
-                height: 73
+                x: 272
+                y: 2
+                width: 84
+                height: 95
                 signal sendStop()
                 onClicked: sendStop()
             }
@@ -114,8 +117,8 @@ Window {
                 objectName: "Play"
                 x: 0
                 y: 0
-                width: 70
-                height: 65
+                width: 84
+                height: 97
                 z: 12
                 signal sendPlay()
                 onClicked: sendPlay()
@@ -126,10 +129,10 @@ Window {
             MouseArea {
                 id: mouseAreaNext
                 objectName: "Next"
-                x: 295
-                y: 5
-                width: 73
-                height: 63
+                x: 355
+                y: 3
+                width: 87
+                height: 94
                 signal sendNext()
                 onClicked: sendNext()
             }
@@ -139,27 +142,14 @@ Window {
             MouseArea {
                 id: mouseAreaPrev
                 objectName: "Previous"
-                x: 154
-                y: 2
-                width: 69
-                height: 71
+                x: 170
+                y: 1
+                width: 96
+                height: 96
                 signal sendPrevious()
                 onClicked: sendPrevious()
             }
 
-        }
-
-        Text {
-            id: genre
-            objectName: "GenreObject"
-            x: 36
-            y: 348
-            width: 376
-            height: 22
-            text: ""
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 12
         }
 
         Text {
@@ -179,9 +169,9 @@ Window {
         Text {
             id: description
             objectName: "DescriptionObject"
-            x: 41
-            y: 240
-            width: 376
+            x: 13
+            y: 223
+            width: 437
             height: 31
             color: "#6581f5"
             text: "Description"
@@ -195,9 +185,9 @@ Window {
         Text {
             id: songName
             objectName: "SongObject"
-            x: 41
-            y: 387
-            width: 376
+            x: 13
+            y: 308
+            width: 437
             height: 41
             color: "#054bba"
             text: qsTr("SongName")
@@ -216,9 +206,9 @@ Window {
         Text {
             id: mediastatus
             objectName: "MediaStatus"
-            x: 510
+            x: 456
             y: 84
-            width: 161
+            width: 240
             height: 19
             text: qsTr("Media status")
             horizontalAlignment: Text.AlignHCenter
@@ -230,7 +220,7 @@ Window {
             id: additionalInfo
             objectName: "additionalInfo"
             x: 465
-            y: 394
+            y: 420
             width: 231
             height: 61
             text: qsTr("Additional Info")
@@ -265,6 +255,55 @@ Window {
                     horizontalAlignment: Text.AlignHCenter
                     text: qsTr("No Audio Stream Available")
                 }
+            }
+
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent | Popup.CloseOnReleaseOutside | Popup.CloseOnReleaseOutsideParent
+        }
+
+        Popup {
+            id: popupProgramView
+
+            x: Math.round((parent.width - width) / 2)
+            y: Math.round((parent.height - height) / 2)
+            width: 800
+            height: 175
+
+            Rectangle{
+                width: 750
+                height: 150
+                anchors.fill: parent
+                ListView {
+                    id: programView2
+                    x: 0
+                    y: 0
+                    width: 700
+                    height: 200
+                    layer.enabled: false
+                    highlightRangeMode: ListView.ApplyRange
+                    snapMode: ListView.SnapToItem
+                    cacheBuffer: 20
+                    keyNavigationWraps: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    orientation: ListView.Horizontal
+                    flickableDirection: Flickable.HorizontalFlick
+                    pixelAligned: false
+                    model: programInfoModel
+                    delegate: programmeInformationDelegate
+                }
+            }
+
+            Image{
+                width: 25
+                height: 25
+                x: 750
+                y: 5
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        popupProgramView.close()
+                    }
+                }
+                source: "close-512.png"
             }
 
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent | Popup.CloseOnReleaseOutside | Popup.CloseOnReleaseOutsideParent
@@ -315,9 +354,9 @@ Window {
             id: programListModel
             objectName: "programListModel"
             ListElement {
-                name: "Station"
-                genre: "Station"
-                image: ""
+                name: "Empty"
+                genre: "Empty"
+                image: "default-art.jpg"
             }
 
         }
@@ -326,10 +365,10 @@ Window {
             id: listView
             objectName: "ServiceListTableObject"
             signal selectIndex( int index)
-            x: 721
-            y: 38
-            width: 282
-            height: 371
+            x: 710
+            y: 58
+            width: 286
+            height: 480
             keyNavigationWraps: true
             pixelAligned: false
             highlight: Rectangle { color: "lightsteelblue"}
@@ -342,10 +381,10 @@ Window {
         Component {
             id: programmeInformationDelegate
             Item {
-                width: 200; height: 116
+                width: 250; height: 150
                 Column {
                     Rectangle {
-                        width: 200; height: 116
+                        width: 250; height: 150
                         color: index % 2 == 0 ? "Dark Gray" : "Light Gray"
                         Text {
                             id: programText
@@ -363,8 +402,8 @@ Window {
                             id: image2
                             x: 5
                             y: 21
-                            width: 85
-                            height: 85
+                            width: 90
+                            height: 90
                             opacity: 1
                             source: image
                         }
@@ -372,11 +411,11 @@ Window {
                             id: duration
                             text: time
                             font.family: "Tahoma"
-                            x: 80
+                            x: 110
                             y: 60
                             color: "Black"
                             font.pixelSize: 13
-                            width: 100
+                            width: 200
                             wrapMode: Text.WordWrap
                             textFormat: Text.RichText
                         }
@@ -396,7 +435,63 @@ Window {
 
         }
 
+        Image {
+            id: epgImage
+            objectName: "epgImageVisibility"
+            x: 456
+            y: 361
+            width: 49
+            height: 43
+            visible: false
+            fillMode: Image.PreserveAspectFit
+            source: "epg_image.jpg"
+            MouseArea{
+                anchors.fill: parent
+                onClicked: popupProgramView.open()
+            }
+        }
 
+        Image {
+            id: image
+            x: 8
+            y: 8
+            width: 97
+            height: 50
+            fillMode: Image.PreserveAspectFit
+            source: "radio-dns.png"
+        }
+
+        Image {
+            id: image3
+            x: 94
+            y: 8
+            width: 86
+            height: 39
+            fillMode: Image.PreserveAspectFit
+            source: "400x235_DABplus_Logo_Farbe_sRGB.png"
+        }
+
+        Image {
+            id: image4
+            x: 194
+            y: 18
+            width: 76
+            height: 34
+            fillMode: Image.PreserveAspectFit
+            source: "RDS-logo.jpg"
+        }
+
+        Image {
+            id: image5
+            x: 290
+            y: 23
+            width: 73
+            height: 24
+            fillMode: Image.PreserveAspectFit
+            source: "HD-Radio-logo-HD-Only.jpeg"
+        }
+
+        /*
         ListView {
             id: programView
             x: 456
@@ -414,7 +509,7 @@ Window {
             pixelAligned: false
             model: programInfoModel
             delegate: programmeInformationDelegate
-        }
+        }*/
 
         function displayPopUp()
         {
@@ -423,6 +518,15 @@ Window {
         function hidePopUp()
         {
             popup.close()
+        }
+
+        function displayEpgImage()
+        {
+            epgImage.visible = true
+        }
+        function hideEpgImage()
+        {
+            epgImage.visible = false
         }
 
         function clearListElement()
@@ -450,3 +554,9 @@ Window {
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:4;anchors_height:31;anchors_width:208;anchors_x:456;anchors_y:27}
+}
+##^##*/

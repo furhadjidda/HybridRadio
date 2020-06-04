@@ -30,6 +30,7 @@ private slots:
   void slotFinished();
 
   void slotReadData();
+
 private:
   QByteArray* m_pBuffer;
   QNetworkReply* reply;

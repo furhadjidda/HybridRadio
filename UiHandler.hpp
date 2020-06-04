@@ -23,6 +23,8 @@ public:
     void QmlMethodInvokeaddListElement( const SiData& aValue );
     void QmlMethodInvokeMethoddisplayPopUp();
     void QmlMethodInvokeMethodhidePopUp();
+    void QmlMethodInvokeMethodDisplayEpgPresentImage();
+    void QmlMethodInvokeMethodHideEpgPresentImage();
 
     void QmlMethodInvokeclearProgramElement();
     void QmlMethodInvokeaddProgramElement( const EpgStruct& aValue );
