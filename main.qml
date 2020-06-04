@@ -367,7 +367,7 @@ Window {
             signal selectIndex( int index)
             x: 710
             y: 58
-            width: 286
+            width: 282
             height: 480
             keyNavigationWraps: true
             pixelAligned: false
@@ -463,7 +463,7 @@ Window {
 
         Image {
             id: image3
-            x: 94
+            x: 111
             y: 8
             width: 86
             height: 39
@@ -473,7 +473,7 @@ Window {
 
         Image {
             id: image4
-            x: 194
+            x: 217
             y: 18
             width: 76
             height: 34
@@ -483,12 +483,23 @@ Window {
 
         Image {
             id: image5
-            x: 290
+            x: 321
             y: 23
             width: 73
             height: 24
             fillMode: Image.PreserveAspectFit
             source: "HD-Radio-logo-HD-Only.jpeg"
+        }
+
+        Text {
+            id: element
+            x: 566
+            y: 387
+            width: 98
+            height: 17
+            text: qsTr("List Count: " + programListModel.count )
+            font.bold: true
+            font.pixelSize: 14
         }
 
         /*
