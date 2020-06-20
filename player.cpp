@@ -5,15 +5,15 @@
 bool Player::playUrl(const QString &url)
 {
     _isPlaying = true;
-    mPlayer->setMedia(QMediaContent(url));
-    mPlayer->setVolume(100);
+    mPlayer->setMedia( QMediaContent( url ) );
+    mPlayer->setVolume( 100 );
     mPlayer->play();
-    qDebug() << "audio = " << mPlayer->isAudioAvailable();
-    qDebug() << "mute = " << mPlayer->isMuted();
-    qDebug() << "player = " << mPlayer->isAvailable();
-    qDebug() << "audio = " << mPlayer->isAudioAvailable();
-    qDebug() << "State = "<< mPlayer->state();
-    qDebug() << "Duration = "<< mPlayer->duration();
+    qDebug() << "[PLAYER] Audio = " << mPlayer->isAudioAvailable();
+    qDebug() << "[PLAYER] Mute = " << mPlayer->isMuted();
+    qDebug() << "[PLAYER] Player = " << mPlayer->isAvailable();
+    qDebug() << "[PLAYER] Audio = " << mPlayer->isAudioAvailable();
+    qDebug() << "[PLAYER] State = "<< mPlayer->state();
+    qDebug() << "[PLAYER] Duration = "<< mPlayer->duration();
 
     return true;
 }
@@ -27,15 +27,24 @@ Player::Player(QObject *parent)
     : QObject(parent)
 {
     _isPlaying = false;
-    volume = 50;
-    mPlayer = new QMediaPlayer(this,QMediaPlayer::StreamPlayback);
+
+    mPlayer = new QMediaPlayer
+                    (
+                    this,
+                    QMediaPlayer::StreamPlayback
+                    );
 
     // Connect all the signals
-    connect(mPlayer, static_cast<void(QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error),
-        [=](QMediaPlayer::Error error){ qDebug() << "Error = " << error; });
+    connect
+        (
+        mPlayer,
+        static_cast<void(QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error),
+        [=]( QMediaPlayer::Error aError )
+            {
+                qDebug() << "[PLAYER] Error = " << aError;
+            }
+        );
 
-
-    //connect(mPlayer, SIGNAL(volumeChanged(int)), this, SLOT(volumeChanged(int)));
 
     connect(mPlayer, SIGNAL(audioAvailableChanged(bool)), this, SLOT(audioAvailableChanged(bool)));
 

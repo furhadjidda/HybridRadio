@@ -14,8 +14,8 @@ Q_OBJECT
 public:
     ~Player()
     {
-        qDebug()<<"Destructor Called";
-        delete mPlayer;mPlayer=0;
+        delete mPlayer;
+        mPlayer = nullptr;
     }
 
     bool Play(const QString &url);
@@ -30,32 +30,31 @@ public slots:
 
      void volumeChanged(int val)
      {
-         qDebug()<<"volume Changed "<<val;
+         qDebug()<<"[PLAYER] Volume Changed "<<val;
      }
 
      void mutedChanged(bool val)
      {
-         qDebug()<<"mute Changed "<<val;
+         qDebug()<<"[PLAYER] Mute Changed "<<val;
      }
      void mediaStatusChanged(QMediaPlayer::MediaStatus val)
      {
-         qDebug()<<"media status Changed "<<val;
+         qDebug()<<"[PLAYER] Media status Changed "<<val;
      }
 
      void durationChanged(qint64 duration)
      {
-         qDebug()<<"Duration "<<duration;
+         qDebug()<<"[PLAYER] Duration "<<duration;
 
      }
 
      void audioAvailableChanged(bool val)
      {
-         qDebug()<<"audio avail Changed "<<val;
+         qDebug()<<"[PLAYER] Audio avail Changed "<<val;
      }
 
-     void mediaStateChanged(QMediaPlayer::State val)
+     void mediaStateChanged( QMediaPlayer::State val )
      {
-         //qDebug()<<"media status Changed "<<val;
          emit signalMediaStatusChanged(val);
      }
 
@@ -64,10 +63,8 @@ signals:
 
 
 private:
-    QMediaPlayer *mPlayer;
-    QMediaPlaylist *playlist;
+    QMediaPlayer* mPlayer;
     bool _isPlaying;
-    int volume;
 };
 
 #endif // PLAYER_HPP

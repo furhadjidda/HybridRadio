@@ -39,17 +39,7 @@ private:
         const QString& aQString,
         QString& aTime,
         QString& aDate
-        )
-    {
-        QRegExp rx("(\\T)"); //RegEx for ' ' or ',' or '.' or ':' or '\t'
-        QStringList  query = aQString.split(rx);
-        if( 0 == query.size() )
-        {
-            return;
-        }
-        aTime = query.at(1);
-        aDate = query.at(0);
-    }
+        );
 
 };
 

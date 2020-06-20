@@ -33,7 +33,7 @@ private slots:
 
 private:
   QByteArray* m_pBuffer;
-  QNetworkReply* reply;
+  QNetworkReply* mReply;
   uint mIndex;
   QString mFileName;
 

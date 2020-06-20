@@ -200,11 +200,11 @@ void DeconstructBearer
         aStationInfo.mEid = query.at(--lastIndex).toUInt(&ok,16);
         aGcc = query.at(--lastIndex);
     }
-
-    qDebug() << "@@ Splitting Data mBand " << aStationInfo.mBand;
-    qDebug() << "@@ Splitting Data mPi " << aStationInfo.mPi;
-    qDebug() << "@@ Splitting Data mGcc " << aGcc;
-    qDebug() << "@@ Splitting Data mScids " << hex << aStationInfo.mScids;
-    qDebug() << "@@ Splitting Data mSid " << hex << aStationInfo.mSid;
-    qDebug() << "@@ Splitting Data mEid " << hex << aStationInfo.mEid;
+    qDebug() << "[ HELPER ] Bearer Info " << bearer;
+    qDebug() << "[ HELPER ] Splitting Bearer Info mBand " << aStationInfo.mBand;
+    qDebug() << "[ HELPER ] Splitting Bearer Info mPi " << aStationInfo.mPi;
+    qDebug() << "[ HELPER ] Splitting Bearer Info mGcc " << aGcc;
+    qDebug() << "[ HELPER ] Splitting Bearer Info mScids " << hex << aStationInfo.mScids;
+    qDebug() << "[ HELPER ] Splitting Bearer Info mSid " << hex << aStationInfo.mSid;
+    qDebug() << "[ HELPER ] Splitting Bearer Info mEid " << hex << aStationInfo.mEid;
 }

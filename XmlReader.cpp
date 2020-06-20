@@ -43,8 +43,8 @@ void XmlReader::ReadPiXmlData
         QTextStream in( &piXmlFile );
         piXmlString = in.readAll();
 
-        qDebug() << "[HYB_RADIO] Reading PI XML file, Size = " << piXmlFile.size() << "  Bytes";
-        qDebug() << "[HYB_RADIO] Reading PI XML file, Name = " << fileName ;
+        qDebug() << "[XML_READER] Reading PI XML file, Size = " << piXmlFile.size() << "  Bytes, Name : " << fileName;
+
     }
 
     QXmlStreamReader reader( piXmlString );
@@ -159,8 +159,8 @@ void XmlReader::ReadSiXmlData
     {
         QTextStream in( &downloadedSiXmlFile );
         siXml = in.readAll();
-        qDebug() << "[HYB_RADIO] Reading SI XML file, Size = " << downloadedSiXmlFile.size() << "  Bytes";
-        qDebug() << "[HYB_RADIO] Reading SI XML file, Name = " << fileName ;
+        qDebug() << "[XML_READER] Reading SI XML file, Size = " << downloadedSiXmlFile.size() << "  Bytes";
+        qDebug() << "[XML_READER] Reading SI XML file, Name = " << fileName ;
     }
 
     QXmlStreamReader reader( siXml );
@@ -306,7 +306,7 @@ void XmlReader::ReadSiXmlData
                     {
                         QString attribute_value = attr.value().toString();                        
 
-                        if( attribute_value == "73" || attribute_value == "80" || attribute_value == "70" || attribute_value == "110" || attribute_value == "120")
+                        if( attribute_value == "73" || attribute_value == "80" || attribute_value == "70" || attribute_value == "110" || attribute_value == "120" )
                         {
 
                             id_found = true;
@@ -408,5 +408,23 @@ void XmlReader::PrintSiData( const SiDataList& aSiList )
     }
 
     file.close();
+}
+
+
+void XmlReader::TimeDateParser
+    (
+    const QString& aQString,
+    QString& aTime,
+    QString& aDate
+    )
+{
+    QRegExp rx("(\\T)"); //RegEx for ' ' or ',' or '.' or ':' or '\t'
+    QStringList  query = aQString.split(rx);
+    if( 0 == query.size() )
+    {
+        return;
+    }
+    aTime = query.at(1);
+    aDate = query.at(0);
 }
 

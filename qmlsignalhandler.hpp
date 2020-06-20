@@ -17,6 +17,7 @@
 #include "downloadmanager.h"
 #include "lookuphelper.hpp"
 #include "UiHandler.hpp"
+#include "HttpTransport.hpp"
 
 class SignalHandler : public QObject
 {
@@ -47,11 +48,9 @@ public slots:
     void OnStop();
     void OnHttpTextTimeout();
     void OnHttpImageTimeout();
-    void HttpTextResponseReceived();
-    void HttpImageResponseReceived();
+    void OnTextChanged( const QString& aText );
+    void OnImageChanged( const QString& aImage );
     void MediaStatusChanged(QMediaPlayer::State val);
-    void RequestHttpText();
-    void RequestHttpImage();
 
 private:
     QString DownloadProgramInformation(QString fqdn, QString serviceIdentifier);
@@ -69,11 +68,6 @@ private:
     DownloadManager* mProgramInformationDownloader;
     QTimer* mHttpTextTimer;
     QTimer* mHttpImageTimer;
-    //Network manager
-    QNetworkAccessManager mNetworkManager;
-    QNetworkReply* mTextReply;
-    QNetworkReply* mImageReply;
-
 
     SiDataList mList;
     EpgList mEpgList;
@@ -83,12 +77,12 @@ private:
     // Topic Handling
     QString mTextTopic;
     QString mImageTopic;
-    QVariantMap mLastHttpTextResponse;
-    QVariantMap mLastHttpImageResponse;
     qint16 mCurrentPlayingIndex{0};
 
     // UI Handler
     UiHandler mUiHandler{ mUIObject };
+
+    HttpTransport mHttpTransport;
 
     typedef struct{
         QString mBand;
