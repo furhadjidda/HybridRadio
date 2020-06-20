@@ -342,13 +342,12 @@ void XmlReader::ReadSiXmlData
                     {
                         QString attribute_value = attr.value().toString();
                         idCache = attribute_value;
-                        if( true == id_found )
+                        if( true == id_found || attribute_value.contains("http",Qt::CaseInsensitive)  )
                         {
                             siList[index].mPlayableMedia = attribute_value;
                         }
                         if( bearer_found )
                         {
-
                             BearerInfo data;
                             siList[index].mBearerInfo.push_back( data );
                             bearerIndex = siList[index].mBearerInfo.size() - 1;
