@@ -45,8 +45,22 @@ public:
     {
         return mHttpServicePort;
     }
+
+    QString GetStompTargetName()
+    {
+        return mStompTargetName;
+    }
+
+    uint GetStompPortNumber()
+    {
+        return mStompServicePort;
+    }
+
 signals:
-    void sendSIAndEPGFileNames( QString, QString );
+    void SignalServiceInformationAvailable( const QString& );
+    void SignalHttpVisSupported( bool aVal );
+    void SignalStompVisSupported( bool aVal );
+
 public slots:
     void onCNameResponse();
     void onServiceResponse();
@@ -62,8 +76,10 @@ private:
     QString mCNAME;
     QString mServiceName;
     uint mServicePort;
+    // For Http
     QString mHttpTargetName;
     uint mHttpServicePort;
+    // For Stomp
     QString mStompTargetName;
     uint mStompServicePort;
 };

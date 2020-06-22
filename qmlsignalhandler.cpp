@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <QProcess>
 #include "lookuphelper.hpp"
+#include <QtAlgorithms>
+#include <QCollator>
+
 
 static const QString Selecttion_UK_FM("95.8-c479-fm-uk");
 static const QString Selecttion_UK_DAB("c7d8-c1ce-0-dab-uk");
@@ -101,21 +104,11 @@ QString SignalHandler::DownloadProgramInformation(QString fqdn, QString serviceI
 
 void SignalHandler::OnHttpTextTimeout()
 {
-    mHttpTransport.SetPortAndTarget
-            (
-            QString::number( mDnsLookup->GetHttpPortNumber() ),
-            mDnsLookup->GetHttpTargetName()
-            );
     mHttpTransport.RequestText( mTextTopic );
 }
 
 void SignalHandler::OnHttpImageTimeout()
 {
-    mHttpTransport.SetPortAndTarget
-            (
-            QString::number( mDnsLookup->GetHttpPortNumber() ),
-            mDnsLookup->GetHttpTargetName()
-            );
     mHttpTransport.RequestImage( mImageTopic );
 }
 
@@ -180,37 +173,31 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
         qWarning() << "[HANDLER] List Size = " << mList.size() << "is not in range with Index = " << aIndex;
         return;
     }
+    StopVisTimers();
+    mPlayer->Stop();
+    m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
+    qDebug() << "[HANDLER] Selecting " + m_CurrentLyPlaying + "@ index " << aIndex;
+    mPlayer->playUrl(m_CurrentLyPlaying.toUtf8().constData());
+    // This updates the UI with the findings
+    UpdateUIFromList( aIndex );
+    DownloadProgramInformation( mList[aIndex].mFqdn, mList[aIndex].mServiceIdentifier );
+    BearerSplit data;
 
-    //if( mList[aIndex].mBearerInfo.size() > 0 )
+    for(int index = 0; index < mList[aIndex].mBearerInfo.size(); ++index)
     {
-        mHttpTextTimer->stop();
-        mHttpImageTimer->stop();
-        mPlayer->Stop();
-        m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
-        qDebug() << "[HANDLER] Selecting " + m_CurrentLyPlaying + "@ index " << aIndex;
-        mPlayer->playUrl(m_CurrentLyPlaying.toUtf8().constData());
-        // This updates the UI with the findings
-        UpdateUIFromList( aIndex );
-        DownloadProgramInformation( mList[aIndex].mFqdn, mList[aIndex].mServiceIdentifier );
-        BearerSplit data;
-
-        for(int index = 0; index < mList[aIndex].mBearerInfo.size(); ++index)
+        if( mList[aIndex].mBearerInfo[index].mId.length() > 0 )
         {
-            if( mList[aIndex].mBearerInfo[index].mId.length() > 0 )
-            {
-                StationInformation station;
-                QString gcc;
-                data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station,gcc);
+            StationInformation station;
+            QString gcc;
+            data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station,gcc);
+            // May be when selection get the service identifier from the list ??
+            ConstructTopic( station, gcc, "text", mTextTopic );
+            ConstructTopic( station, gcc, "image", mImageTopic );
 
-                ConstructTopic( station, gcc, "text", mTextTopic );
-                ConstructTopic( station, gcc, "image", mImageTopic );
-
-                mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
-                mCurrentPlayingIndex = aIndex;
-                mHttpTextTimer->start( sTimerValue );
-                mHttpImageTimer->start( sTimerValue );
-                break;
-            }
+            mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
+            mCurrentPlayingIndex = aIndex;
+            StartVisTimers();
+            break;
         }
     }
 }
@@ -224,9 +211,8 @@ void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
 {
     mHttpTransport.ResetTransportResponses();
     mList.clear();
-    mReader->ReadSiXmlData(ServiceInformationFileName,mList);
-    qDebug() << "List Size = " << mList.size();
-    qDebug() << "aFilePath = " << aFilePath;
+    mReader->ReadSiXmlData( ServiceInformationFileName, mList );
+    qDebug() << "[HANDLER] List Size = " << mList.size() << " FilePath = " << aFilePath;
     m_CurrentLyPlaying = "";
 
     mPlayer->Stop();
@@ -252,16 +238,18 @@ void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
     }
 
     ShowNoAudioStreamAvaialablePopup( ( m_CurrentLyPlaying.size() == 0 ) );
-
-
+    QCollator collator;
+    collator.setNumericMode(true);
+    qSort( mList.begin(),mList.end(), [&collator]( const SiData& aArg1, const SiData& aArg2 ){
+        return ( collator.compare( aArg1.mServiceName, aArg2.mServiceName ) < 0 );
+    });
     mUiHandler.QmlMethodInvokeclearListElement();
     foreach( SiData val,mList )
     {
         mUiHandler.QmlMethodInvokeaddListElement( val );
     }
 
-    mHttpTextTimer->start(sTimerValue);
-    mHttpImageTimer->start(sTimerValue);
+    StartVisTimers();
 }
 
 void SignalHandler::OnProgramInformationDownloaded( const QString& aFilePath )
@@ -289,7 +277,6 @@ void SignalHandler::ShowNoAudioStreamAvaialablePopup( bool val )
 {
     if ( val )
     {
-
         mUiHandler.QmlMethodInvokeMethoddisplayPopUp();
     }
     else
@@ -378,12 +365,13 @@ void SignalHandler::ConnectSignals()
             this,
             SLOT(OnSelectionChanged(QString))
             );
+
     QObject::connect
             (
             mDnsLookup,
-            SIGNAL(sendSIAndEPGFileNames(QString,QString)),
+            &DNSLookup::SignalServiceInformationAvailable,
             this,
-            SLOT(OnFileNameAvailable(QString,QString))
+            &SignalHandler::OnServiceInformationAvailable
             );
 
     // Connect Downloader
@@ -419,6 +407,94 @@ void SignalHandler::ConnectSignals()
             &SignalHandler::OnImageChanged
             );
 
+    QObject::connect
+            (
+            mDnsLookup,
+            &DNSLookup::SignalHttpVisSupported,
+            this,
+            &SignalHandler::OnHttpVisSupported
+            );
+
+    QObject::connect
+            (
+            mDnsLookup,
+            &DNSLookup::SignalStompVisSupported,
+            this,
+            &SignalHandler::OnStompVisSupported
+            );
+
+    QObject::connect
+            (
+            mDnsLookup,
+            &DNSLookup::SignalStompVisSupported,
+            this,
+            &SignalHandler::OnStompVisSupported
+            );
+
+    QObject::connect
+            (
+            &mStompTransport,
+            &StompTransport::SignalStompConnectionReady,
+            this,
+            &SignalHandler::OnStompConnectionReady
+            );
+
+}
+
+
+void SignalHandler::OnHttpVisSupported( bool aVal )
+{
+    if( !aVal )
+    {
+        qDebug() << "[HANDLER] Http Vis NOT SUPPORTED !! ";
+    }
+
+    mHttpTransport.SetPortAndTarget
+            (
+            QString::number( mDnsLookup->GetHttpPortNumber() ),
+            mDnsLookup->GetHttpTargetName()
+            );
+    mHttpTransport.RequestText( mTextTopic );
+    mHttpTransport.RequestImage( mImageTopic );
+
+    isHttpVisSupported = aVal;
+    StopVisTimers();
+}
+
+void SignalHandler::OnStompVisSupported( bool aVal )
+{
+    if( !aVal )
+    {
+        qDebug() << "[HANDLER] Stomp Vis NOT SUPPORTED !! ";
+    }
+    isStopVisSupported = aVal;
+
+    mStompTransport.SetPortAndTarget
+            (
+            QString::number( mDnsLookup->GetStompPortNumber() ),
+            mDnsLookup->GetStompTargetName()
+            );
+}
+
+void SignalHandler::OnStompConnectionReady()
+{
+    mStompTransport.RequestText( mTextTopic );
+    mStompTransport.RequestImage( mImageTopic );
+}
+
+void SignalHandler::StartVisTimers()
+{
+    if( isHttpVisSupported )
+    {
+        mHttpTextTimer->start(sTimerValue);
+        mHttpImageTimer->start(sTimerValue);
+    }
+}
+
+void SignalHandler::StopVisTimers()
+{
+    mHttpTextTimer->stop();
+    mHttpImageTimer->stop();
 }
 
 void SignalHandler::UpdateUIFromList( int aIndex )
@@ -447,12 +523,10 @@ void SignalHandler::ClearMetaData()
 }
 
 
-void SignalHandler::OnFileNameAvailable( QString si, QString xsi )
+void SignalHandler::OnServiceInformationAvailable( const QString& aFilePath )
 {
-    qDebug() << "[HANDLER] FileName Received";
-    qDebug() << "[HANDLER] SI FileName=" << si;
-    qDebug() << "[HANDLER] XSI FileName=" << xsi;
-    mServiceInformationDownloader->DownloadFile( si );
+    qDebug() << "[HANDLER] SI FileName=" << aFilePath;
+    mServiceInformationDownloader->DownloadFile( aFilePath );
 }
 
 

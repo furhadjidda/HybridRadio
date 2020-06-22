@@ -2,18 +2,19 @@
 #include <QUrl>
 
 #if 1
-bool Player::playUrl(const QString &url)
+bool Player::playUrl
+    (
+    const QString &url
+    )
 {
-    _isPlaying = true;
     mPlayer->setMedia( QMediaContent( url ) );
     mPlayer->setVolume( 100 );
     mPlayer->play();
-    qDebug() << "[PLAYER] Audio = " << mPlayer->isAudioAvailable();
-    qDebug() << "[PLAYER] Mute = " << mPlayer->isMuted();
-    qDebug() << "[PLAYER] Player = " << mPlayer->isAvailable();
-    qDebug() << "[PLAYER] Audio = " << mPlayer->isAudioAvailable();
-    qDebug() << "[PLAYER] State = "<< mPlayer->state();
-    qDebug() << "[PLAYER] Duration = "<< mPlayer->duration();
+    qDebug() << "[PLAYER] Audio Available = " << mPlayer->isAudioAvailable()
+             << "[PLAYER] Mute = " << mPlayer->isMuted()
+             << "[PLAYER] Player Available = " << mPlayer->isAvailable()
+             << "[PLAYER] Audio Available= " << mPlayer->isAudioAvailable()
+             << "[PLAYER] State = "<< mPlayer->state();
 
     return true;
 }
@@ -26,8 +27,6 @@ void Player::Stop()
 Player::Player(QObject *parent)
     : QObject(parent)
 {
-    _isPlaying = false;
-
     mPlayer = new QMediaPlayer
                     (
                     this,
@@ -35,7 +34,7 @@ Player::Player(QObject *parent)
                     );
 
     // Connect all the signals
-    connect
+    QObject::connect
         (
         mPlayer,
         static_cast<void(QMediaPlayer::*)(QMediaPlayer::Error)>(&QMediaPlayer::error),
@@ -46,15 +45,21 @@ Player::Player(QObject *parent)
         );
 
 
-    connect(mPlayer, SIGNAL(audioAvailableChanged(bool)), this, SLOT(audioAvailableChanged(bool)));
+    QObject::connect
+        (
+        mPlayer,
+        &QMediaPlayer::audioAvailableChanged,
+        this,
+        &Player::audioAvailableChanged
+        );
 
-    //connect(mPlayer, SIGNAL(mutedChanged(bool)), this, SLOT(mutedChanged(bool)));
-
-    //connect(mPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
-
-    //connect(mPlayer, SIGNAL(durationChanged(qint64)), this, SLOT(durationChanged(qint64)));
-    //mediaStateChanged(QMediaPlayer::State val)
-    connect(mPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(mediaStateChanged(QMediaPlayer::State)));
+    QObject::connect
+        (
+        mPlayer,
+        &QMediaPlayer::stateChanged,
+        this,
+        &Player::mediaStateChanged
+        );
 
 }
 #endif

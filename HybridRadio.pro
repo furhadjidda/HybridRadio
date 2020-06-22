@@ -1,10 +1,11 @@
 TEMPLATE = app
 
-QT += qml quick multimedia network core
+QT += qml quick multimedia network core websockets
 CONFIG += c++11
 
 SOURCES += main.cpp \
     HttpTransport.cpp \
+    StompTransport.cpp \
     Transport.cpp \
     UiHandler.cpp \
     XmlReader.cpp \
@@ -25,6 +26,7 @@ include(deployment.pri)
 HEADERS += \
     HttpTransport.hpp \
     HybridRadioCommonTypes.hpp \
+    StompTransport.hpp \
     Transport.hpp \
     UiHandler.hpp \
     XmlReader.h \
@@ -37,3 +39,8 @@ HEADERS += \
 DISTFILES += \
     ../build-HybridRadio-Desktop_Qt_5_7_0_MinGW_32bit-Debug/PlayStrip.PNG
 
+
+unix:!macx: LIBS += -L$$PWD/../qt5pi/lib/ -lqstomp
+
+INCLUDEPATH += $$PWD/../qt5pi/include
+DEPENDPATH += $$PWD/../qt5pi/include

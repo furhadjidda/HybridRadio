@@ -52,7 +52,8 @@ void DownloadManager::SetFileName( const QString& aFileName )
 void DownloadManager::slotFinished()
 {
     //Check status code
-     if ( mReply->error() == QNetworkReply::NoError ) {
+     if ( mReply->error() == QNetworkReply::NoError )
+     {
          int statusCode = mReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
          if( statusCode == 301 )
          {

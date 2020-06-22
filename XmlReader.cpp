@@ -371,7 +371,6 @@ void XmlReader::ReadSiXmlData
             }
         }
     }
-    //qSort( siList.begin(),siList.end(), SiData::SortingComparison );
 }
 
 void XmlReader::PrintSiData( const SiDataList& aSiList )

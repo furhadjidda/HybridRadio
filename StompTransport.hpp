@@ -1,0 +1,51 @@
+#ifndef STOMPTRANSPORT_HPP
+#define STOMPTRANSPORT_HPP
+
+#include <QObject>
+#include <QtWebSockets/QWebSocket>
+#include <QAbstractSocket>
+#include "Transport.hpp"
+#include <QStomp/qstomp.h>
+
+class StompTransport : public Transport
+{
+    Q_OBJECT
+public:
+    StompTransport();
+
+    void SetPortAndTarget
+        (
+        const QString& aPort,
+        const QString& aTarget
+        ) override;
+
+    void ResetTransportResponses() override
+    {
+        mImageResponse.clear();
+        mTextResponse.clear();
+    }
+
+    void RequestText( const QString& aTextTopic ) override;
+
+    void RequestImage( const QString& aImageTopic ) override;
+public slots:
+    void OnTextResponse() override;
+    void OnImageResponse() override;
+
+    void OnStompError( QAbstractSocket::SocketError error );
+    void OnConnected();
+    void OnDisConnected();
+    void OnFrameReceived();
+    void OnSocketStateChanged( QAbstractSocket::SocketState aState);
+
+signals:
+    void SignalTextChanged( const QString& aText ) override;
+    void SignalImageChanged( const QString& aImage ) override;
+    void SignalStompConnectionReady();
+
+private:
+    QWebSocket* m_webSocket;
+    QStompClient mStompClient;
+};
+
+#endif // STOMPTRANSPORT_HPP

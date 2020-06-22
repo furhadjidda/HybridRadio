@@ -64,7 +64,6 @@ signals:
 
 private:
     QMediaPlayer* mPlayer;
-    bool _isPlaying;
 };
 
 #endif // PLAYER_HPP

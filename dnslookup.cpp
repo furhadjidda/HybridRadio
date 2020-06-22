@@ -20,7 +20,6 @@ void DNSLookup::lookupCName( QString& val )
         this,
         SLOT(onCNameResponse()));
 
-    // Find the XMPP servers for gmail.com
     mCName->setName( val );
     mCName->lookup();
 }
@@ -163,21 +162,20 @@ void DNSLookup::onServiceResponse()
     // Handle the results.
     const auto serviceRecords = mService->serviceRecords();
     for ( const QDnsServiceRecord &record : serviceRecords )
-    {        
+    {
         mServiceName = record.target();
         mServicePort = record.port();
         qDebug() << "[DNS Look-up] Service" <<record.name();
         qDebug() << "[DNS Look-up] Target" <<record.target();
         qDebug() << "[DNS Look-up] Port" <<record.port();
 
+        // See Section 10.2.2.2    Services not supporting client identification , of document
+        // ETSI TS 102 818 V3.2.1 (2019-06) for document discovery of Service information.
         QString HTTP("http://");
         QString SIFilePostFix("/radiodns/spi/3.1/SI.xml");
-        QString XSIFilePostFix("/radiodns/epg/XSI.xml");
         QString SIFileName("");
-        QString XSIFileName("");
         SIFileName = HTTP + GetServiceName() + SIFilePostFix;
-        XSIFileName = HTTP + GetServiceName()+ XSIFilePostFix;
-        emit sendSIAndEPGFileNames(SIFileName,XSIFileName);
+        emit SignalServiceInformationAvailable( SIFileName );
     }
     mService->deleteLater();
 }
@@ -189,19 +187,21 @@ void DNSLookup::onHttpVisResponse()
     {
         qWarning() << "[DNS Look-up ERR] onHttpVisResponse::DNS lookup failed";
         qWarning() << "[DNS Look-up ERR] mHttpVis->error()" << mHttpVis->error();
+        emit SignalHttpVisSupported( false );
         mHttpVis->deleteLater();
         return;
     }
     // Handle the results.
     const auto serviceRecords = mHttpVis->serviceRecords();
     for ( const QDnsServiceRecord &record : serviceRecords )
-    {        
+    {
         mHttpTargetName = record.target();
         mHttpServicePort = record.port();
         qDebug() << "[DNS Look-up] HTTP Service" <<record.name();
         qDebug() << "[DNS Look-up] HTTP target" <<record.target();
         qDebug() << "[DNS Look-up] HTTP port" <<record.port();
     }
+    emit SignalHttpVisSupported( true );
     mHttpVis->deleteLater();
 }
 
@@ -212,6 +212,7 @@ void DNSLookup::onVisResponse()
     {
         qWarning() << "[DNS Look-up ERR] onVisResponse::DNS lookup failed";
         qWarning() << "[DNS Look-up ERR] mStompVis->error()" << mStompVis->error();
+        emit SignalStompVisSupported( false );
         mStompVis->deleteLater();
         return;
     }
@@ -225,5 +226,6 @@ void DNSLookup::onVisResponse()
         qDebug() << "[DNS Look-up] STOMP target" <<record.target();
         qDebug() << "[DNS Look-up] STOMP port" <<record.port();
     }
+    emit SignalStompVisSupported( true );
     mStompVis->deleteLater();
 }

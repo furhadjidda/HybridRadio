@@ -18,6 +18,7 @@
 #include "lookuphelper.hpp"
 #include "UiHandler.hpp"
 #include "HttpTransport.hpp"
+#include "StompTransport.hpp"
 
 class SignalHandler : public QObject
 {
@@ -42,7 +43,7 @@ public slots:
     void OnPrevious();
     void OnSelect( int aIndex );
     void OnSelectionChanged( QString value );
-    void OnFileNameAvailable( QString si, QString xsi );
+    void OnServiceInformationAvailable( const QString& aFilePath );
     void OnServiceInformationDownloaded( const QString& aFilePath );
     void OnProgramInformationDownloaded( const QString& aFilePath );
     void OnStop();
@@ -51,6 +52,9 @@ public slots:
     void OnTextChanged( const QString& aText );
     void OnImageChanged( const QString& aImage );
     void MediaStatusChanged(QMediaPlayer::State val);
+    void OnHttpVisSupported( bool aVal );
+    void OnStompVisSupported( bool aVal );
+    void OnStompConnectionReady();
 
 private:
     QString DownloadProgramInformation(QString fqdn, QString serviceIdentifier);
@@ -59,6 +63,8 @@ private:
     void ConnectSignals();
     void ClearMetaData();
     void PlayAtIndex( const qint16 aIndex );
+    void StartVisTimers();
+    void StopVisTimers();
 
     Player* mPlayer;
     QObject* mUIObject;
@@ -83,6 +89,10 @@ private:
     UiHandler mUiHandler{ mUIObject };
 
     HttpTransport mHttpTransport;
+    StompTransport mStompTransport;
+
+    bool isHttpVisSupported{false};
+    bool isStopVisSupported{false};
 
     typedef struct{
         QString mBand;
