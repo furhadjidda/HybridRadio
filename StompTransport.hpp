@@ -21,13 +21,16 @@ public:
 
     void ResetTransportResponses() override
     {
-        mImageResponse.clear();
-        mTextResponse.clear();
     }
 
-    void RequestText( const QString& aTextTopic ) override;
+    void SubscribeTextTopic( const QString& aTextTopic ) override;
 
-    void RequestImage( const QString& aImageTopic ) override;
+    void SubscribeImageTopic( const QString& aImageTopic ) override;
+
+    void UnSubscribeTextTopic( const QString& aTextTopic ) override;
+
+    void UnSubscribeImageTopic( const QString& aImageTopic ) override;
+
 public slots:
     void OnTextResponse() override;
     void OnImageResponse() override;

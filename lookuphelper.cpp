@@ -201,10 +201,10 @@ void DeconstructBearer
         aGcc = query.at(--lastIndex);
     }
     qDebug() << "[ HELPER ] Bearer Info " << bearer;
-    qDebug() << "[ HELPER ] Splitting Bearer Info mBand " << aStationInfo.mBand;
-    qDebug() << "[ HELPER ] Splitting Bearer Info mPi " << aStationInfo.mPi;
-    qDebug() << "[ HELPER ] Splitting Bearer Info mGcc " << aGcc;
-    qDebug() << "[ HELPER ] Splitting Bearer Info mScids " << hex << aStationInfo.mScids;
-    qDebug() << "[ HELPER ] Splitting Bearer Info mSid " << hex << aStationInfo.mSid;
-    qDebug() << "[ HELPER ] Splitting Bearer Info mEid " << hex << aStationInfo.mEid;
+    qDebug() << "[ HELPER ] Splitting Bearer -> Band: " << aStationInfo.mBand
+             << " Pi " << hex << aStationInfo.mPi
+             << " Gcc " << aGcc
+             << " Scids " << hex << aStationInfo.mScids
+             << " Sid " << hex << aStationInfo.mSid
+             << " Eid " << hex << aStationInfo.mEid;
 }

@@ -20,10 +20,6 @@ static const QString SelectCoxMedia1("73978-292-fm-usa");
 static const QString SelectAustralia ("111a-f003-1f0-dab-au");
 static const QString SelectNorway ("f204-f801-fe2-dab-norway");
 
-static const QString RadioVISMessageID("RadioVIS-Message-ID");
-static const QString RadioVISTriggerTime("RadioVIS-Trigger-Time");
-const int sTimerValue = 10000;
-
 static const QString ServiceInformationFileName("RadioDns_ServiceInformation.xml");
 static const QString ProgramInformationFileName("RadioDns_ProgramInformation.xml");
 
@@ -48,8 +44,6 @@ SignalHandler::SignalHandler
 {
 
     // Creating a Timer
-    mHttpTextTimer = new QTimer( this );
-    mHttpImageTimer = new QTimer( this );
     mPlayer = new Player();
     mServiceInformationDownloader = new DownloadManager( ServiceInformationFileName );
     mProgramInformationDownloader = new DownloadManager(ProgramInformationFileName);
@@ -102,15 +96,6 @@ QString SignalHandler::DownloadProgramInformation(QString fqdn, QString serviceI
     return urlFormation;
 }
 
-void SignalHandler::OnHttpTextTimeout()
-{
-    mHttpTransport.RequestText( mTextTopic );
-}
-
-void SignalHandler::OnHttpImageTimeout()
-{
-    mHttpTransport.RequestImage( mImageTopic );
-}
 
 void SignalHandler::OnTextChanged( const QString& aText )
 {
@@ -173,7 +158,7 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
         qWarning() << "[HANDLER] List Size = " << mList.size() << "is not in range with Index = " << aIndex;
         return;
     }
-    StopVisTimers();
+    //StopVisTimers();
     mPlayer->Stop();
     m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
     qDebug() << "[HANDLER] Selecting " + m_CurrentLyPlaying + "@ index " << aIndex;
@@ -191,12 +176,22 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
             QString gcc;
             data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station,gcc);
             // May be when selection get the service identifier from the list ??
+            // First UnSubscribe from previous topics
+            mHttpTransport.UnSubscribeTextTopic( mTextTopic );
+            mHttpTransport.UnSubscribeImageTopic( mImageTopic );
+            mStompTransport.UnSubscribeTextTopic( mTextTopic );
+            mStompTransport.UnSubscribeImageTopic( mImageTopic );
+            // Create New Topics
             ConstructTopic( station, gcc, "text", mTextTopic );
             ConstructTopic( station, gcc, "image", mImageTopic );
-
+            // Subscribe to New Topics
+            mHttpTransport.SubscribeTextTopic( mTextTopic );
+            mHttpTransport.SubscribeImageTopic( mImageTopic );
+            mStompTransport.SubscribeTextTopic( mTextTopic );
+            mStompTransport.SubscribeImageTopic( mImageTopic );
             mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
             mCurrentPlayingIndex = aIndex;
-            StartVisTimers();
+            //StartVisTimers();
             break;
         }
     }
@@ -249,7 +244,7 @@ void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
         mUiHandler.QmlMethodInvokeaddListElement( val );
     }
 
-    StartVisTimers();
+    //StartVisTimers();
 }
 
 void SignalHandler::OnProgramInformationDownloaded( const QString& aFilePath )
@@ -287,20 +282,6 @@ void SignalHandler::ShowNoAudioStreamAvaialablePopup( bool val )
 
 void SignalHandler::ConnectSignals()
 {
-    QObject::connect
-            (
-            mHttpTextTimer,
-            SIGNAL(timeout()),
-            this,
-            SLOT(OnHttpTextTimeout())
-            );
-    QObject::connect
-            (
-            mHttpImageTimer,
-            SIGNAL(timeout()),
-            this,
-            SLOT(OnHttpImageTimeout())
-            );
 
     QObject::connect
             (
@@ -454,11 +435,11 @@ void SignalHandler::OnHttpVisSupported( bool aVal )
             QString::number( mDnsLookup->GetHttpPortNumber() ),
             mDnsLookup->GetHttpTargetName()
             );
-    mHttpTransport.RequestText( mTextTopic );
-    mHttpTransport.RequestImage( mImageTopic );
+    mHttpTransport.SubscribeTextTopic( mTextTopic );
+    mHttpTransport.SubscribeImageTopic( mImageTopic );
 
     isHttpVisSupported = aVal;
-    StopVisTimers();
+    //StopVisTimers();
 }
 
 void SignalHandler::OnStompVisSupported( bool aVal )
@@ -478,23 +459,8 @@ void SignalHandler::OnStompVisSupported( bool aVal )
 
 void SignalHandler::OnStompConnectionReady()
 {
-    mStompTransport.RequestText( mTextTopic );
-    mStompTransport.RequestImage( mImageTopic );
-}
-
-void SignalHandler::StartVisTimers()
-{
-    if( isHttpVisSupported )
-    {
-        mHttpTextTimer->start(sTimerValue);
-        mHttpImageTimer->start(sTimerValue);
-    }
-}
-
-void SignalHandler::StopVisTimers()
-{
-    mHttpTextTimer->stop();
-    mHttpImageTimer->stop();
+    mStompTransport.SubscribeTextTopic( mTextTopic );
+    mStompTransport.SubscribeImageTopic( mImageTopic );
 }
 
 void SignalHandler::UpdateUIFromList( int aIndex )
@@ -535,6 +501,8 @@ void SignalHandler::OnSelectionChanged(QString value)
     qDebug() <<"[HANDLER] OnSelectionChanged :"<<value;
     ClearMetaData();
     mCurrentSelection = value;
+    mHttpTransport.UnSubscribeTextTopic( mTextTopic );
+    mHttpTransport.UnSubscribeImageTopic( mImageTopic );
     if( Selecttion_UK_FM == value )
     {
         StationInformation data;
@@ -715,4 +683,7 @@ void SignalHandler::OnSelectionChanged(QString value)
         mTextTopic.clear();
         ConstructTopic(data,"fe2","text",mTextTopic);
     }
+
+    mHttpTransport.SubscribeTextTopic( mTextTopic );
+    mHttpTransport.SubscribeImageTopic( mImageTopic );
 }

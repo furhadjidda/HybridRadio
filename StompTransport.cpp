@@ -3,6 +3,10 @@
 #include <QNetworkRequest>
 #include <QStomp/qstomp.h>
 
+const static QString TopicPrefix("/topic/");
+const static QPair<QByteArray, QByteArray> ReceiptHeader = {"receipt","hybrid-radio-receipt-2020"};
+QPair<QByteArray, QByteArray> IdHeader = {"id","hybrid-radio-id-2020"};
+
 StompTransport::StompTransport()
     : m_webSocket( nullptr )
 {
@@ -16,6 +20,7 @@ void StompTransport::SetPortAndTarget
     const QString& aTarget
     )
 {
+    qDebug() << "[STOMP-TRANSPORT] Port = " << aPort << " Target = " << aTarget;
     if( mTarget == aTarget )
     {
         return;
@@ -41,30 +46,42 @@ void StompTransport::SetPortAndTarget
                      this, SLOT(OnFrameReceived()));
 }
 
-void StompTransport::RequestText( const QString& aTextTopic )
+void StompTransport::SubscribeTextTopic( const QString& aTextTopic )
 {
-    // TODO Clean this
-    qDebug() << "\n[STOMP-TRANSPORT] RequestText " << aTextTopic;
-    QString textTopic = "/topic/" + aTextTopic;
-    QPair<QByteArray, QByteArray> receipt = {"receipt","newIdHybrid"};
-    QPair<QByteArray, QByteArray> id = {"id","testHybridId1"};
+    QString textTopic = TopicPrefix + aTextTopic;
     QStompHeaderList headers;
-    headers.push_back(receipt);
-    headers.push_back(id);
+    headers.push_back( ReceiptHeader );
+    headers.push_back( IdHeader );
+    qDebug() << "[STOMP-TRANSPORT] Subscribing to " << textTopic;
     mStompClient.subscribe( textTopic.toUtf8(), true, headers );
 }
 
-void StompTransport::RequestImage( const QString& aImageTopic )
+void StompTransport::SubscribeImageTopic( const QString& aImageTopic )
 {
-    // TODO Clean this
-    qDebug() << "\n[STOMP-TRANSPORT] RequestImage\n";
-    QString imageTopic = "/topic/" + aImageTopic;
-    QPair<QByteArray, QByteArray> receipt = {"receipt","newIdHybrid"};
-    QPair<QByteArray, QByteArray> id = {"id","testHybridId2"};
+    QString imageTopic = TopicPrefix + aImageTopic;
     QStompHeaderList headers;
-    headers.push_back(receipt);
-    headers.push_back(id);
+    headers.push_back( ReceiptHeader );
+    headers.push_back( IdHeader );
+    qDebug() << "[STOMP-TRANSPORT] Subscribing to " << imageTopic;
     mStompClient.subscribe( imageTopic.toUtf8(), true, headers );
+}
+
+void StompTransport::UnSubscribeTextTopic( const QString& aTextTopic )
+{
+    QString textTopic = TopicPrefix + aTextTopic;
+    QStompHeaderList headers;
+    qDebug() << "[STOMP-TRANSPORT] UnSubscribing to " << textTopic;
+    mStompClient.unsubscribe( textTopic.toUtf8(), headers );
+    mCurrentTextTopic.clear();
+}
+
+void StompTransport::UnSubscribeImageTopic( const QString& aImageTopic )
+{
+    QString imageTopic = TopicPrefix + aImageTopic;
+    QStompHeaderList headers;
+    qDebug() << "[STOMP-TRANSPORT] UnSubscribing to " << imageTopic;
+    mStompClient.unsubscribe( imageTopic.toUtf8(), headers );
+    mCurrentImageTopic.clear();
 }
 
 void StompTransport::OnTextResponse()
@@ -77,27 +94,29 @@ void StompTransport::OnImageResponse()
 
 void StompTransport::OnStompError( QAbstractSocket::SocketError error )
 {
-    qDebug() << "\n[STOMP-TRANSPORT] error = " << error;
+    qDebug() << "[STOMP-TRANSPORT] error = " << error;
 }
+
 void StompTransport::OnConnected()
 {
-    qDebug() << "\n[STOMP-TRANSPORT] connected !! ";
+    qDebug() << "[STOMP-TRANSPORT] CONNECTED !! ";
     mStompClient.login();
     emit SignalStompConnectionReady();
 }
+
 void StompTransport::OnDisConnected()
 {
-    qDebug() << "\n[STOMP-TRANSPORT] disconnected !! ";
+    qDebug() << "[STOMP-TRANSPORT] DISCONNECTED !! ";
 }
+
 void StompTransport::OnFrameReceived()
 {
-    qDebug() << "\n[STOMP-TRANSPORT] Frame Received ";
-    QList<QStompResponseFrame> frames = mStompClient.fetchAllFrames();
-    qDebug() << "\n [STOMP-TRANSPORT] Number of Frames Received = " << frames.size();
-    for( QStompResponseFrame frame:frames )
+    QList<QStompResponseFrame> responseFrames = mStompClient.fetchAllFrames();
+    qDebug() << "[STOMP-TRANSPORT] Number of Frames Received = " << responseFrames.size();
+    for( QStompResponseFrame frame:responseFrames )
     {
         QByteArray data = frame.toByteArray();
-        qDebug() << "\n[STOMP-TRANSPORT] data = " << QString(data);
+        qDebug() << "[STOMP-TRANSPORT] Data Received = " << data;
     }
 
     // TODO : Parse the data here to send to QMlSignalHandler
@@ -105,5 +124,5 @@ void StompTransport::OnFrameReceived()
 }
 void StompTransport::OnSocketStateChanged( QAbstractSocket::SocketState aState)
 {
-    qDebug() << "\n[STOMP-TRANSPORT] State = " << aState;
+    qDebug() << "[STOMP-TRANSPORT] State = " << aState;
 }

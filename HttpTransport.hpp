@@ -1,8 +1,8 @@
 #ifndef HTTPTRANSPORT_HPP
 #define HTTPTRANSPORT_HPP
 
+#include <QTimer>
 #include "Transport.hpp"
-
 
 class HttpTransport : public Transport
 {
@@ -22,17 +22,45 @@ public:
         mTextResponse.clear();
     }
 
-    void RequestText( const QString& aTextTopic ) override;
+    void SubscribeTextTopic( const QString& aTextTopic ) override;
 
-    void RequestImage( const QString& aImageTopic ) override;
+    void SubscribeImageTopic( const QString& aImageTopic ) override;
+
+
+    void UnSubscribeTextTopic( const QString& aTextTopic ) override
+    {
+        qDebug() << "[HTTP-TRANSPORT] Unsubscribe from Topic" << aTextTopic;
+        mCurrentTextTopic.clear();
+        mTextTopicTimer->stop();
+    };
+
+    void UnSubscribeImageTopic( const QString& aImageTopic ) override
+    {
+        qDebug() << "[HTTP-TRANSPORT] Unsubscribe from Topic" << aImageTopic;
+        mCurrentImageTopic.clear();
+        mImageTopicTimer->stop();
+    }
 
 public slots:
     void OnTextResponse() override;
     void OnImageResponse() override;
+    void OnTextTopicTimeExpired();
+    void OnImageTopicTimeExpired();
 
 signals:
     void SignalTextChanged( const QString& aText ) override;
     void SignalImageChanged( const QString& aImage ) override;
+
+private:
+    void RequestTextTopic( const QString& aTextTopic );
+    void RequestImageTopic( const QString& aImageTopic );
+    QVariantMap mTextResponse;
+    QVariantMap mImageResponse;
+    QNetworkReply* mTextReply;
+    QNetworkReply* mImageReply;
+    QTimer* mTextTopicTimer;
+    QTimer* mImageTopicTimer;
+    QNetworkAccessManager mNetworkManager;
 };
 
 #endif // HTTPTRANSPORT_HPP

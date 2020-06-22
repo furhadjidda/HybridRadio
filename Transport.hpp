@@ -20,9 +20,13 @@ public:
 
     virtual void ResetTransportResponses() = 0;
 
-    virtual void RequestText( const QString& aTextTopic ) = 0;
+    virtual void SubscribeTextTopic( const QString& aTextTopic ) = 0;
 
-    virtual void RequestImage( const QString& aImageTopic ) = 0;
+    virtual void SubscribeImageTopic( const QString& aImageTopic ) = 0;
+
+    virtual void UnSubscribeTextTopic( const QString& aTextTopic ) = 0;
+
+    virtual void UnSubscribeImageTopic( const QString& aImageTopic ) = 0;
 
 signals:
     virtual void SignalTextChanged( const QString& aText ) = 0;
@@ -33,13 +37,10 @@ public slots:
     virtual void OnImageResponse() = 0;
 
 protected:
-    QVariantMap mTextResponse;
-    QVariantMap mImageResponse;
-    QNetworkAccessManager mNetworkManager;
+    QString mCurrentTextTopic;
+    QString mCurrentImageTopic;
     QString mPort;
     QString mTarget;
-    QNetworkReply* mTextReply;
-    QNetworkReply* mImageReply;
 
 };
 

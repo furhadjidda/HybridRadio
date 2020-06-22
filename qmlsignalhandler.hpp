@@ -47,8 +47,6 @@ public slots:
     void OnServiceInformationDownloaded( const QString& aFilePath );
     void OnProgramInformationDownloaded( const QString& aFilePath );
     void OnStop();
-    void OnHttpTextTimeout();
-    void OnHttpImageTimeout();
     void OnTextChanged( const QString& aText );
     void OnImageChanged( const QString& aImage );
     void MediaStatusChanged(QMediaPlayer::State val);
@@ -72,8 +70,6 @@ private:
     DNSLookup* mDnsLookup;
     DownloadManager* mServiceInformationDownloader;
     DownloadManager* mProgramInformationDownloader;
-    QTimer* mHttpTextTimer;
-    QTimer* mHttpImageTimer;
 
     SiDataList mList;
     EpgList mEpgList;
