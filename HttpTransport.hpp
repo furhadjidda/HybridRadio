@@ -57,10 +57,6 @@ public slots:
     void OnTextTopicTimeExpired();
     void OnImageTopicTimeExpired();
 
-signals:
-    void SignalTextChanged( const QString& aText ) override;
-    void SignalImageChanged( const QString& aImage ) override;
-
 private:
     void RequestTextTopic( const QString& aTextTopic );
     void RequestImageTopic( const QString& aImageTopic );

@@ -168,6 +168,12 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
     DownloadProgramInformation( mList[aIndex].mFqdn, mList[aIndex].mServiceIdentifier );
     BearerSplit data;
 
+    // First UnSubscribe from previous topics
+    mHttpTransport.UnSubscribeTextTopic( mTextTopic );
+    mHttpTransport.UnSubscribeImageTopic( mImageTopic );
+    mStompTransport.UnSubscribeTextTopic( mTextTopic );
+    mStompTransport.UnSubscribeImageTopic( mImageTopic );
+
     for(int index = 0; index < mList[aIndex].mBearerInfo.size(); ++index)
     {
         if( mList[aIndex].mBearerInfo[index].mId.length() > 0 )
@@ -176,11 +182,6 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
             QString gcc;
             data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station,gcc);
             // May be when selection get the service identifier from the list ??
-            // First UnSubscribe from previous topics
-            mHttpTransport.UnSubscribeTextTopic( mTextTopic );
-            mHttpTransport.UnSubscribeImageTopic( mImageTopic );
-            mStompTransport.UnSubscribeTextTopic( mTextTopic );
-            mStompTransport.UnSubscribeImageTopic( mImageTopic );
             // Create New Topics
             ConstructTopic( station, gcc, "text", mTextTopic );
             ConstructTopic( station, gcc, "image", mImageTopic );
@@ -374,24 +375,8 @@ void SignalHandler::ConnectSignals()
 
     QObject::connect
             (
-            &mHttpTransport,
-            &HttpTransport::SignalTextChanged,
-            this,
-            &SignalHandler::OnTextChanged
-            );
-
-    QObject::connect
-            (
-            &mHttpTransport,
-            &HttpTransport::SignalImageChanged,
-            this,
-            &SignalHandler::OnImageChanged
-            );
-
-    QObject::connect
-            (
             &mStompTransport,
-            &StompTransport::SignalTextChanged,
+            &Transport::SignalTextChanged,
             this,
             &SignalHandler::OnTextChanged
             );
@@ -399,7 +384,7 @@ void SignalHandler::ConnectSignals()
     QObject::connect
             (
             &mStompTransport,
-            &StompTransport::SignalImageChanged,
+            &Transport::SignalImageChanged,
             this,
             &SignalHandler::OnImageChanged
             );

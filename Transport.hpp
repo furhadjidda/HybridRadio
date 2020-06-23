@@ -33,8 +33,8 @@ public:
     virtual void EnableTransport() = 0;
 
 signals:
-    virtual void SignalTextChanged( const QString& aText ) = 0;
-    virtual void SignalImageChanged( const QString& aImage ) = 0;
+    void SignalTextChanged( const QString& aText );
+    void SignalImageChanged( const QString& aImage );
 
 public slots:
     virtual void OnTextResponse() = 0;
@@ -45,6 +45,7 @@ protected:
     QString mCurrentImageTopic;
     QString mPort;
     QString mTarget;
+    bool mIsDiabled{false};
 
 };
 

@@ -70,7 +70,7 @@ void StompTransport::UnSubscribeTextTopic( const QString& aTextTopic )
 {
     QString textTopic = TopicPrefix + aTextTopic;
     QStompHeaderList headers;
-    qDebug() << "[STOMP-TRANSPORT] UnSubscribing to " << textTopic;
+    qDebug() << "[STOMP-TRANSPORT] UnSubscribing from " << textTopic;
     mStompClient.unsubscribe( textTopic.toUtf8(), headers );
     mCurrentTextTopic.clear();
 }
@@ -79,7 +79,7 @@ void StompTransport::UnSubscribeImageTopic( const QString& aImageTopic )
 {
     QString imageTopic = TopicPrefix + aImageTopic;
     QStompHeaderList headers;
-    qDebug() << "[STOMP-TRANSPORT] UnSubscribing to " << imageTopic;
+    qDebug() << "[STOMP-TRANSPORT] UnSubscribing from " << imageTopic;
     mStompClient.unsubscribe( imageTopic.toUtf8(), headers );
     mCurrentImageTopic.clear();
 }

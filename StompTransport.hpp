@@ -52,8 +52,6 @@ public slots:
     void OnSocketStateChanged( QAbstractSocket::SocketState aState);
 
 signals:
-    void SignalTextChanged( const QString& aText ) override;
-    void SignalImageChanged( const QString& aImage ) override;
     void SignalStompConnectionReady();
 
 private:
