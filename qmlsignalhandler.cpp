@@ -390,6 +390,22 @@ void SignalHandler::ConnectSignals()
 
     QObject::connect
             (
+            &mStompTransport,
+            &StompTransport::SignalTextChanged,
+            this,
+            &SignalHandler::OnTextChanged
+            );
+
+    QObject::connect
+            (
+            &mStompTransport,
+            &StompTransport::SignalImageChanged,
+            this,
+            &SignalHandler::OnImageChanged
+            );
+
+    QObject::connect
+            (
             mDnsLookup,
             &DNSLookup::SignalHttpVisSupported,
             this,
@@ -428,6 +444,7 @@ void SignalHandler::OnHttpVisSupported( bool aVal )
     if( !aVal )
     {
         qDebug() << "[HANDLER] Http Vis NOT SUPPORTED !! ";
+        return;
     }
 
     mHttpTransport.SetPortAndTarget
@@ -447,8 +464,12 @@ void SignalHandler::OnStompVisSupported( bool aVal )
     if( !aVal )
     {
         qDebug() << "[HANDLER] Stomp Vis NOT SUPPORTED !! ";
+        return;
     }
     isStopVisSupported = aVal;
+
+    // TODO Once STOMP is stable - disable Http transport when STOMP is supported !
+    //mHttpTransport.DisableTransport(); // Disables Http Transport
 
     mStompTransport.SetPortAndTarget
             (

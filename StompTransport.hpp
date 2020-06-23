@@ -31,6 +31,16 @@ public:
 
     void UnSubscribeImageTopic( const QString& aImageTopic ) override;
 
+    void DisableTransport() override
+    {
+        mIsDiabled = true;
+    }
+
+    void EnableTransport() override
+    {
+        mIsDiabled = false;
+    }
+
 public slots:
     void OnTextResponse() override;
     void OnImageResponse() override;

@@ -28,6 +28,10 @@ public:
 
     virtual void UnSubscribeImageTopic( const QString& aImageTopic ) = 0;
 
+    virtual void DisableTransport() = 0;
+
+    virtual void EnableTransport() = 0;
+
 signals:
     virtual void SignalTextChanged( const QString& aText ) = 0;
     virtual void SignalImageChanged( const QString& aImage ) = 0;

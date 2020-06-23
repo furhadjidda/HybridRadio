@@ -117,6 +117,54 @@ void StompTransport::OnFrameReceived()
     {
         QByteArray data = frame.toByteArray();
         qDebug() << "[STOMP-TRANSPORT] Data Received = " << data;
+
+        QString receivedFrame( data );
+        QStringList parts = receivedFrame.split(QLatin1Char('\n'));
+        for( QString part : parts )
+        {
+            if( part.contains( "SHOW" ) )
+            {
+                // 5 is the size of "TEXT" + the space
+                // SHOW http://slideshow.musicradio.com/slides/GCap_Media/One_Network/Capital_Radio/NowPlaying_973027.jpg
+                QString ImagePath = part.right( part.size() - 5 );
+                emit SignalImageChanged( ImagePath );
+            }
+            else if( part.contains( "TEXT" ) )
+            {
+                // 5 is the size of "TEXT" + the space
+                // TEXT Now on Capital: Powfu Feat. Beabadoobee with coffee for your head
+                QString Text = part.right( part.size() - 5 );
+                emit SignalTextChanged( Text );
+            }
+        }
+
+        qDebug() << "[STOMP-TRANSPORT] Response Type = " << frame.type();
+
+        if( frame.hasMessage() )
+        {
+            qDebug() << "[STOMP-TRANSPORT] Response message = " << frame.message();
+        }
+
+        if( frame.hasDestination() )
+        {
+            qDebug() << "[STOMP-TRANSPORT] Response Destination = " << frame.destination();
+        }
+
+        if( frame.hasSubscriptionId() )
+        {
+            qDebug() << "[STOMP-TRANSPORT] Response subscriptionId = " << frame.subscriptionId();
+        }
+
+        if( frame.hasMessageId() )
+        {
+            qDebug() << "[STOMP-TRANSPORT] Response messageId = " << frame.messageId();
+        }
+
+        if( frame.hasReceiptId() )
+        {
+            qDebug() << "[STOMP-TRANSPORT] Response receiptId = " << frame.receiptId();
+        }
+
     }
 
     // TODO : Parse the data here to send to QMlSignalHandler

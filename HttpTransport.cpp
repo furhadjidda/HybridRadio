@@ -127,6 +127,9 @@ void HttpTransport::OnImageTopicTimeExpired()
 void HttpTransport::RequestTextTopic( const QString& aTextTopic )
 {
     // Construct a url for text topic
+    if( mIsDiabled )
+        return;
+
     QVariantMap::const_iterator iter = mTextResponse.find( RadioVISMessageID );
 
     QString lastTextId("");
@@ -169,6 +172,9 @@ void HttpTransport::RequestTextTopic( const QString& aTextTopic )
 
 void HttpTransport::RequestImageTopic( const QString& aImageTopic )
 {
+    if( mIsDiabled )
+        return;
+
     // Construct a url for image topic
     QVariantMap::const_iterator iter = mImageResponse.find( RadioVISMessageID );
 
