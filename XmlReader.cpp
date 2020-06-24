@@ -43,7 +43,7 @@ void XmlReader::ReadPiXmlData
         QTextStream in( &piXmlFile );
         piXmlString = in.readAll();
 
-        qDebug() << "[XML_READER] Reading PI XML file, Size = " << piXmlFile.size() << "  Bytes, Name : " << fileName;
+        qDebug() << "[XML_READER] file, Name " << fileName << "Size = " << piXmlFile.size() << "  Bytes, Name : " << fileName;
 
     }
 
@@ -159,8 +159,7 @@ void XmlReader::ReadSiXmlData
     {
         QTextStream in( &downloadedSiXmlFile );
         siXml = in.readAll();
-        qDebug() << "[XML_READER] Reading SI XML file, Size = " << downloadedSiXmlFile.size() << "  Bytes";
-        qDebug() << "[XML_READER] Reading SI XML file, Name = " << fileName ;
+        qDebug() << "[XML_READER] Reading file " << fileName << " Size = " << downloadedSiXmlFile.size() << "  Bytes";
     }
 
     QXmlStreamReader reader( siXml );

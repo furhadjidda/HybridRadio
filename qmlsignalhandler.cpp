@@ -101,6 +101,7 @@ void SignalHandler::OnTextChanged( const QString& aText )
 {
     mUiHandler.SetSongNameValue( aText );
 }
+
 void SignalHandler::OnImageChanged( const QString& aImage )
 {
     mUiHandler.SetArtworkValue( aImage );
@@ -110,19 +111,11 @@ void SignalHandler::OnImageChanged( const QString& aImage )
 void SignalHandler::OnPlay()
 {
     mPlayer->playUrl(m_CurrentLyPlaying);
-    //mProcess->kill();
-    //mProcess->waitForFinished();
-    //QString gstreamerCommand = "gst-launch-0.10 -v souphttpsrc location="
-    //        + m_CurrentLyPlaying
-    //        + " iradio-mode=true ! decodebin name=demux ! audioresample ! audioconvert ! autoaudiosink";
-    //mProcess->start(gstreamerCommand);
 }
 
 void SignalHandler::OnStop()
 {
      mPlayer->Stop();
-     //mProcess->kill();
-     //mProcess->waitForFinished();
 }
 
 
@@ -148,7 +141,7 @@ void SignalHandler::OnPrevious()
 
 void SignalHandler::PlayAtIndex( const qint16 aIndex )
 {
-    mHttpTransport.ResetTransportResponses();
+    mHttpTransport.ResetTransport();
     ClearMetaData();
 
     ShowNoAudioStreamAvaialablePopup( (mList[aIndex].mPlayableMedia.size() == 0) );
@@ -161,7 +154,7 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
     //StopVisTimers();
     mPlayer->Stop();
     m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
-    qDebug() << "[HANDLER] Selecting " + m_CurrentLyPlaying + "@ index " << aIndex;
+    qDebug() << "\n\n[HANDLER] >>> Selecting " + m_CurrentLyPlaying + " @ index " << aIndex << "\n\n";
     mPlayer->playUrl(m_CurrentLyPlaying.toUtf8().constData());
     // This updates the UI with the findings
     UpdateUIFromList( aIndex );
@@ -192,7 +185,6 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
             mStompTransport.SubscribeImageTopic( mImageTopic );
             mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
             mCurrentPlayingIndex = aIndex;
-            //StartVisTimers();
             break;
         }
     }
@@ -205,7 +197,7 @@ void SignalHandler::OnSelect( int aIndex )
 
 void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
 {
-    mHttpTransport.ResetTransportResponses();
+    mHttpTransport.ResetTransport();
     mList.clear();
     mReader->ReadSiXmlData( ServiceInformationFileName, mList );
     qDebug() << "[HANDLER] List Size = " << mList.size() << " FilePath = " << aFilePath;
@@ -391,6 +383,22 @@ void SignalHandler::ConnectSignals()
 
     QObject::connect
             (
+            &mHttpTransport,
+            &Transport::SignalTextChanged,
+            this,
+            &SignalHandler::OnTextChanged
+            );
+
+    QObject::connect
+            (
+            &mHttpTransport,
+            &Transport::SignalImageChanged,
+            this,
+            &SignalHandler::OnImageChanged
+            );
+
+    QObject::connect
+            (
             mDnsLookup,
             &DNSLookup::SignalHttpVisSupported,
             this,
@@ -454,7 +462,7 @@ void SignalHandler::OnStompVisSupported( bool aVal )
     isStopVisSupported = aVal;
 
     // TODO Once STOMP is stable - disable Http transport when STOMP is supported !
-    //mHttpTransport.DisableTransport(); // Disables Http Transport
+    mHttpTransport.DisableTransport(); // Disables Http Transport
 
     mStompTransport.SetPortAndTarget
             (
@@ -504,11 +512,14 @@ void SignalHandler::OnServiceInformationAvailable( const QString& aFilePath )
 
 void SignalHandler::OnSelectionChanged(QString value)
 {
-    qDebug() <<"[HANDLER] OnSelectionChanged :"<<value;
+    qDebug() <<"\n\n\n[HANDLER] OnSelectionChanged :"<<value << "\n\n";
     ClearMetaData();
     mCurrentSelection = value;
     mHttpTransport.UnSubscribeTextTopic( mTextTopic );
     mHttpTransport.UnSubscribeImageTopic( mImageTopic );
+    mStompTransport.UnSubscribeTextTopic( mTextTopic );
+    mStompTransport.UnSubscribeImageTopic( mImageTopic );
+    mStompTransport.ResetTransport();
     if( Selecttion_UK_FM == value )
     {
         StationInformation data;
@@ -678,7 +689,6 @@ void SignalHandler::OnSelectionChanged(QString value)
         data.PopulateDabFields(0xf204,0,0xf801);
         ConstructFqdn(data,"fe2",fqdn);
         mDnsLookup->lookupCName(fqdn);
-        qDebug() << fqdn;
 
         mCurrentBearer.clear();
         ConstructBearerUri(data,"fe2",mCurrentBearer);

@@ -1,6 +1,7 @@
 #ifndef HTTPTRANSPORT_HPP
 #define HTTPTRANSPORT_HPP
 
+#include <QObject>
 #include <QTimer>
 #include "Transport.hpp"
 
@@ -16,7 +17,7 @@ public:
         const QString& aTarget
         ) override;
 
-    void ResetTransportResponses() override
+    void ResetTransport() override
     {
         mImageResponse.clear();
         mTextResponse.clear();
@@ -29,6 +30,9 @@ public:
 
     void UnSubscribeTextTopic( const QString& aTextTopic ) override
     {
+        if( mIsDiabled )
+            return;
+
         qDebug() << "[HTTP-TRANSPORT] Unsubscribe from Topic" << aTextTopic;
         mCurrentTextTopic.clear();
         mTextTopicTimer->stop();
@@ -36,6 +40,9 @@ public:
 
     void UnSubscribeImageTopic( const QString& aImageTopic ) override
     {
+        if( mIsDiabled )
+            return;
+
         qDebug() << "[HTTP-TRANSPORT] Unsubscribe from Topic" << aImageTopic;
         mCurrentImageTopic.clear();
         mImageTopicTimer->stop();

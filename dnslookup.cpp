@@ -29,7 +29,7 @@ void DNSLookup::lookupService( QString& val )
     QString lookUp("_radioepg._tcp.");
 
     lookUp = lookUp + val;
-    qDebug() << "[DNS Look-up] Looking Service with Name " << lookUp;
+    qDebug() << "[DNS Look-up] Looking Service " << lookUp;
 
     mService = new QDnsLookup
                         (
@@ -68,7 +68,7 @@ void DNSLookup::lookupHttpVis()
     QString lookUp("_radiovis-http._tcp.");
 
     lookUp = lookUp + mCNAME;
-    qDebug() << "[DNS Look-up] Looking HTTP VIS with Name " << lookUp;
+    qDebug() << "[DNS Look-up] Checking HTTP VIS support" << lookUp;
 
     mHttpVis = new QDnsLookup
                         (
@@ -107,7 +107,7 @@ void DNSLookup::lookupHttpVis()
      QString lookUp("_radiovis._tcp.");
 
      lookUp = lookUp + mCNAME;
-     qDebug() << "[DNS Look-up] Looking VIS with Name " << lookUp;
+     qDebug() << "[DNS Look-up] Checking Stomp support " << lookUp;
 
      mStompVis = new QDnsLookup
                          (
@@ -165,9 +165,9 @@ void DNSLookup::onServiceResponse()
     {
         mServiceName = record.target();
         mServicePort = record.port();
-        qDebug() << "[DNS Look-up] Service" <<record.name();
-        qDebug() << "[DNS Look-up] Target" <<record.target();
-        qDebug() << "[DNS Look-up] Port" <<record.port();
+        qDebug() << "[DNS Look-up]->ServiceNameResponse Service" <<record.name()
+                 << "Target" <<record.target()
+                 << "Port" <<record.port();
 
         // See Section 10.2.2.2    Services not supporting client identification , of document
         // ETSI TS 102 818 V3.2.1 (2019-06) for document discovery of Service information.
@@ -185,8 +185,8 @@ void DNSLookup::onHttpVisResponse()
     // Check the lookup succeeded.
     if ( mHttpVis->error() != QDnsLookup::NoError )
     {
-        qWarning() << "[DNS Look-up ERR] onHttpVisResponse::DNS lookup failed";
-        qWarning() << "[DNS Look-up ERR] mHttpVis->error()" << mHttpVis->error();
+        qWarning() << "[DNS Look-up ERR] -> HttpVisResponse::DNS lookup failed"
+                   << " , mHttpVis->error()" << mHttpVis->error();
         emit SignalHttpVisSupported( false );
         mHttpVis->deleteLater();
         return;
@@ -197,9 +197,9 @@ void DNSLookup::onHttpVisResponse()
     {
         mHttpTargetName = record.target();
         mHttpServicePort = record.port();
-        qDebug() << "[DNS Look-up] HTTP Service" <<record.name();
-        qDebug() << "[DNS Look-up] HTTP target" <<record.target();
-        qDebug() << "[DNS Look-up] HTTP port" <<record.port();
+        qDebug() << "[DNS Look-up] -> HttpVisResponse Service" <<record.name()
+                 << " Target" <<record.target()
+                 << " Port" <<record.port();
     }
     emit SignalHttpVisSupported( true );
     mHttpVis->deleteLater();
@@ -210,8 +210,8 @@ void DNSLookup::onVisResponse()
     // Check the lookup succeeded.
     if ( mStompVis->error() != QDnsLookup::NoError )
     {
-        qWarning() << "[DNS Look-up ERR] onVisResponse::DNS lookup failed";
-        qWarning() << "[DNS Look-up ERR] mStompVis->error()" << mStompVis->error();
+        qWarning() << "[DNS Look-up ERR] -> VisResponse::DNS lookup failed"
+                   << " , mStompVis->error()" << mStompVis->error();
         emit SignalStompVisSupported( false );
         mStompVis->deleteLater();
         return;
@@ -222,9 +222,9 @@ void DNSLookup::onVisResponse()
     {
         mStompTargetName = record.target();
         mStompServicePort = record.port();
-        qDebug() << "[DNS Look-up] STOMP Service" <<record.name();
-        qDebug() << "[DNS Look-up] STOMP target" <<record.target();
-        qDebug() << "[DNS Look-up] STOMP port" <<record.port();
+        qDebug() << "[DNS Look-up] -> VisResponse Service" <<record.name()
+                 << " Target" <<record.target()
+                 << " Port" <<record.port();
     }
     emit SignalStompVisSupported( true );
     mStompVis->deleteLater();

@@ -19,8 +19,10 @@ public:
         const QString& aTarget
         ) override;
 
-    void ResetTransportResponses() override
+    void ResetTransport() override
     {
+        mTarget.clear();
+        DisableTransport();
     }
 
     void SubscribeTextTopic( const QString& aTextTopic ) override;
@@ -33,11 +35,19 @@ public:
 
     void DisableTransport() override
     {
+        qWarning() << "[STOMP-TRANSPORT] Disabling the Transport";
         mIsDiabled = true;
+
+        QStompRequestFrame disconnectFrame;
+
+        disconnectFrame.setType( QStompRequestFrame::RequestDisconnect );
+        disconnectFrame.setReceiptId("hybrid-radio-id-disconnect");
+        mStompClient.sendFrame( disconnectFrame );
     }
 
     void EnableTransport() override
     {
+        qWarning() << "[STOMP-TRANSPORT] Enabling the Transport";
         mIsDiabled = false;
     }
 
@@ -53,10 +63,17 @@ public slots:
 
 signals:
     void SignalStompConnectionReady();
+    void SignalStompConnectionBroken();
 
 private:
-    QWebSocket* m_webSocket;
+    void SendStompFrame
+        (
+        const QString& aTopic,
+        const QString& aReceipt,
+        QStompRequestFrame::RequestType aType
+        );
     QStompClient mStompClient;
+    QList<QPair<QString,QByteArray>> mPendingMessage;
 };
 
 #endif // STOMPTRANSPORT_HPP

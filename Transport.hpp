@@ -18,7 +18,7 @@ public:
         const QString& aTarget
         ) = 0;
 
-    virtual void ResetTransportResponses() = 0;
+    virtual void ResetTransport() = 0;
 
     virtual void SubscribeTextTopic( const QString& aTextTopic ) = 0;
 

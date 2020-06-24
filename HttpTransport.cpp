@@ -58,7 +58,7 @@ void HttpTransport::OnTextResponse()
 {
     QString textJson( mTextReply->readAll().data() );
     mTextResponse.clear();
-    qDebug() <<"[HTTP-TRANSPORT] Http Text Response : " << textJson << endl;
+    qDebug() <<"[HTTP-TRANSPORT] Http Text Response : " << textJson << "\n\n";
     if( 0 == textJson.size() )
     {
         return;
@@ -86,7 +86,7 @@ void HttpTransport::OnTextResponse()
 void HttpTransport::OnImageResponse()
 {
     QString imageJson = QString( mImageReply->readAll().data() );
-    qDebug() <<"[HTTP-TRANSPORT] Http Image Response : " << imageJson << endl;
+    qDebug() <<"[HTTP-TRANSPORT] Http Image Response : " << imageJson  << "\n\n";
     mImageResponse.clear();
 
     if( 0 == imageJson.size() )

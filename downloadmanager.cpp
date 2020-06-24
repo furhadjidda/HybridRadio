@@ -76,7 +76,6 @@ void DownloadManager::slotFinished()
     {
         file.write(*m_pBuffer);
         file.close();
-        qDebug() << "[ DOWNLOADER ] Downloaded the File " << mFileName;
         emit sendDownloadComplete( mFileName );
     }
     else

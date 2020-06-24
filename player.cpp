@@ -11,10 +11,10 @@ bool Player::playUrl
     mPlayer->setVolume( 100 );
     mPlayer->play();
     qDebug() << "[PLAYER] Audio Available = " << mPlayer->isAudioAvailable()
-             << "[PLAYER] Mute = " << mPlayer->isMuted()
-             << "[PLAYER] Player Available = " << mPlayer->isAvailable()
-             << "[PLAYER] Audio Available= " << mPlayer->isAudioAvailable()
-             << "[PLAYER] State = "<< mPlayer->state();
+             << " Mute = " << mPlayer->isMuted()
+             << " Player Available = " << mPlayer->isAvailable()
+             << " Audio Available= " << mPlayer->isAudioAvailable()
+             << " State = "<< mPlayer->state();
 
     return true;
 }
