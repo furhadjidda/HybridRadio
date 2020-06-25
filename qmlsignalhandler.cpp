@@ -449,7 +449,6 @@ void SignalHandler::OnHttpVisSupported( bool aVal )
     mHttpTransport.SubscribeImageTopic( mImageTopic );
 
     isHttpVisSupported = aVal;
-    //StopVisTimers();
 }
 
 void SignalHandler::OnStompVisSupported( bool aVal )

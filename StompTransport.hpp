@@ -6,12 +6,14 @@
 #include <QAbstractSocket>
 #include "Transport.hpp"
 #include <QStomp/qstomp.h>
+#include <tuple>
 
 class StompTransport : public Transport
 {
     Q_OBJECT
 public:
     StompTransport();
+    virtual ~StompTransport();
 
     void SetPortAndTarget
         (
@@ -42,7 +44,9 @@ public:
 
         disconnectFrame.setType( QStompRequestFrame::RequestDisconnect );
         disconnectFrame.setReceiptId("hybrid-radio-id-disconnect");
-        mStompClient.sendFrame( disconnectFrame );
+        mStompClient->sendFrame( disconnectFrame );
+
+        mStompClient->disconnectFromHost();
     }
 
     void EnableTransport() override
@@ -72,8 +76,10 @@ private:
         const QString& aReceipt,
         QStompRequestFrame::RequestType aType
         );
-    QStompClient mStompClient;
-    QList<QPair<QString,QByteArray>> mPendingMessage;
+    QStompClient* mStompClient{nullptr};
+
+    // tuple = RequestType , topic, receipt-id
+    QList<std::tuple<QStompRequestFrame::RequestType, QByteArray, QByteArray> > mPendingResponse;
 };
 
 #endif // STOMPTRANSPORT_HPP
