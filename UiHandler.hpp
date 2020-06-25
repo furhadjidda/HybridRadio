@@ -28,6 +28,9 @@ public:
 
     void QmlMethodInvokeclearProgramElement();
     void QmlMethodInvokeaddProgramElement( const EpgStruct& aValue );
+    void QmlMethodInvokeMethodDisplayHttpProtocolSupport( bool aStatus );
+    void QmlMethodInvokeMethodDisplayStompProtocolSupport( bool aStatus );
+    void QmlMethodInvokeAddMoreInfo( const QVariant& aValue );
 
 
 private:

@@ -91,73 +91,12 @@ Window {
              }
         }
 
-        Image {
-            id: image2
-            x: 8
-            y: 478
-            width: 442
-            height: 97
-            clip: false
-            opacity: 1
-            source: "PlayStrip.PNG"
-
-            MouseArea {
-                id: stopMouseArea
-                objectName: "Stop"
-                x: 272
-                y: 2
-                width: 84
-                height: 95
-                signal sendStop()
-                onClicked: sendStop()
-            }
-
-            MouseArea {
-                id: playMouseArea
-                objectName: "Play"
-                x: 0
-                y: 0
-                width: 84
-                height: 97
-                z: 12
-                signal sendPlay()
-                onClicked: sendPlay()
-            }
-
-
-
-            MouseArea {
-                id: mouseAreaNext
-                objectName: "Next"
-                x: 355
-                y: 3
-                width: 87
-                height: 94
-                signal sendNext()
-                onClicked: sendNext()
-            }
-
-
-
-            MouseArea {
-                id: mouseAreaPrev
-                objectName: "Previous"
-                x: 170
-                y: 1
-                width: 96
-                height: 96
-                signal sendPrevious()
-                onClicked: sendPrevious()
-            }
-
-        }
-
         Text {
             id: bitrate
             objectName: "BitRateObject"
-            x: 581
+            x: 605
             y: 361
-            width: 115
+            width: 91
             height: 14
             text: "bitrate"
             font.bold: true
@@ -219,10 +158,11 @@ Window {
         Text {
             id: additionalInfo
             objectName: "additionalInfo"
-            x: 465
-            y: 420
+            x: 461
+            y: 514
             width: 231
             height: 61
+            visible: false
             text: qsTr("Additional Info")
             wrapMode: Text.WordWrap
             font.pixelSize: 15
@@ -337,6 +277,8 @@ Window {
                             width: 220
                             wrapMode: Text.WordWrap
                             textFormat: Text.RichText
+                            verticalAlignment: Text.AlignVCenter
+                            horizontalAlignment: Text.AlignHCenter
                             MouseArea {
                                 width: 282; height: 60
                                 onClicked: {
@@ -493,34 +435,148 @@ Window {
 
         Text {
             id: element
-            x: 566
+            x: 616
             y: 387
-            width: 98
+            width: 88
             height: 17
-            text: qsTr("List Count: " + programListModel.count )
+            text: qsTr("Count: " + programListModel.count )
             font.bold: true
             font.pixelSize: 14
         }
 
-        /*
-        ListView {
-            id: programView
-            x: 456
-            y: 469
-            width: 547
-            height: 116
-            layer.enabled: false
-            highlightRangeMode: ListView.ApplyRange
-            snapMode: ListView.SnapToItem
-            cacheBuffer: 20
-            keyNavigationWraps: true
-            boundsBehavior: Flickable.StopAtBounds
-            orientation: ListView.Horizontal
-            flickableDirection: Flickable.HorizontalFlick
-            pixelAligned: false
-            model: programInfoModel
-            delegate: programmeInformationDelegate
-        }*/
+        Image {
+            id: httpProtocolImage
+            x: 526
+            y: 361
+            width: 73
+            height: 20
+            visible: false
+            source: "HttpImage.jpg"
+            fillMode: Image.PreserveAspectCrop
+        }
+
+        Image {
+            id: stompProtocolImage
+            x: 526
+            y: 387
+            width: 73
+            height: 20
+            visible: false
+            source: "StompImage.png"
+            fillMode: Image.PreserveAspectCrop
+        }
+
+
+        Popup {
+            id: additionalInfoPopup
+
+            x: Math.round((parent.width - width) / 2)
+            y: Math.round((parent.height - height) / 2)
+            width: 700
+            height: 175
+
+            Rectangle{
+                width: 700
+                height: 175
+                anchors.fill: parent
+                Text {
+                    id: moreInfoId
+                    anchors.fill: parent
+                    wrapMode: Text.WordWrap
+                    text: qsTr("text")
+                }
+
+                // Image for closing
+                Image{
+                    width: 25
+                    height: 25
+                    x: 660
+                    y: 1
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            additionalInfoPopup.close()
+                        }
+                    }
+                    source: "close-512.png"
+                }
+            }
+
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent | Popup.CloseOnReleaseOutside | Popup.CloseOnReleaseOutsideParent
+        }
+
+        Image {
+            id: additionalInfoImage
+            x: 461
+            y: 71
+            width: 30
+            height: 32
+            source: "info.png"
+            fillMode: Image.PreserveAspectFit
+            MouseArea{
+                anchors.fill: parent
+                onClicked: additionalInfoPopup.open()
+            }
+        }
+
+        Image {
+            id: playIconsImage
+            x: 22
+            y: 462
+            width: 366
+            height: 103
+            source: "playIcons_Mod.png"
+            fillMode: Image.PreserveAspectFit
+            MouseArea {
+                id: stopMouseArea
+                objectName: "Stop"
+                x: 290
+                y: 4
+                width: 84
+                height: 95
+                signal sendStop()
+                onClicked: sendStop()
+            }
+
+            MouseArea {
+                id: playMouseArea
+                objectName: "Play"
+                x: 81
+                y: 3
+                width: 84
+                height: 97
+                z: 12
+                signal sendPlay()
+                onClicked: sendPlay()
+            }
+
+
+
+            MouseArea {
+                id: mouseAreaNext
+                objectName: "Next"
+                x: 181
+                y: 1
+                width: 87
+                height: 94
+                signal sendNext()
+                onClicked: sendNext()
+            }
+
+
+
+            MouseArea {
+                id: mouseAreaPrev
+                objectName: "Previous"
+                x: 0
+                y: 4
+                width: 82
+                height: 96
+                signal sendPrevious()
+                onClicked: sendPrevious()
+            }
+
+        }
 
         function displayPopUp()
         {
@@ -535,6 +591,17 @@ Window {
         {
             epgImage.visible = true
         }
+
+        function displayHttpProtocolStatus( status )
+        {
+            httpProtocolImage.visible = status
+        }
+
+        function displayStompProtocolStatus( status )
+        {
+            stompProtocolImage.visible = status
+        }
+
         function hideEpgImage()
         {
             epgImage.visible = false
@@ -562,6 +629,12 @@ Window {
         {
             programInfoModel.append({"name":programName,"image":image,"time":timeAndDate})
             return 0;
+        }
+
+        function addBearerInformation( bearerInfoArg )
+        {
+            console.log("[QML] " + bearerInfoArg);
+            moreInfoId.text = bearerInfoArg;
         }
     }
 }

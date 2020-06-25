@@ -73,8 +73,9 @@ void SignalHandler::MediaStatusChanged(QMediaPlayer::State val)
 
     }
     mUiHandler.SetMediaStatusValue( status );
-
 }
+
+
 
 QString SignalHandler::DownloadProgramInformation(QString fqdn, QString serviceIdentifier)
 {
@@ -154,7 +155,7 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
     //StopVisTimers();
     mPlayer->Stop();
     m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
-    qDebug() << "\n\n[HANDLER] >>> Selecting " + m_CurrentLyPlaying + " @ index " << aIndex << "\n\n";
+    qDebug() << "\n\n\n[HANDLER] >>> Selecting " + m_CurrentLyPlaying + " @ index " << aIndex << "\n\n";
     mPlayer->playUrl(m_CurrentLyPlaying.toUtf8().constData());
     // This updates the UI with the findings
     UpdateUIFromList( aIndex );
@@ -437,6 +438,7 @@ void SignalHandler::OnHttpVisSupported( bool aVal )
     if( !aVal )
     {
         qDebug() << "[HANDLER] Http Vis NOT SUPPORTED !! ";
+        mUiHandler.QmlMethodInvokeMethodDisplayHttpProtocolSupport(false);
         return;
     }
 
@@ -449,13 +451,17 @@ void SignalHandler::OnHttpVisSupported( bool aVal )
     mHttpTransport.SubscribeImageTopic( mImageTopic );
 
     isHttpVisSupported = aVal;
+    mUiHandler.QmlMethodInvokeMethodDisplayHttpProtocolSupport(true);
 }
+
+
 
 void SignalHandler::OnStompVisSupported( bool aVal )
 {
     if( !aVal )
     {
-        qDebug() << "[HANDLER] Stomp Vis NOT SUPPORTED !! ";
+        qDebug() << "[HANDLER] Stomp Vis NOT SUPPORTED !! ";        
+        mUiHandler.QmlMethodInvokeMethodDisplayStompProtocolSupport(false);
         return;
     }
     isStopVisSupported = aVal;
@@ -468,13 +474,17 @@ void SignalHandler::OnStompVisSupported( bool aVal )
             QString::number( mDnsLookup->GetStompPortNumber() ),
             mDnsLookup->GetStompTargetName()
             );
+    mUiHandler.QmlMethodInvokeMethodDisplayStompProtocolSupport(true);
 }
+
+
 
 void SignalHandler::OnStompConnectionReady()
 {
     mStompTransport.SubscribeTextTopic( mTextTopic );
     mStompTransport.SubscribeImageTopic( mImageTopic );
 }
+
 
 void SignalHandler::UpdateUIFromList( int aIndex )
 {
@@ -488,17 +498,20 @@ void SignalHandler::UpdateUIFromList( int aIndex )
         data.append(val.mId);
         data.append(" ; ");
     }
-    mUiHandler.SetMoreInfoValue( data );
+    mUiHandler.QmlMethodInvokeAddMoreInfo( data );
 }
+
 
 void SignalHandler::ClearMetaData()
 {
     mUiHandler.SetStationNameValue( "" );
     mUiHandler.SetStationDescriptionValue( "" );
     mUiHandler.SetBitrateValue( "" );
+    mUiHandler.SetSongNameValue( "" );
+    mUiHandler.SetArtworkValue("");
 
     QString data("Bearer Info: ");
-    mUiHandler.SetMoreInfoValue( data );
+    mUiHandler.QmlMethodInvokeAddMoreInfo( data );
 }
 
 

@@ -42,9 +42,10 @@ void UiHandler::SetStationNameValue( const QVariant& aValue )
 
 void UiHandler::SetArtworkValue( const QVariant& aValue )
 {
-    if( 0 == aValue.toString().size() )
+    QString artWorkString = aValue.toString();
+    if( 0 == artWorkString.size() )
     {
-        return;
+        artWorkString = "default-art.jpg";
     }
     QObject *artWork = mUiObject->findChild<QObject*>("artWork");
 
@@ -53,7 +54,7 @@ void UiHandler::SetArtworkValue( const QVariant& aValue )
         artWork->setProperty
                 (
                 "source",
-                aValue
+                artWorkString
                 );
 
         QQmlProperty
@@ -63,7 +64,7 @@ void UiHandler::SetArtworkValue( const QVariant& aValue )
                 )
                 .write
                 (
-                aValue
+                artWorkString
                 );
     }
 
@@ -276,6 +277,40 @@ void UiHandler::QmlMethodInvokeMethodDisplayEpgPresentImage()
     }
 }
 
+void UiHandler::QmlMethodInvokeMethodDisplayHttpProtocolSupport( bool aStatus )
+{
+    QVariant retValue=0;
+    QObject *RectBoxObj= mUiObject->findChild<QObject*>("RectBox");
+    bool succeeded = QMetaObject::invokeMethod
+                        (
+                        RectBoxObj, "displayHttpProtocolStatus",
+                        Q_RETURN_ARG(QVariant, retValue),
+                        Q_ARG( QVariant, aStatus )
+                        );
+
+    if(!succeeded)
+    {
+        qWarning() << "Invokation Failed";
+    }
+}
+
+void UiHandler::QmlMethodInvokeMethodDisplayStompProtocolSupport( bool aStatus )
+{
+    QVariant retValue=0;
+    QObject *RectBoxObj= mUiObject->findChild<QObject*>("RectBox");
+    bool succeeded = QMetaObject::invokeMethod
+                        (
+                        RectBoxObj, "displayStompProtocolStatus",
+                        Q_RETURN_ARG(QVariant, retValue),
+                        Q_ARG( QVariant, aStatus )
+                        );
+
+    if(!succeeded)
+    {
+        qWarning() << "Invokation Failed";
+    }
+}
+
 void UiHandler::QmlMethodInvokeMethodHideEpgPresentImage()
 {
     QVariant retValue=0;
@@ -328,3 +363,21 @@ void UiHandler::QmlMethodInvokeaddProgramElement( const EpgStruct& aValue )
         qWarning() << "Invokation Failed";
     }
 }
+
+void UiHandler::QmlMethodInvokeAddMoreInfo( const QVariant& aValue )
+{
+    QVariant retValue = 0;
+    QObject *RectBoxObj = mUiObject->findChild<QObject*>("RectBox");
+    bool succeeded = QMetaObject::invokeMethod
+                        (
+                        RectBoxObj, "addBearerInformation",
+                        Q_RETURN_ARG(QVariant, retValue),
+                        Q_ARG( QVariant, aValue )
+                        );
+
+    if(!succeeded)
+    {
+        qWarning() << "Invokation Failed";
+    }
+}
+
