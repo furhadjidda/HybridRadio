@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>PlayStrip.PNG</file>
-        <file>child.qml</file>
         <file>music-2756904_1280.png</file>
         <file>images.jpeg</file>
         <file>b122_3-512.png</file>
@@ -13,5 +12,9 @@
         <file>400x235_DABplus_Logo_Farbe_sRGB.png</file>
         <file>HD-Radio-logo-HD-Only.jpeg</file>
         <file>RDS-logo.jpg</file>
+        <file>HttpImage.jpg</file>
+        <file>StompImage.png</file>
+        <file>info.png</file>
+        <file>playIcons_Mod.png</file>
     </qresource>
 </RCC>

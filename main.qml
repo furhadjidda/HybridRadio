@@ -68,17 +68,16 @@ Window {
             wheelEnabled: true
             model: ListModel {
                   id: cbItems
-                  ListElement { text: ""}                  
-                  ListElement { text: "88.1-c202-uk-bbc2" } // new
-                  ListElement { text: "93.1-c203-bbc3" } // new
-                  ListElement { text: "93.2-c204-bbc4" } // new
-                  ListElement { text: "95.8-c479-fm-uk"}
-                  ListElement { text: "97.7-c201-radio1" } // new
-                  ListElement { text: "104.2-d389-de" } // new
-                  ListElement { text: "c7d8-c1ce-0-dab-uk"}
-                  ListElement { text: "73978-292-fm-usa"}
-                  ListElement { text: "111a-f003-1f0-dab-au"}
-                  ListElement { text: "f204-f801-fe2-dab-norway"}
+                  ListElement { text: ""}
+                  ListElement { text: "FM(USA)-73978"}
+                  ListElement { text: "FM(DEUTSCHLAND)" } // new
+                  ListElement { text: "FM(RADIO1 UK)" } // new
+                  ListElement { text: "FM(BBC-2 UK)" } // new
+                  ListElement { text: "FM(BBC-4 UK)" } // new
+                  ListElement { text: "FM(UK)"}
+                  ListElement { text: "DAB(NORWAY)"}
+                  ListElement { text: "DAB(UK)"}
+                  ListElement { text: "DAB(AUS)"}
               }
             signal sendSelectionChanged(string data)
             x: 456
@@ -633,7 +632,6 @@ Window {
 
         function addBearerInformation( bearerInfoArg )
         {
-            console.log("[QML] " + bearerInfoArg);
             moreInfoId.text = bearerInfoArg;
         }
     }

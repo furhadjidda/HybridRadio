@@ -102,17 +102,16 @@ private:
         void SplitBearerString
             (
             const QString& data,
-            StationInformation& aStationInfo,
-            QString& aGcc
+            StationInformation& aStationInfo
             )
         {
-            DeconstructBearer(aStationInfo, aGcc, data);
+            DeconstructBearer(aStationInfo, data);
             mBand = aStationInfo.mBand;
             mFrequency = aStationInfo.mFrequency;
             mPi = QString::number( aStationInfo.mPi, 16);
             mSid = QString::number( aStationInfo.mSid, 16);
             mScids = QString::number( aStationInfo.mScids, 16);
-            mGcc = aGcc;
+            mGcc = aStationInfo.mGcc;
             mEid = QString::number( aStationInfo.mEid, 16);
         }
 

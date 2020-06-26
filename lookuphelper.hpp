@@ -72,28 +72,24 @@ typedef struct{
 void ConstructFqdn
     (
     const StationInformation& aStationInfo,
-    const QString& aGcc,
     QString& returnValue
     );
 
 void ConstructServiceIdentifier
     (
     const StationInformation& aStationInfo,
-    const QString& aGcc,
     QString& returnValue
     );
 
 void ConstructBearerUri
     (
     const StationInformation& aStationInfo,
-    const QString& aGcc,
     QString& returnValue
     );
 
 void ConstructTopic
     (
     const StationInformation& aStationInfo,
-    const QString& aGcc,
     const QString& aTopic,
     QString& returnValue
     );
@@ -101,7 +97,6 @@ void ConstructTopic
 void DeconstructBearer
     (
     StationInformation& aStationInfo,
-    QString& aGcc,
     const QString& bearer
     );
 

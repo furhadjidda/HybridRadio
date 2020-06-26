@@ -12,7 +12,6 @@ static const QString RadioDnsPostFix("radiodns.org");
 void ConstructFqdn
     (
     const StationInformation& aStationInfo,
-    const QString& aGcc,
     QString& returnValue
     )
     {
@@ -21,7 +20,7 @@ void ConstructFqdn
             // <frequency>.<pi>.<gcc>.fm.radiodns.org
             returnValue = aStationInfo.mFrequency + "."
                    + QString::number( aStationInfo.mPi, 16 ) + "."
-                   + aGcc + "."
+                   + aStationInfo.mGcc + "."
                    + aStationInfo.mBand + "."
                    + RadioDnsPostFix;
             qDebug() << "FQDN = " << returnValue;
@@ -33,7 +32,7 @@ void ConstructFqdn
             returnValue = QString::number( aStationInfo.mScids, 16 ) + "."
                    + QString::number( aStationInfo.mSid, 16 ) + "."
                    + QString::number( aStationInfo.mEid, 16 ) + "."
-                   + aGcc + "."
+                   + aStationInfo.mGcc + "."
                    + aStationInfo.mBand + "."
                    + RadioDnsPostFix;
             qDebug() << "FQDN = " << returnValue;
@@ -63,7 +62,6 @@ void ConstructFqdn
 void ConstructServiceIdentifier
     (
     const StationInformation& aStationInfo,
-    const QString& aGcc,
     QString& returnValue
     )
     {
@@ -71,7 +69,7 @@ void ConstructServiceIdentifier
         {
             // fm/<gcc>/<pi>/<frequency>
             returnValue = aStationInfo.mBand + "/"
-                   + aGcc + "/"
+                   + aStationInfo.mGcc + "/"
                    + QString::number( aStationInfo.mPi, 16 ) + "/"
                    + aStationInfo.mFrequency;
             return;
@@ -80,7 +78,7 @@ void ConstructServiceIdentifier
         {
             // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
             returnValue = aStationInfo.mBand + "/"
-                   + aGcc + "/"
+                   + aStationInfo.mGcc + "/"
                    + QString::number( aStationInfo.mEid, 16 ) + "/"
                    + QString::number( aStationInfo.mSid, 16 ) + "/"
                    + QString::number( aStationInfo.mScids, 16 );
@@ -111,7 +109,6 @@ void ConstructServiceIdentifier
 void ConstructBearerUri
     (
     const StationInformation& aStationInfo,
-    const QString& aGcc,
     QString& returnValue
     )
     {
@@ -119,7 +116,7 @@ void ConstructBearerUri
         {
             // fm:<gcc>.<pi>.<frequency>
             returnValue = aStationInfo.mBand + ":"
-                   + aGcc + "."
+                   + aStationInfo.mGcc + "."
                    + QString::number( aStationInfo.mPi, 16 ) + "."
                    + aStationInfo.mFrequency;
             qDebug() << "Bearer URI = " << returnValue;
@@ -130,7 +127,7 @@ void ConstructBearerUri
         {
             // dab:<gcc>.<eid>.<sid>.<scids>[.<uatype>]
             returnValue = aStationInfo.mBand + ":"
-                   + aGcc + "."
+                   + aStationInfo.mGcc + "."
                    + QString::number( aStationInfo.mEid, 16 ) + "."
                    + QString::number( aStationInfo.mSid, 16 ) + "."
                    + QString::number( aStationInfo.mScids, 16 );
@@ -162,12 +159,11 @@ void ConstructBearerUri
 void ConstructTopic
     (
     const StationInformation& aStationInfo,
-    const QString& aGcc,
     const QString& aTopic,
     QString& returnValue
     )
 {
-    ConstructServiceIdentifier( aStationInfo, aGcc, returnValue );
+    ConstructServiceIdentifier( aStationInfo, returnValue );
     returnValue += "/" + aTopic;
 }
 
@@ -175,7 +171,6 @@ void ConstructTopic
 void DeconstructBearer
     (
     StationInformation& aStationInfo,
-    QString& aGcc,
     const QString& bearer
     )
 {
@@ -189,7 +184,7 @@ void DeconstructBearer
         int lastIndex = query.size() - 1;
         aStationInfo.mFrequency = query.at(lastIndex);
         aStationInfo.mPi = query.at(--lastIndex).toUInt(&ok,16);
-        aGcc = query.at(--lastIndex);
+        aStationInfo.mGcc = query.at(--lastIndex);
     }
     else if( aStationInfo.mBand == "dab" )
     {
@@ -198,12 +193,12 @@ void DeconstructBearer
         aStationInfo.mScids = query.at(lastIndex).toUInt(&ok,16);
         aStationInfo.mSid = query.at(--lastIndex).toUInt(&ok,16);
         aStationInfo.mEid = query.at(--lastIndex).toUInt(&ok,16);
-        aGcc = query.at(--lastIndex);
+        aStationInfo.mGcc = query.at(--lastIndex);
     }
     qDebug() << "[ HELPER ] Bearer Info " << bearer;
     qDebug() << "[ HELPER ] Splitting Bearer -> Band = " << aStationInfo.mBand
              << " Pi = " << hex << aStationInfo.mPi
-             << " Gcc = " << aGcc
+             << " Gcc = " << aStationInfo.mGcc
              << " Scids = " << hex << aStationInfo.mScids
              << " Sid = " << hex << aStationInfo.mSid
              << " Eid = " << hex << aStationInfo.mEid

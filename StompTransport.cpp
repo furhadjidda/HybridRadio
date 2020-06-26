@@ -5,8 +5,6 @@
 #include <QThread>
 #include <QTcpSocket>
 
-#define STOMP_DEBUG 0
-
 const static QString TopicPrefix("/topic/");
 const static QPair<QByteArray, QByteArray> ReceiptHeaderText = {"receipt","1-1-text"};
 const static QPair<QByteArray, QByteArray> ReceiptHeaderImage = {"receipt","1-1-image"};
@@ -109,7 +107,6 @@ void StompTransport::UnSubscribeTextTopic( const QString& aTextTopic )
     qDebug() << "[STOMP-TRANSPORT] UnSubscribing from " << textTopic;
     mStompClient->unsubscribe( textTopic.toUtf8(), headers );
     mCurrentTextTopic.clear();
-    QThread::msleep( 500 );
 }
 
 void StompTransport::UnSubscribeImageTopic( const QString& aImageTopic )
@@ -123,7 +120,6 @@ void StompTransport::UnSubscribeImageTopic( const QString& aImageTopic )
     qDebug() << "[STOMP-TRANSPORT] UnSubscribing from " << imageTopic;
     mStompClient->unsubscribe( imageTopic.toUtf8(), headers );
     mCurrentImageTopic.clear();
-    QThread::msleep( 500 );
 }
 
 void StompTransport::OnTextResponse()
@@ -166,6 +162,7 @@ void StompTransport::OnFrameReceived()
 
         if( QStompResponseFrame::ResponseError == frame.type() )
         {
+            qDebug() << "[STOMP-TRANSPORT] Data Received = " << data << endl << endl;
             if( frame.hasMessage() )
             {
                 qDebug() << "[STOMP-TRANSPORT] ResponseError message = " << frame.message();

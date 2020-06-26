@@ -8,17 +8,16 @@
 #include <QCollator>
 
 
-static const QString Selecttion_UK_FM("95.8-c479-fm-uk");
-static const QString Selecttion_UK_DAB("c7d8-c1ce-0-dab-uk");
-static const QString Selecttion_DE_FM("104.2-d389-de");
+static const QString Selecttion_UK_FM("FM(UK)");
+static const QString Selecttion_UK_DAB("DAB(UK)");
+static const QString Selecttion_DE_FM("FM(DEUTSCHLAND)");
 // New
-static const QString SelectRadio1("97.7-c201-radio1");
-static const QString SelectBBC2("88.1-c202-uk-bbc2");
-static const QString SelectBBC3("93.1-c203-bbc3");
-static const QString SelectBBC4("93.2-c204-bbc4");
-static const QString SelectCoxMedia1("73978-292-fm-usa");
-static const QString SelectAustralia ("111a-f003-1f0-dab-au");
-static const QString SelectNorway ("f204-f801-fe2-dab-norway");
+static const QString SelectRadio1("FM(RADIO1 UK)");
+static const QString SelectBBC2("FM(BBC-2 UK)");
+static const QString SelectBBC4("FM(BBC-4 UK)");
+static const QString SelectCoxMedia1("FM(USA)-73978");
+static const QString SelectAustralia ("DAB(AUS)");
+static const QString SelectNorway ("DAB(NORWAY)");
 
 static const QString ServiceInformationFileName("RadioDns_ServiceInformation.xml");
 static const QString ProgramInformationFileName("RadioDns_ProgramInformation.xml");
@@ -48,6 +47,7 @@ SignalHandler::SignalHandler
     mServiceInformationDownloader = new DownloadManager( ServiceInformationFileName );
     mProgramInformationDownloader = new DownloadManager(ProgramInformationFileName);
     ConnectSignals();
+    OnSelectionChanged( SelectCoxMedia1 );
 }
 
 void SignalHandler::MediaStatusChanged(QMediaPlayer::State val)
@@ -173,12 +173,11 @@ void SignalHandler::PlayAtIndex( const qint16 aIndex )
         if( mList[aIndex].mBearerInfo[index].mId.length() > 0 )
         {
             StationInformation station;
-            QString gcc;
-            data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station,gcc);
+            data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station);
             // May be when selection get the service identifier from the list ??
             // Create New Topics
-            ConstructTopic( station, gcc, "text", mTextTopic );
-            ConstructTopic( station, gcc, "image", mImageTopic );
+            ConstructTopic( station, "text", mTextTopic );
+            ConstructTopic( station, "image", mImageTopic );
             // Subscribe to New Topics
             mHttpTransport.SubscribeTextTopic( mTextTopic );
             mHttpTransport.SubscribeImageTopic( mImageTopic );
@@ -213,7 +212,7 @@ void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
             {
                 if( mCurrentBearer == mList[index].mBearerInfo[bearerIndex].mId )
                 {
-                    qDebug() << "[HANDLER] BearerUri = " << mCurrentBearer;
+                    //qDebug() << "[HANDLER] BearerUri = " << mCurrentBearer;
                     qDebug() << "[HANDLER] Media " << mList[index].mPlayableMedia;
                     mPlayer->playUrl( mList[index].mPlayableMedia.toUtf8().constData() );
                     m_CurrentLyPlaying = mList[index].mPlayableMedia;
@@ -524,6 +523,9 @@ void SignalHandler::OnServiceInformationAvailable( const QString& aFilePath )
 
 void SignalHandler::OnSelectionChanged(QString value)
 {
+    StationInformation data;
+    QString fqdn;
+
     qDebug() <<"\n\n\n[HANDLER] OnSelectionChanged :"<<value << "\n\n";
     ClearMetaData();
     mCurrentSelection = value;
@@ -534,183 +536,74 @@ void SignalHandler::OnSelectionChanged(QString value)
     mStompTransport.ResetTransport();
     if( Selecttion_UK_FM == value )
     {
-        StationInformation data;
-        QString fqdn;
         data.PopulateFmFields( 9580, 0xc479 );
-        ConstructFqdn( data, "ce1", fqdn );
-        mDnsLookup->lookupCName( fqdn );
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"ce1",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"ce1","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"ce1","text",mTextTopic);
+        data.mGcc = "ce1";
     }
     else if( Selecttion_DE_FM == value )
     {
-        StationInformation data;
-        QString fqdn;
-        data.PopulateFmFields(10420,0xd389);
-        ConstructFqdn(data,"de0",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"de0",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"de0","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"ce1","text",mTextTopic);
+        data.PopulateFmFields( 10420, 0xd389 );
+        data.mGcc = "de0";
     }
     else if( Selecttion_UK_DAB == value )
     {
         // [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
         // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
         //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
-        StationInformation data;
-        QString fqdn;
-        data.PopulateDabFields(0xc7d8,0,0xc1ce);
-        ConstructFqdn(data,"ce1",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"de0",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"de0","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"de0","text",mTextTopic);
+        data.PopulateDabFields( 0xc7d8, 0, 0xc1ce) ;
+        data.mGcc = "ce1";
     }
     else if( SelectRadio1 == value )
     {
-        StationInformation data;
-        QString fqdn;
-        data.PopulateFmFields(9770,0xc201);
-        ConstructFqdn(data,"ce1",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"ce1",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"ce1","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"ce1","text",mTextTopic);
+        data.PopulateFmFields( 9770, 0xc201 );
+        data.mGcc = "ce1";
     }
     else if( SelectBBC2 == value )
     {
-        StationInformation data;
-        QString fqdn;
-        data.PopulateFmFields(8810,0xc202);
-        ConstructFqdn(data,"ce1",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"ce1",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"ce1","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"ce1","text",mTextTopic);
-    }
-    else if( SelectBBC3 == value )
-    {
-        StationInformation data;
-        QString fqdn;
-        data.PopulateFmFields(9310,0xc203);
-        ConstructFqdn(data,"ce1",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"ce1",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"ce1","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"ce1","text",mTextTopic);
+        data.PopulateFmFields( 8810, 0xc202 );
+        data.mGcc = "ce1";
     }
     else if( SelectBBC4 == value )
     {
-        StationInformation data;
-        QString fqdn;
-        data.PopulateFmFields(9320,0xc204);
-        ConstructFqdn(data,"ce1",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"ce1",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"ce1","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"ce1","text",mTextTopic);
+        data.PopulateFmFields( 9320, 0xc204 );
+        data.mGcc = "ce1";
     }
     else if( SelectCoxMedia1 == value )
     {
-        StationInformation data;
-        QString fqdn;
-        data.PopulateIbocFields(0x7426,0,"292");
-        ConstructFqdn(data,"",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"","text",mTextTopic);
+        data.PopulateIbocFields( 0x7426, 0, "292" );
     }
     else if( SelectAustralia == value )
     {
         // [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
         // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
         //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
-        StationInformation data;
-        QString fqdn;
         data.PopulateDabFields(0x111a,0,0xf003);
-        ConstructFqdn(data,"1f0",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"1f0",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"1f0","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"1f0","text",mTextTopic);
+        data.mGcc = "1f0";
     }
     else if( SelectNorway == value )
     {
         // [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
         // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
         //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
-        StationInformation data;
-        QString fqdn;
-        data.PopulateDabFields(0xf204,0,0xf801);
-        ConstructFqdn(data,"fe2",fqdn);
-        mDnsLookup->lookupCName(fqdn);
-
-        mCurrentBearer.clear();
-        ConstructBearerUri(data,"fe2",mCurrentBearer);
-
-        mImageTopic.clear();
-        ConstructTopic(data,"fe2","image",mImageTopic);
-
-        mTextTopic.clear();
-        ConstructTopic(data,"fe2","text",mTextTopic);
+        data.PopulateDabFields( 0xf204, 0, 0xf801 );
+        data.mGcc = "fe2";
     }
+    else
+    {
+        qWarning() << "InValid Selection";
+        return;
+    }
+
+    ConstructFqdn( data, fqdn );
+    mDnsLookup->lookupCName(fqdn);
+
+    mCurrentBearer.clear();
+    ConstructBearerUri( data , mCurrentBearer );
+
+    mImageTopic.clear();
+    ConstructTopic( data, "image", mImageTopic );
+
+    mTextTopic.clear();
+    ConstructTopic( data, "text", mTextTopic );
 
     mHttpTransport.SubscribeTextTopic( mTextTopic );
     mHttpTransport.SubscribeImageTopic( mImageTopic );
