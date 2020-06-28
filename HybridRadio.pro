@@ -4,6 +4,7 @@ QT += qml quick multimedia network core websockets
 CONFIG += c++11
 
 SOURCES += main.cpp \
+    GccHelper.cpp \
     HttpTransport.cpp \
     StompTransport.cpp \
     Transport.cpp \
@@ -24,6 +25,7 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
+    GccHelper.hpp \
     HttpTransport.hpp \
     HybridRadioCommonTypes.hpp \
     StompTransport.hpp \
@@ -37,7 +39,8 @@ HEADERS += \
     qmlsignalhandler.hpp
 
 DISTFILES += \
-    ../build-HybridRadio-Desktop_Qt_5_7_0_MinGW_32bit-Debug/PlayStrip.PNG
+    ../build-HybridRadio-Desktop_Qt_5_7_0_MinGW_32bit-Debug/PlayStrip.PNG \
+    countries.csv
 
 
 unix:!macx: LIBS += -L$$PWD/../qt5pi/lib/ -lqstomp

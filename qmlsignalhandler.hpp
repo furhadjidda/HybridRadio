@@ -19,6 +19,7 @@
 #include "UiHandler.hpp"
 #include "HttpTransport.hpp"
 #include "StompTransport.hpp"
+#include "GccHelper.hpp"
 
 class SignalHandler : public QObject
 {
@@ -87,8 +88,11 @@ private:
     HttpTransport mHttpTransport;
     StompTransport mStompTransport;
 
+    GccHelper mGccHelper;
+
     bool isHttpVisSupported{false};
-    bool isStopVisSupported{false};
+    bool isStompVisSupported{false};
+
 
     typedef struct{
         QString mBand;

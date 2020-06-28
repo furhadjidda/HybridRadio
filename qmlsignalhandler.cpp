@@ -463,7 +463,7 @@ void SignalHandler::OnStompVisSupported( bool aVal )
         mUiHandler.QmlMethodInvokeMethodDisplayStompProtocolSupport(false);
         return;
     }
-    isStopVisSupported = aVal;
+    isStompVisSupported = aVal;
 
     // TODO Once STOMP is stable - disable Http transport when STOMP is supported !
     mHttpTransport.DisableTransport(); // Disables Http Transport
@@ -537,12 +537,20 @@ void SignalHandler::OnSelectionChanged(QString value)
     if( Selecttion_UK_FM == value )
     {
         data.PopulateFmFields( 9580, 0xc479 );
-        data.mGcc = "ce1";
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xc479 ),
+                        "GB"
+                        );
     }
     else if( Selecttion_DE_FM == value )
     {
         data.PopulateFmFields( 10420, 0xd389 );
-        data.mGcc = "de0";
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xd389 ),
+                        "DE"
+                        );
     }
     else if( Selecttion_UK_DAB == value )
     {
@@ -550,22 +558,38 @@ void SignalHandler::OnSelectionChanged(QString value)
         // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
         //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
         data.PopulateDabFields( 0xc7d8, 0, 0xc1ce) ;
-        data.mGcc = "ce1";
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xc7d8 ),
+                        "GB"
+                        );
     }
     else if( SelectRadio1 == value )
     {
         data.PopulateFmFields( 9770, 0xc201 );
-        data.mGcc = "ce1";
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xc201 ),
+                        "GB"
+                        );
     }
     else if( SelectBBC2 == value )
     {
         data.PopulateFmFields( 8810, 0xc202 );
-        data.mGcc = "ce1";
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xc202 ),
+                        "GB"
+                        );
     }
     else if( SelectBBC4 == value )
     {
         data.PopulateFmFields( 9320, 0xc204 );
-        data.mGcc = "ce1";
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xc204 ),
+                        "GB"
+                        );
     }
     else if( SelectCoxMedia1 == value )
     {
@@ -577,7 +601,11 @@ void SignalHandler::OnSelectionChanged(QString value)
         // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
         //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
         data.PopulateDabFields(0x111a,0,0xf003);
-        data.mGcc = "1f0";
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0x111a ),
+                        "AU"
+                        );
     }
     else if( SelectNorway == value )
     {
@@ -585,7 +613,11 @@ void SignalHandler::OnSelectionChanged(QString value)
         // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
         //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
         data.PopulateDabFields( 0xf204, 0, 0xf801 );
-        data.mGcc = "fe2";
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xf204 ),
+                        "NO"
+                        );
     }
     else
     {
@@ -604,7 +636,4 @@ void SignalHandler::OnSelectionChanged(QString value)
 
     mTextTopic.clear();
     ConstructTopic( data, "text", mTextTopic );
-
-    mHttpTransport.SubscribeTextTopic( mTextTopic );
-    mHttpTransport.SubscribeImageTopic( mImageTopic );
 }

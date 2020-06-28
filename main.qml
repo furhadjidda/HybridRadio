@@ -154,19 +154,6 @@ Window {
             font.pixelSize: 15
         }
 
-        Text {
-            id: additionalInfo
-            objectName: "additionalInfo"
-            x: 461
-            y: 514
-            width: 231
-            height: 61
-            visible: false
-            text: qsTr("Additional Info")
-            wrapMode: Text.WordWrap
-            font.pixelSize: 15
-        }
-
         Popup {
             id: popup
 
