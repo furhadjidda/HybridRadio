@@ -79,8 +79,8 @@ void GccHelper::ReadLookUpTable()
             {
                  QRegExp rx("(\\:)");
                  QStringList countryCode = boundaryContriesData.split(rx);
-                 // If the data is read correctly there can only be two values for example B:BW
-                 // B -> Key , BW -> Value
+                 // If the data is read correctly there can only be one key value for example B:BW
+                 // B -> Key , BW -> Value , which when stored in the string list the count is 2
                  if( 2 == countryCode.size() )
                  {
                      boundaryCountries.insert( countryCode.at(0), countryCode.at(1) );

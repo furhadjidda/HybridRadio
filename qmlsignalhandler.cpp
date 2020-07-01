@@ -11,6 +11,7 @@
 static const QString Selecttion_UK_FM("FM(UK)");
 static const QString Selecttion_UK_DAB("DAB(UK)");
 static const QString Selecttion_DE_FM("FM(DEUTSCHLAND)");
+static const QString Selection_DE_DAB("DAB(DEUTSCHLAND)");
 // New
 static const QString SelectRadio1("FM(RADIO1 UK)");
 static const QString SelectBBC2("FM(BBC-2 UK)");
@@ -33,68 +34,19 @@ static const QString ProgramInformationFileName("RadioDns_ProgramInformation.xml
 
 SignalHandler::SignalHandler
     (
-    QObject *object, // Object which can be used to set QML properties.
-    XmlReader *reader,
-    DNSLookup *dnsLookup
+    QObject *object // Object which can be used to set QML properties.
     )
     : mUIObject( object )
-    , mReader( reader )
-    , mDnsLookup( dnsLookup )
-{
-
-    // Creating a Timer
-    mPlayer = new Player();
-    mServiceInformationDownloader = new DownloadManager( ServiceInformationFileName );
-    mProgramInformationDownloader = new DownloadManager(ProgramInformationFileName);
+    , mHybridRadioCore( new HybridRadioCore() )
+{    
+    mHybridRadioCore->InitializeCore();
     ConnectSignals();
     OnSelectionChanged( SelectCoxMedia1 );
 }
 
-void SignalHandler::MediaStatusChanged(QMediaPlayer::State val)
+SignalHandler::~SignalHandler()
 {
-    QString status("");
 
-    switch (val)
-    {
-        case QMediaPlayer::State::PlayingState :
-            status = "Playing";
-        break;
-
-        case QMediaPlayer::State::StoppedState :
-            status = "Stopped";
-        break;
-
-        case QMediaPlayer::State::PausedState :
-            status = "Paused";
-        break;
-
-        default:
-            break;
-
-    }
-    mUiHandler.SetMediaStatusValue( status );
-}
-
-
-
-QString SignalHandler::DownloadProgramInformation(QString fqdn, QString serviceIdentifier)
-{
-    //http://epg.musicradio.com/radiodns/spi/3.1/id/www.helpmechill.com/chill/20170202_PI.xml
-    QString date = QDate::currentDate().toString("yyyyMMdd");
-    QString urlFormation = "http://" +
-            mDnsLookup->GetServiceName() +
-            "/radiodns/spi/3.1/id/" +
-            fqdn + "/" + serviceIdentifier + "/" + date +"_PI.xml";
-
-    qDebug() << "[HANDLER]  Program Inforamtion URL = " << urlFormation;
-
-    QString fileNameFormation = serviceIdentifier + "_" + date + ".xml";
-    // Create a file Name
-    mProgramInformationDownloader->SetFileName( fileNameFormation );
-    // Download a file
-    mProgramInformationDownloader->DownloadFile( urlFormation );
-    mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
-    return urlFormation;
 }
 
 
@@ -111,157 +63,58 @@ void SignalHandler::OnImageChanged( const QString& aImage )
 
 void SignalHandler::OnPlay()
 {
-    mPlayer->playUrl(m_CurrentLyPlaying);
+    mHybridRadioCore->StartPlayingCurrentAudio();
 }
 
 void SignalHandler::OnStop()
 {
-     mPlayer->Stop();
+    mHybridRadioCore->StopPlayingCurrentAudio();
 }
 
 
 void SignalHandler::OnNext()
 {
-    ++mCurrentPlayingIndex;
-    if( mCurrentPlayingIndex > mList.size() - 1 )
-    {
-        mCurrentPlayingIndex = 0;
-    }
-    PlayAtIndex( mCurrentPlayingIndex );
+    mCurrentPlayingIndex = mHybridRadioCore->PlayNextServiceIndex();
 }
 
 void SignalHandler::OnPrevious()
 {
-    --mCurrentPlayingIndex;
-    if( mCurrentPlayingIndex < 0 )
-    {
-        mCurrentPlayingIndex = mList.size() - 1;
-    }
-    PlayAtIndex( mCurrentPlayingIndex );
-}
-
-void SignalHandler::PlayAtIndex( const qint16 aIndex )
-{
-    mHttpTransport.ResetTransport();
-    ClearMetaData();
-
-    ShowNoAudioStreamAvaialablePopup( (mList[aIndex].mPlayableMedia.size() == 0) );
-
-    if( aIndex > mList.size() - 1 )
-    {
-        qWarning() << "[HANDLER] List Size = " << mList.size() << "is not in range with Index = " << aIndex;
-        return;
-    }
-    //StopVisTimers();
-    mPlayer->Stop();
-    m_CurrentLyPlaying = mList[aIndex].mPlayableMedia;
-    qDebug() << "\n\n\n[HANDLER] >>> Selecting " + m_CurrentLyPlaying + " @ index " << aIndex << "\n\n";
-    mPlayer->playUrl(m_CurrentLyPlaying.toUtf8().constData());
-    // This updates the UI with the findings
-    UpdateUIFromList( aIndex );
-    DownloadProgramInformation( mList[aIndex].mFqdn, mList[aIndex].mServiceIdentifier );
-    BearerSplit data;
-
-    // First UnSubscribe from previous topics
-    mHttpTransport.UnSubscribeTextTopic( mTextTopic );
-    mHttpTransport.UnSubscribeImageTopic( mImageTopic );
-    mStompTransport.UnSubscribeTextTopic( mTextTopic );
-    mStompTransport.UnSubscribeImageTopic( mImageTopic );
-
-    for(int index = 0; index < mList[aIndex].mBearerInfo.size(); ++index)
-    {
-        if( mList[aIndex].mBearerInfo[index].mId.length() > 0 )
-        {
-            StationInformation station;
-            data.SplitBearerString(mList[aIndex].mBearerInfo[index].mId,station);
-            // May be when selection get the service identifier from the list ??
-            // Create New Topics
-            ConstructTopic( station, "text", mTextTopic );
-            ConstructTopic( station, "image", mImageTopic );
-            // Subscribe to New Topics
-            mHttpTransport.SubscribeTextTopic( mTextTopic );
-            mHttpTransport.SubscribeImageTopic( mImageTopic );
-            mStompTransport.SubscribeTextTopic( mTextTopic );
-            mStompTransport.SubscribeImageTopic( mImageTopic );
-            mCurrentBearer = mList[aIndex].mBearerInfo[index].mId;
-            mCurrentPlayingIndex = aIndex;
-            break;
-        }
-    }
+    mCurrentPlayingIndex = mHybridRadioCore->PlayPreviousServiceIndex();
 }
 
 void SignalHandler::OnSelect( int aIndex )
 {
-    PlayAtIndex( aIndex );
+    mHybridRadioCore->PlayServiceAtIndex( aIndex );
 }
 
-void SignalHandler::OnServiceInformationDownloaded( const QString& aFilePath )
+void SignalHandler::OnServiceInformationDownloaded()
 {
-    mHttpTransport.ResetTransport();
-    mList.clear();
-    mReader->ReadSiXmlData( ServiceInformationFileName, mList );
-    qDebug() << "[HANDLER] List Size = " << mList.size() << " FilePath = " << aFilePath;
-    m_CurrentLyPlaying = "";
 
-    mPlayer->Stop();
-    for( int index = 0; index < mList.size(); ++index )
-    {
-        if( mList[index].mBearerInfo.size() > 0 )
-        {
-            for( int bearerIndex = 0; bearerIndex < mList[index].mBearerInfo.size(); ++bearerIndex )
-            {
-                if( mCurrentBearer == mList[index].mBearerInfo[bearerIndex].mId )
-                {
-                    //qDebug() << "[HANDLER] BearerUri = " << mCurrentBearer;
-                    qDebug() << "[HANDLER] Media " << mList[index].mPlayableMedia;
-                    mPlayer->playUrl( mList[index].mPlayableMedia.toUtf8().constData() );
-                    m_CurrentLyPlaying = mList[index].mPlayableMedia;
-                    mCurrentPlayingIndex = index;
-                    UpdateUIFromList( index );
-                    DownloadProgramInformation( mList[index].mFqdn, mList[index].mServiceIdentifier );
-                    break;
-                }
-            }
-        }
-    }
-
-    ShowNoAudioStreamAvaialablePopup( ( m_CurrentLyPlaying.size() == 0 ) );
-    QCollator collator;
-    collator.setNumericMode(true);
-    qSort( mList.begin(),mList.end(), [&collator]( const SiData& aArg1, const SiData& aArg2 ){
-        return ( collator.compare( aArg1.mServiceName, aArg2.mServiceName ) < 0 );
-    });
+    qDebug() << endl << endl << "OnServiceInformationDownloaded" << endl;
+    mHybridRadioCore->GetServiceInformationList( mList );
     mUiHandler.QmlMethodInvokeclearListElement();
-    foreach( SiData val,mList )
+    foreach( SiData val, mList )
     {
         mUiHandler.QmlMethodInvokeaddListElement( val );
     }
-
-    //StartVisTimers();
 }
 
-void SignalHandler::OnProgramInformationDownloaded( const QString& aFilePath )
+void SignalHandler::OnProgramInformationDownloaded()
 {
-    if( 0 == aFilePath.size() )
-    {
-        qWarning() << "[HANDLER] Program information file size is empty";
-    }
+    mHybridRadioCore->GetProgramInformationData( mProgramList );
     mUiHandler.QmlMethodInvokeclearProgramElement();
-    EpgList data;
-    mReader->ReadPiXmlData( aFilePath, data );
-
-    for( EpgStruct val : data )
+    for( EpgStruct val : mProgramList )
     {
         mUiHandler.QmlMethodInvokeaddProgramElement( val );
     }
 
-    if( data.size() > 0 )
+    if( mProgramList.size() > 0 )
     {
        mUiHandler.QmlMethodInvokeMethodDisplayEpgPresentImage();
     }
 }
 
-void SignalHandler::ShowNoAudioStreamAvaialablePopup( bool val )
+void SignalHandler::OnAudioStreamAvailability( bool val )
 {
     if ( val )
     {
@@ -275,15 +128,6 @@ void SignalHandler::ShowNoAudioStreamAvaialablePopup( bool val )
 
 void SignalHandler::ConnectSignals()
 {
-
-    QObject::connect
-            (
-            mPlayer,
-            SIGNAL(signalMediaStatusChanged(QMediaPlayer::State)),
-            this,
-            SLOT(MediaStatusChanged(QMediaPlayer::State))
-            );
-
     // Connect Play Button
     QObject *playButton_Object = mUIObject->findChild<QObject*>("Play");
     QObject::connect
@@ -342,164 +186,145 @@ void SignalHandler::ConnectSignals()
 
     QObject::connect
             (
-            mDnsLookup,
-            &DNSLookup::SignalServiceInformationAvailable,
-            this,
-            &SignalHandler::OnServiceInformationAvailable
-            );
-
-    // Connect Downloader
-    QObject::connect
-            (
-            mServiceInformationDownloader,
-            SIGNAL(sendDownloadComplete( const QString& )),
-            this,
-            SLOT(OnServiceInformationDownloaded( const QString& ))
-            );
-
-    QObject::connect
-            (
-            mProgramInformationDownloader,
-            SIGNAL(sendDownloadComplete( const QString& )),
-            this,
-            SLOT(OnProgramInformationDownloaded( const QString& ))
-            );
-
-    QObject::connect
-            (
-            &mStompTransport,
-            &Transport::SignalTextChanged,
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalTextChanged,
             this,
             &SignalHandler::OnTextChanged
             );
 
     QObject::connect
             (
-            &mStompTransport,
-            &Transport::SignalImageChanged,
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalImageChanged,
             this,
             &SignalHandler::OnImageChanged
             );
 
     QObject::connect
             (
-            &mHttpTransport,
-            &Transport::SignalTextChanged,
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalServiceInformationDownloaded,
             this,
-            &SignalHandler::OnTextChanged
+            &SignalHandler::OnServiceInformationDownloaded
             );
 
     QObject::connect
             (
-            &mHttpTransport,
-            &Transport::SignalImageChanged,
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalProgramInformationDownloaded,
             this,
-            &SignalHandler::OnImageChanged
+            &SignalHandler::OnProgramInformationDownloaded
             );
 
     QObject::connect
             (
-            mDnsLookup,
-            &DNSLookup::SignalHttpVisSupported,
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalAudioStreamAvailability,
+            this,
+            &SignalHandler::OnAudioStreamAvailability
+            );
+
+    QObject::connect
+            (
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalAudioStreamAvailability,
+            this,
+            &SignalHandler::OnAudioStreamAvailability
+            );
+
+    QObject::connect
+            (
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalHttpTransportSupport,
             this,
             &SignalHandler::OnHttpVisSupported
             );
 
     QObject::connect
             (
-            mDnsLookup,
-            &DNSLookup::SignalStompVisSupported,
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalStompTransportSupport,
             this,
             &SignalHandler::OnStompVisSupported
+            );
+    // Data
+
+    QObject::connect
+            (
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalStationNameChanged,
+            this,
+            &SignalHandler::OnStationNameChanged
             );
 
     QObject::connect
             (
-            mDnsLookup,
-            &DNSLookup::SignalStompVisSupported,
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalDescriptionChanged,
             this,
-            &SignalHandler::OnStompVisSupported
+            &SignalHandler::OnDescriptionChanged
             );
 
     QObject::connect
             (
-            &mStompTransport,
-            &StompTransport::SignalStompConnectionReady,
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalBitRateChanged,
             this,
-            &SignalHandler::OnStompConnectionReady
+            &SignalHandler::OnBitRateChanged
             );
 
+    QObject::connect
+            (
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalMediaStateChanged,
+            this,
+            &SignalHandler::OnMediaStateChanged
+            );    
+
+    QObject::connect
+            (
+            mHybridRadioCore.get(),
+            &HybridRadioCore::SignalStationFound,
+            this,
+            &SignalHandler::OnStationFound
+            );
 }
 
+void SignalHandler::OnStationFound( const SiData& aData )
+{
+    SiData temp( aData );
+    qDebug() << temp.FormattedData();
+}
+
+void SignalHandler::OnStationNameChanged( const QString& aData )
+{
+    mUiHandler.SetStationNameValue( aData );
+}
+
+void SignalHandler::OnDescriptionChanged( const QString& aData )
+{
+    mUiHandler.SetStationDescriptionValue( aData );
+}
+
+void SignalHandler::OnBitRateChanged( const QString& aData )
+{
+    mUiHandler.SetBitrateValue( aData );
+}
+
+void SignalHandler::OnMediaStateChanged( const QString& aData )
+{
+    mUiHandler.SetMediaStatusValue( aData );
+}
 
 void SignalHandler::OnHttpVisSupported( bool aVal )
 {
-    if( !aVal )
-    {
-        qDebug() << "[HANDLER] Http Vis NOT SUPPORTED !! ";
-        mUiHandler.QmlMethodInvokeMethodDisplayHttpProtocolSupport(false);
-        return;
-    }
-
-    mHttpTransport.SetPortAndTarget
-            (
-            QString::number( mDnsLookup->GetHttpPortNumber() ),
-            mDnsLookup->GetHttpTargetName()
-            );
-    mHttpTransport.SubscribeTextTopic( mTextTopic );
-    mHttpTransport.SubscribeImageTopic( mImageTopic );
-
-    isHttpVisSupported = aVal;
-    mUiHandler.QmlMethodInvokeMethodDisplayHttpProtocolSupport(true);
+    mUiHandler.QmlMethodInvokeMethodDisplayHttpProtocolSupport( aVal );
 }
-
-
 
 void SignalHandler::OnStompVisSupported( bool aVal )
 {
-    if( !aVal )
-    {
-        qDebug() << "[HANDLER] Stomp Vis NOT SUPPORTED !! ";        
-        mUiHandler.QmlMethodInvokeMethodDisplayStompProtocolSupport(false);
-        return;
-    }
-    isStompVisSupported = aVal;
-
-    // TODO Once STOMP is stable - disable Http transport when STOMP is supported !
-    mHttpTransport.DisableTransport(); // Disables Http Transport
-
-    mStompTransport.SetPortAndTarget
-            (
-            QString::number( mDnsLookup->GetStompPortNumber() ),
-            mDnsLookup->GetStompTargetName()
-            );
-    mUiHandler.QmlMethodInvokeMethodDisplayStompProtocolSupport(true);
+    mUiHandler.QmlMethodInvokeMethodDisplayStompProtocolSupport( aVal );
 }
-
-
-
-void SignalHandler::OnStompConnectionReady()
-{
-    mStompTransport.SubscribeTextTopic( mTextTopic );
-    mStompTransport.SubscribeImageTopic( mImageTopic );
-}
-
-
-void SignalHandler::UpdateUIFromList( int aIndex )
-{
-    mUiHandler.SetArtworkValue( mList[aIndex].mArtwork );
-    mUiHandler.SetStationNameValue( mList[aIndex].mServiceName );
-    mUiHandler.SetStationDescriptionValue( mList[aIndex].mDescription );
-    mUiHandler.SetBitrateValue( mList[aIndex].mBitRate );
-
-    QString data("Bearer Info: ");
-    for (auto val : mList[aIndex].mBearerInfo) {
-        data.append(val.mId);
-        data.append(" ; ");
-    }
-    mUiHandler.QmlMethodInvokeAddMoreInfo( data );
-}
-
 
 void SignalHandler::ClearMetaData()
 {
@@ -513,27 +338,13 @@ void SignalHandler::ClearMetaData()
     mUiHandler.QmlMethodInvokeAddMoreInfo( data );
 }
 
-
-void SignalHandler::OnServiceInformationAvailable( const QString& aFilePath )
-{
-    qDebug() << "[HANDLER] SI FileName=" << aFilePath;
-    mServiceInformationDownloader->DownloadFile( aFilePath );
-}
-
-
 void SignalHandler::OnSelectionChanged(QString value)
 {
     StationInformation data;
     QString fqdn;
 
-    qDebug() <<"\n\n\n[HANDLER] OnSelectionChanged :"<<value << "\n\n";
+    qDebug() <<"[HANDLER] OnSelectionChanged :"<<value << "\n\n";
     ClearMetaData();
-    mCurrentSelection = value;
-    mHttpTransport.UnSubscribeTextTopic( mTextTopic );
-    mHttpTransport.UnSubscribeImageTopic( mImageTopic );
-    mStompTransport.UnSubscribeTextTopic( mTextTopic );
-    mStompTransport.UnSubscribeImageTopic( mImageTopic );
-    mStompTransport.ResetTransport();
     if( Selecttion_UK_FM == value )
     {
         data.PopulateFmFields( 9580, 0xc479 );
@@ -548,7 +359,16 @@ void SignalHandler::OnSelectionChanged(QString value)
         data.PopulateFmFields( 10420, 0xd389 );
         data.mGcc = mGccHelper.FormGcc
                         (
-                        mGccHelper.CountryIdentifier( 0xd389 ),
+                        mGccHelper.CountryIdentifier( 0xd318 ),
+                        "DE"
+                        );
+    }
+    else if( Selection_DE_DAB == value )
+    {
+        data.PopulateDabFields( 0xd318, 0, 0x10a5) ;
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xd318 ),
                         "DE"
                         );
     }
@@ -625,15 +445,5 @@ void SignalHandler::OnSelectionChanged(QString value)
         return;
     }
 
-    ConstructFqdn( data, fqdn );
-    mDnsLookup->lookupCName(fqdn);
-
-    mCurrentBearer.clear();
-    ConstructBearerUri( data , mCurrentBearer );
-
-    mImageTopic.clear();
-    ConstructTopic( data, "image", mImageTopic );
-
-    mTextTopic.clear();
-    ConstructTopic( data, "text", mTextTopic );
+    mHybridRadioCore->LookForStation( data );
 }

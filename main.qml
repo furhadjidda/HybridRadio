@@ -71,6 +71,7 @@ Window {
                   ListElement { text: ""}
                   ListElement { text: "FM(USA)-73978"}
                   ListElement { text: "FM(DEUTSCHLAND)" } // new
+                  ListElement { text: "DAB(DEUTSCHLAND)" } // new
                   ListElement { text: "FM(RADIO1 UK)" } // new
                   ListElement { text: "FM(BBC-2 UK)" } // new
                   ListElement { text: "FM(BBC-4 UK)" } // new

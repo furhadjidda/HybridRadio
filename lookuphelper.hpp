@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <QString>
 
+static const QString BandFm("fm");
+static const QString BandDab("dab");
+static const QString BandIboc("hd");
+
 typedef struct{
     QString mBand{""};
     QString mFrequency{""};

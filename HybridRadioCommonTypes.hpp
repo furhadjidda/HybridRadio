@@ -3,6 +3,7 @@
 #include <QString>
 #include <QVector>
 #include <stdint.h>
+#include "lookuphelper.hpp"
 
 //! Structure to hold Information about EPG
 typedef struct {
@@ -24,6 +25,8 @@ typedef struct {
     std::uint32_t mBitRate{0};
     std::uint32_t mOffset{0};
 }BearerInfo;
+
+typedef  QVector<BearerInfo> BearerList;
 
 //! Structure containing interactive link information.
 typedef struct {
@@ -49,9 +52,55 @@ struct SiData{
     {
         return QString::compare(aArg2.mServiceName, aArg1.mServiceName);
     }
+
+    const QString FormattedData()
+    {
+        QString formattedData;
+
+        formattedData = "Service Name = " + mServiceName + "\n" +
+                        " PlayableMedia = " + mPlayableMedia + "\n" +
+                        " FQDN = " + mFqdn + "\n" +
+                        " ServiceIdentifier = " + mServiceIdentifier + "\n";
+
+        for( auto bearer : mBearerInfo )
+        {
+            formattedData.append( ("   Bearer: " + bearer.mId + "\n") ) ;
+        }
+
+        return formattedData;
+    }
 };
 
 //! List of each Service Information read from the xml file
 typedef QVector<SiData> SiDataList;
+
+
+
+typedef struct{
+    QString mBand;
+    QString mFrequency;
+    QString mPi;
+    QString mSid;
+    QString mScids;
+    QString mGcc;
+    QString mEid;
+
+    void SplitBearerString
+        (
+        const QString& data,
+        StationInformation& aStationInfo
+        )
+    {
+        DeconstructBearer(aStationInfo, data);
+        mBand = aStationInfo.mBand;
+        mFrequency = aStationInfo.mFrequency;
+        mPi = QString::number( aStationInfo.mPi, 16);
+        mSid = QString::number( aStationInfo.mSid, 16);
+        mScids = QString::number( aStationInfo.mScids, 16);
+        mGcc = aStationInfo.mGcc;
+        mEid = QString::number( aStationInfo.mEid, 16);
+    }
+
+}BearerSplit;
 
 #endif // HYBRIDRADIOCOMMONTYPES_HPP

@@ -10,8 +10,6 @@
 class Transport : public QObject{
 Q_OBJECT
 public:
-    Transport();
-
     virtual void SetPortAndTarget
         (
         const QString& aPort,

@@ -6,8 +6,8 @@ CONFIG += c++11
 SOURCES += main.cpp \
     GccHelper.cpp \
     HttpTransport.cpp \
+    HybridRadioCore.cpp \
     StompTransport.cpp \
-    Transport.cpp \
     UiHandler.cpp \
     XmlReader.cpp \
     lookuphelper.cpp \
@@ -28,6 +28,7 @@ HEADERS += \
     GccHelper.hpp \
     HttpTransport.hpp \
     HybridRadioCommonTypes.hpp \
+    HybridRadioCore.hpp \
     StompTransport.hpp \
     Transport.hpp \
     UiHandler.hpp \

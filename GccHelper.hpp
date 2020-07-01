@@ -28,6 +28,9 @@ public:
 
     QString CountryIdentifier( const qint32 aUniqueCodeHex )
     {
+        // For FM RDS/RBDS or DAB/DAB+ audio services, the Country Code of the
+        // service is given by the first nibble of the RDS/RBDS PI code or DAB
+        // SId respectively.
         if( 0 == aUniqueCodeHex )
         {
            return InvalidPi;

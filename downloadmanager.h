@@ -16,7 +16,7 @@ class DownloadManager
   Q_OBJECT
 public:
   DownloadManager(QString fileName);
-  ~DownloadManager();
+  virtual ~DownloadManager();
   void DownloadFile(QString urlPath);
   void SetFileName( const QString& aFileName );
 

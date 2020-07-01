@@ -20,8 +20,6 @@ int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine   engine;
-    XmlReader               reader;   // Reads the SI/XSI xml files.
-    DNSLookup dns;
     QQmlComponent component
             (
             &engine,
@@ -35,9 +33,7 @@ int main(int argc, char *argv[]) {
 
     SignalHandler handler
             (
-            object,
-            &reader,
-            &dns
+            object
              ); // Handler that handles the events coming from QML.
 
     return app.exec();

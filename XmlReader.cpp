@@ -183,6 +183,11 @@ void XmlReader::ReadSiXmlData
             {
                 siList[index].mServiceName = reader.readElementText();
             }
+
+            else if( "shortDescription" == reader.name()  && index >= 0 )
+            {
+                siList[index].mDescription = reader.readElementText();
+            }
             else if ( reader.name() == "mediaDescription" && index >= 0 )
             {
                 if( reader.readNextStartElement() )
@@ -316,7 +321,7 @@ void XmlReader::ReadSiXmlData
                                 id_found = false;
                             }
                         }
-                        else if( attribute_value == "30" || attribute_value == "40" || attribute_value == "100" || attribute_value == "101")
+                        else if( attribute_value == "20" || attribute_value == "10" || attribute_value == "30" || attribute_value == "40" || attribute_value == "100" || attribute_value == "101")
                         {
                             bearer_found = true;
                             if(!idCache.isEmpty())
