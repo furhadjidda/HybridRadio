@@ -198,8 +198,9 @@ void HybridRadioCore::OnProgramInformationDownloaded( const QString& aFilePath )
     if( 0 == aFilePath.size() )
     {
         qWarning() << "[HYBRID_CORE] Program information file size is empty";
+        return;
     }
-
+    mProgramList.clear();
     mReader->ReadPiXmlData( aFilePath, mProgramList );
 
     emit SignalProgramInformationDownloaded();

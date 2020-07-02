@@ -28,49 +28,34 @@ public slots:
     void OnPrevious();
     void OnSelect( int aIndex );
     void OnSelectionChanged( QString value );
-    void OnServiceInformationAvailable( const QString& aFilePath );
-    void OnServiceInformationDownloaded( const QString& aFilePath );
-    void OnProgramInformationDownloaded( const QString& aFilePath );
+    void OnServiceInformationDownloaded();
+    void OnProgramInformationDownloaded();
     void OnTextChanged( const QString& aText );
     void OnImageChanged( const QString& aImage );
-    void MediaStatusChanged(QMediaPlayer::State val);
     void OnHttpVisSupported( bool aVal );
     void OnStompVisSupported( bool aVal );
-    void OnStompConnectionReady();
+    void OnAudioStreamAvailability( bool val );
+    void OnStationNameChanged( const QString& aData );
+    void OnDescriptionChanged( const QString& aData );
+    void OnBitRateChanged( const QString& aData );
+    void OnMediaStateChanged( const QString& aData );
+    void OnStationFound( const SiData& aData );
+
 
 private:
-    QString DownloadProgramInformation(QString fqdn, QString serviceIdentifier);
-    void UpdateUIFromList( int aIndex );
-    void ShowNoAudioStreamAvaialablePopup( bool val );
     void ConnectSignals();
     void ClearMetaData();
     void PlayAtIndex( const qint16 aIndex );
 
     QObject* mUIObject;
-    std::unique_ptr<Player> mPlayer;
-    std::unique_ptr<XmlReader> mReader;
-    std::unique_ptr<DNSLookup> mDnsLookup;
-    DownloadManager* mServiceInformationDownloader;
-    DownloadManager* mProgramInformationDownloader;
+    std::unique_ptr<HybridRadioCore> mHybridRadioCore;
 
     SiDataList mList;
-    QString m_CurrentLyPlaying;
-    QString mCurrentSelection;
-    QString mCurrentBearer;
-    // Topic Handling
-    QString mTextTopic;
-    QString mImageTopic;
-    qint16 mCurrentPlayingIndex{0};
-
+    EpgList mProgramList;
+    qint32 mCurrentPlayingIndex;
     // UI Handler
     UiHandler mUiHandler{ mUIObject };
-
-    HttpTransport mHttpTransport;
-    StompTransport mStompTransport;
-
     GccHelper mGccHelper;
-
-    std::unique_ptr<HybridRadioCore> mHybridRadioCore;
 };
 #endif // MAIN_H
 
