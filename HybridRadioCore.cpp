@@ -60,6 +60,16 @@ qint32 HybridRadioCore::PlayPreviousServiceIndex()
     return mCurrentPlayingIndex;
 }
 
+void HybridRadioCore::PlayMedia( const QString& aMediaLink )
+{
+    if( aMediaLink.isEmpty() )
+    {
+        qWarning() << "[HYBRID_CORE] Media Link Empty";
+        return;
+    }
+    mPlayer->playUrl( aMediaLink.toUtf8().constData() );
+}
+
 void HybridRadioCore::PlayServiceAtIndex( qint32 aIndex )
 {
     mHttpTransport->ResetTransport();
@@ -74,8 +84,8 @@ void HybridRadioCore::PlayServiceAtIndex( qint32 aIndex )
     //StopVisTimers();
     mPlayer->Stop();
     mCurrentPlayingUrl = mList[aIndex].mPlayableMedia;
-    qDebug() << "[HYBRID_CORE] >>> Selecting " + mCurrentPlayingUrl + " @ index " << aIndex << "\n\n";
-    qDebug() << "[HYBRID_CORE] >>> station = " << mList[aIndex].FormattedData();
+    qDebug() << "[HYBRID_CORE] Selecting " + mCurrentPlayingUrl + " @ index " << aIndex << "\n\n";
+    qDebug() << "[HYBRID_CORE] Station = " << mList[aIndex].FormattedData();
     mPlayer->playUrl( mCurrentPlayingUrl.toUtf8().constData() );
 
     // This updates the UI with the findings
@@ -136,7 +146,7 @@ void HybridRadioCore::LookForStation( const StationInformation& aStationData )
     ConstructFqdn( aStationData, fqdn );
     mDnsLookup->lookupCName(fqdn);
     qDebug() << " [LookForStation] -> " << aStationData.mBand;
-    ConstructBearerUri( aStationData, mCurrentBearer );    
+    ConstructBearerUri( aStationData, mCurrentBearer );
     qDebug() << " [LookForStation] -> " << mCurrentBearer;
     ConstructTopic( aStationData, "image", mImageTopic );
     ConstructTopic( aStationData, "text", mTextTopic );
@@ -145,56 +155,58 @@ void HybridRadioCore::LookForStation( const StationInformation& aStationData )
 void HybridRadioCore::OnServiceInformationAvailable( const QString& aFilePath )
 {
     qDebug() << "[HYBRID_CORE] SI FileName=" << aFilePath;
+    QString serviceName;
+    mDnsLookup->ConstructServiceInfoFileName( serviceName );
+    mServiceInformationDownloader->SetFileName( serviceName );
+    qDebug() << "[HYBRID_CORE] serviceName FileName=" << serviceName;
     mServiceInformationDownloader->DownloadFile( aFilePath );
 }
+
+
 void HybridRadioCore::OnServiceInformationDownloaded( const QString& aFilePath )
 {
     mHttpTransport->ResetTransport();
     mList.clear();
-    mReader->ReadSiXmlData( ServiceInformationFileName, mList );
-    qDebug() << "[HYBRID_CORE] List Size = " << mList.size() << " FilePath = " << aFilePath;
-    mCurrentPlayingUrl = "";
+    QString serviceName;
+    mDnsLookup->ConstructServiceInfoFileName( serviceName );
+    mReader->ReadSiXmlData( serviceName, mList );
 
-    mPlayer->Stop();
-
-    // This part looks for current Bearer
-    qDebug() << endl << " >> Looking for bearer" << mCurrentBearer;
-    for( int index = 0; index < mList.size(); ++index )
-    {
-        if( mList[index].mBearerInfo.size() > 0 )
-        {
-            for( int bearerIndex = 0; bearerIndex < mList[index].mBearerInfo.size(); ++bearerIndex )
-            {
-                if( mCurrentBearer == mList[index].mBearerInfo[bearerIndex].mId )
-                {
-                    //qDebug() << "[HYBRID_CORE] BearerUri = " << mCurrentBearer;
-                    qDebug() << "[HYBRID_CORE] Media " << mList[index].mPlayableMedia;
-                    mPlayer->playUrl( mList[index].mPlayableMedia.toUtf8().constData() );
-                    mCurrentPlayingUrl = mList[index].mPlayableMedia;
-                    mCurrentPlayingIndex = index;
-                    SignalMetaDataAtIndex( index );
-                    emit SignalStationFound( mList[index] );
-                    DownloadProgramInformation( mList[index].mFqdn, mList[index].mServiceIdentifier );
-                    break;
-                }
-            }
-        }
-    }
-
-    emit SignalAudioStreamAvailability( ( mCurrentPlayingUrl.size() == 0 ) );
-
-    // This is for sorting
+    // This is for sorting the list
     QCollator collator;
     collator.setNumericMode(true);
     qSort( mList.begin(),mList.end(), [&collator]( const SiData& aArg1, const SiData& aArg2 ){
         return ( collator.compare( aArg1.mServiceName, aArg2.mServiceName ) < 0 );
     });
 
+    qDebug() << "[HYBRID_CORE] List Size = " << mList.size() << " FilePath = " << aFilePath;
+    mCurrentPlayingUrl = "";
+    mPlayer->Stop();
+
+    // This part looks for current Bearer
+    qint32 foundIndex = SearchForBearer( mCurrentBearer );
+
+    if( -1 == foundIndex )
+    {
+        qWarning() << "ERR -> [HYBRID_CORE] BearerUri not found !!";
+        return;
+    }
+    //mPlayer->playUrl( mList[foundIndex].mPlayableMedia.toUtf8().constData() );
+    mCurrentPlayingUrl = mList[foundIndex].mPlayableMedia;
+    mCurrentPlayingIndex = foundIndex;
+    SignalMetaDataAtIndex( foundIndex );
+
+    // This signal is handled by client/ consumer of Hybrid Radio core and gives a choice
+    // if it wants to play the stream or not.
+    emit SignalStationFound( mList[foundIndex] );
+    DownloadProgramInformation( mList[foundIndex].mFqdn, mList[foundIndex].mServiceIdentifier );
+
+    emit SignalAudioStreamAvailability( ( mCurrentPlayingUrl.size() == 0 ) );
     emit SignalServiceInformationDownloaded();
 }
 
 void HybridRadioCore::OnProgramInformationDownloaded( const QString& aFilePath )
 {
+    qWarning() << "[HYBRID_CORE] OnProgramInformationDownloaded";
     if( 0 == aFilePath.size() )
     {
         qWarning() << "[HYBRID_CORE] Program information file size is empty";
@@ -409,7 +421,7 @@ void HybridRadioCore::SignalMetaDataAtIndex( qint32 aIndex )
 
 qint32 HybridRadioCore::SearchForBearer( const QString& aBearerString )
 {
-
+    qDebug() << endl << "[HYBRID_CORE] Looking for bearer" << mCurrentBearer;
     for( int index = 0; index < mList.size(); ++index )
     {
         if( mList[index].mBearerInfo.size() > 0 )
@@ -436,15 +448,16 @@ QString HybridRadioCore::DownloadProgramInformation
     )
 {
     //http://epg.musicradio.com/radiodns/spi/3.1/id/www.helpmechill.com/chill/20170202_PI.xml
-    QString date = QDate::currentDate().toString("yyyyMMdd");
-    QString urlFormation = "http://" +
-            mDnsLookup->GetServiceName() +
-            "/radiodns/spi/3.1/id/" +
-            aFqdn + "/" + aServiceIdentifier + "/" + date +"_PI.xml";
+    QString fileNameFormation;
+    QString urlFormation;
+    mDnsLookup->ConstructProgramInfoFileName
+            (
+            aFqdn,
+            aServiceIdentifier,
+            urlFormation,
+            fileNameFormation
+            );
 
-    qDebug() << "[HYBRID_CORE]  Program Inforamtion URL = " << urlFormation;
-
-    QString fileNameFormation = aServiceIdentifier + "_" + date + ".xml";
     // Create a file Name
     mProgramInformationDownloader->SetFileName( fileNameFormation );
     // Download a file
@@ -467,7 +480,9 @@ bool HybridRadioCore::SearchForStationInServiceInformationList
             if( bearerUri == bearerData.mId )
             {
                 aData = siData;
+                return true;
             }
         }
     }
+    return false;
 }

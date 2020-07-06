@@ -173,9 +173,8 @@ void DNSLookup::onServiceResponse()
         // ETSI TS 102 818 V3.2.1 (2019-06) for document discovery of Service information.
         QString HTTP("http://");
         QString SIFilePostFix("/radiodns/spi/3.1/SI.xml");
-        QString SIFileName("");
-        SIFileName = HTTP + GetServiceName() + SIFilePostFix;
-        emit SignalServiceInformationAvailable( SIFileName );
+        QString ServiceInformationLink = HTTP + GetServiceName() + SIFilePostFix;
+        emit SignalServiceInformationAvailable( ServiceInformationLink );
     }
     mService->deleteLater();
 }

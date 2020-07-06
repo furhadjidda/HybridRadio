@@ -1,14 +1,15 @@
 #ifndef DNSLOOKUP_HPP
 #define DNSLOOKUP_HPP
 
-#include<QObject>
-#include<QDnsLookup>
-#include<QDebug>
+#include <QObject>
+#include <QDnsLookup>
+#include <QDebug>
 #include <QHostAddress>
 #include <QDnsDomainNameRecord>
 #include <QDnsMailExchangeRecord>
 #include <QDnsHostAddressRecord>
 #include <QDnsTextRecord>
+#include <QDate>
 
 class DNSLookup : public QObject
 {
@@ -24,6 +25,32 @@ public:
     void lookupService( QString& val );
     void lookupHttpVis();
     void lookupVis();
+
+    inline void ConstructServiceInfoFileName( QString& aRef )
+    {
+        aRef = GetServiceName();
+        aRef.replace(".","_");
+        aRef.append("_SI.xml");
+    }
+
+    inline void ConstructProgramInfoFileName
+        (
+        const QString& aFqdn,
+        const QString& aServiceIdentifier,
+        QString& aUrl,
+        QString& aFileName
+        )
+    {
+        QString date = QDate::currentDate().toString("yyyyMMdd");
+        aUrl = "http://" +
+                GetServiceName() +
+                "/radiodns/spi/3.1/id/" +
+                aFqdn + "/" + aServiceIdentifier + "/" + date +"_PI.xml";
+
+        qDebug() << "[HYBRID_CORE]  Program Inforamtion URL = " << aUrl;
+
+        aFileName = aServiceIdentifier + "_" + date + ".xml";
+    }
 
 
     QString GetServiceName()

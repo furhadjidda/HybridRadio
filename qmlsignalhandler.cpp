@@ -74,23 +74,24 @@ void SignalHandler::OnStop()
 
 void SignalHandler::OnNext()
 {
+    mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mCurrentPlayingIndex = mHybridRadioCore->PlayNextServiceIndex();
 }
 
 void SignalHandler::OnPrevious()
 {
+    mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mCurrentPlayingIndex = mHybridRadioCore->PlayPreviousServiceIndex();
 }
 
 void SignalHandler::OnSelect( int aIndex )
 {
+    mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mHybridRadioCore->PlayServiceAtIndex( aIndex );
 }
 
 void SignalHandler::OnServiceInformationDownloaded()
 {
-
-    qDebug() << endl << endl << "OnServiceInformationDownloaded" << endl;
     mHybridRadioCore->GetServiceInformationList( mList );
     mUiHandler.QmlMethodInvokeclearListElement();
     foreach( SiData val, mList )
@@ -101,6 +102,7 @@ void SignalHandler::OnServiceInformationDownloaded()
 
 void SignalHandler::OnProgramInformationDownloaded()
 {
+    mProgramList.clear();
     mHybridRadioCore->GetProgramInformationData( mProgramList );
     mUiHandler.QmlMethodInvokeclearProgramElement();
     for( EpgStruct val : mProgramList )
@@ -294,6 +296,9 @@ void SignalHandler::OnStationFound( const SiData& aData )
 {
     SiData temp( aData );
     qDebug() << temp.FormattedData();
+    qDebug() << "[HANDLER] Media " << aData.mPlayableMedia;
+    mHybridRadioCore->PlayMedia( aData.mPlayableMedia );
+
 }
 
 void SignalHandler::OnStationNameChanged( const QString& aData )
@@ -444,6 +449,6 @@ void SignalHandler::OnSelectionChanged(QString value)
         qWarning() << "InValid Selection";
         return;
     }
-
+    mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mHybridRadioCore->LookForStation( data );
 }

@@ -196,6 +196,8 @@ void XmlReader::ReadSiXmlData
                     {
                         bool art_found  = false;
                         QString artCache("");
+                        QString key;
+                        QString value;
                         Q_FOREACH( const QXmlStreamAttribute &attr, reader.attributes() )
                         {
                             if ( attr.name().toString() == QLatin1String("height") )
@@ -205,6 +207,7 @@ void XmlReader::ReadSiXmlData
                                 // 800x800 for station logo.
                                 // Eventually we will have options to select
                                 // from different resolutions available.
+                                key = attribute_value;
                                 if( attribute_value == "800" || attribute_value == "600" || attribute_value == "128")
                                 {
                                     art_found = true;
@@ -239,8 +242,10 @@ void XmlReader::ReadSiXmlData
                                 }
                             }
                             else if ( attr.name().toString() == QLatin1String("url") )
-                            {                                
+                            {
                                 QString attribute_value = attr.value().toString();
+                                value = attribute_value;
+
                                 artCache = attribute_value;
                                 if( art_found == true )
                                 {
@@ -250,6 +255,11 @@ void XmlReader::ReadSiXmlData
                             else
                             {
                                 // Do nothing
+                            }
+
+                            if( !key.isEmpty() && !value.isEmpty() )
+                            {
+                                siList[index].mArtworkAvailable.insert( key, value );
                             }
                         }
                     }
@@ -296,20 +306,13 @@ void XmlReader::ReadSiXmlData
                     if ( attr.name().toString() == QLatin1String("bitrate") )
                     {                        
                         QString attribute_value = attr.value().toString();
-                        if( attribute_value == "128" || attribute_value == "112" || attribute_value == "48" )
-                        {
-                            siList[index].mBitRate = attribute_value;
-                            id_found = true;
-                        }
-                        else
-                        {
-                            id_found = false;
-                        }
+                        siList[index].mBitRate = attribute_value;
+                        id_found = true;
                     }
                     else if ( attr.name().toString() == QLatin1String("cost") )
                     {
                         QString attribute_value = attr.value().toString();                        
-
+                        // TODO Remove
                         if( attribute_value == "73" || attribute_value == "80" || attribute_value == "70" || attribute_value == "110" || attribute_value == "120" )
                         {
 
@@ -321,6 +324,7 @@ void XmlReader::ReadSiXmlData
                                 id_found = false;
                             }
                         }
+                        // TODO Remove
                         else if( attribute_value == "20" || attribute_value == "10" || attribute_value == "30" || attribute_value == "40" || attribute_value == "100" || attribute_value == "101")
                         {
                             bearer_found = true;
@@ -346,11 +350,14 @@ void XmlReader::ReadSiXmlData
                     {
                         QString attribute_value = attr.value().toString();
                         idCache = attribute_value;
-                        if( true == id_found || attribute_value.contains("http",Qt::CaseInsensitive)  )
+                        // This should add playable media
+                        if( attribute_value.contains("http",Qt::CaseInsensitive) || attribute_value.contains("https",Qt::CaseInsensitive) )
                         {
                             siList[index].mPlayableMedia = attribute_value;
+                            siList[index].mPlaylableMediaList.push_back( attribute_value );
                         }
-                        if( bearer_found )
+                        //This should add the brearers
+                        if( attribute_value.startsWith("fm:") || attribute_value.startsWith("dab:")|| attribute_value.startsWith("hd:") )
                         {
                             BearerInfo data;
                             siList[index].mBearerInfo.push_back( data );
@@ -375,6 +382,7 @@ void XmlReader::ReadSiXmlData
             }
         }
     }
+    //PrintSiData( siList );
 }
 
 void XmlReader::PrintSiData( const SiDataList& aSiList )
@@ -394,6 +402,14 @@ void XmlReader::PrintSiData( const SiDataList& aSiList )
                     << " mServiceIdentifier = " << data.mServiceIdentifier
                     << " mArtwork = " << data.mArtwork
                     << endl;
+             for( auto artWork : data.mArtworkAvailable.keys() )
+             {
+                 stream << "\t [ ARTWORK ]" << artWork << " -> "<< data.mArtworkAvailable.value(artWork) << endl;
+             }
+             for( auto media : data.mPlaylableMediaList )
+             {
+                 stream << "\t [ PLAYABLEMEDIA ]" << media << endl;
+             }
             int bearerIndex = 0;
             for( BearerInfo bearerData: data.mBearerInfo )
             {

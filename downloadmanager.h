@@ -32,6 +32,10 @@ private slots:
   void slotReadData();
 
 private:
+  bool IsFilePresent
+      (
+      const QString& path
+      );
   QByteArray* m_pBuffer;
   QNetworkReply* mReply;
   uint mIndex;

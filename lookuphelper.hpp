@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <QString>
+#include <QDebug>
 
 static const QString BandFm("fm");
 static const QString BandDab("dab");
@@ -19,6 +20,13 @@ typedef struct{
     QString mIbocCountryCode{""};
     qint32 mIbocHdId{0};
     QString mGcc{""};
+
+    void PrintData()
+    {
+        qDebug() <<" [STATION DATA] Band " << mBand << " Freq " << mFrequency
+                 <<" Pi " << mPi << " Sid " << mSid << " Scids " << mScids << " Eid " << mEid
+                 <<" Gcc " << mGcc << "IbocHdId " << mIbocHdId;
+    }
 
     void PopulateDabFields
         (

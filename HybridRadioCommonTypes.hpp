@@ -2,6 +2,7 @@
 #define HYBRIDRADIOCOMMONTYPES_HPP
 #include <QString>
 #include <QVector>
+#include <QMap>
 #include <stdint.h>
 #include "lookuphelper.hpp"
 
@@ -38,10 +39,12 @@ typedef struct {
 struct SiData{
     QString mServiceName;
     QString mArtwork;
+    QMap<QString,QString> mArtworkAvailable;
     QString mDescription;
     QString mGenre;
     QString mBitRate;
     QString mPlayableMedia;
+    QStringList mPlaylableMediaList;
     QString mMimeType;
     QString mFqdn;
     QString mServiceIdentifier;

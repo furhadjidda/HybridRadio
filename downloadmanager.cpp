@@ -2,6 +2,8 @@
 #include <QDateTime>
 #include <QTime>
 #include <QRegularExpression>
+#include <QFileInfo>
+#include <QDateTime>
 
 
 DownloadManager::DownloadManager
@@ -15,6 +17,12 @@ DownloadManager::DownloadManager
 
 void DownloadManager::DownloadFile( QString urlPath )
 {
+    if( IsFilePresent( mFileName ) )
+    {
+        qDebug() << "[ DOWNLOADER ] File Present , no need for download";
+        emit sendDownloadComplete( mFileName );
+        return;
+    }
     m_pBuffer = new QByteArray();
     QUrl url = QUrl( urlPath );
     QNetworkRequest req( url );
@@ -58,7 +66,7 @@ void DownloadManager::slotFinished()
          if( statusCode == 301 )
          {
              QUrl redirectUrl = mReply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
-             qDebug() << "Redirection URL = " << redirectUrl;
+             qDebug() << "[ DOWNLOADER ] Redirection URL = " << redirectUrl;
              DownloadFile( redirectUrl.toString() );
              return;
          }
@@ -88,4 +96,23 @@ void DownloadManager::slotReadData()
 {
     //append data to QByteArray buffer
     *m_pBuffer += mReply->readAll();
+}
+
+bool DownloadManager::IsFilePresent
+    (
+    const QString& path
+    )
+{
+    QFileInfo check_file( path );
+    QDateTime birthTime = check_file.birthTime();
+    QDateTime currDateAndTime = QDateTime::currentDateTime();
+
+    if( birthTime.daysTo( currDateAndTime ) > 5 )
+    {
+        // Data could be out of date.
+        //return false;
+    }
+
+    // check if file exists and if yes: Is it really a file and no directory?
+    return ( check_file.exists() && check_file.isFile() );
 }

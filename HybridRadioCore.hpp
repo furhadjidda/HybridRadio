@@ -34,6 +34,8 @@ public:
 
     qint32 PlayPreviousServiceIndex();
 
+    void PlayMedia( const QString& aMediaLink );
+
     void PlayServiceAtIndex( qint32 aIndex );
 
     void StartPlayingCurrentAudio();
