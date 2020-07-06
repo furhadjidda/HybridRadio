@@ -194,8 +194,6 @@ void XmlReader::ReadSiXmlData
                 {
                     if( reader.name() == "multimedia" )
                     {
-                        bool art_found  = false;
-                        QString artCache("");
                         QString key;
                         QString value;
                         Q_FOREACH( const QXmlStreamAttribute &attr, reader.attributes() )
@@ -203,54 +201,12 @@ void XmlReader::ReadSiXmlData
                             if ( attr.name().toString() == QLatin1String("height") )
                             {
                                 QString attribute_value = attr.value().toString();
-                                // This select the image with resolution of
-                                // 800x800 for station logo.
-                                // Eventually we will have options to select
-                                // from different resolutions available.
                                 key = attribute_value;
-                                if( attribute_value == "800" || attribute_value == "600" || attribute_value == "128")
-                                {
-                                    art_found = true;
-                                    if( !artCache.isEmpty() )
-                                    {
-                                        siList[index].mArtwork = artCache;
-                                        art_found = false;
-                                        artCache = "";
-                                    }
-                                }
-                                else
-                                {
-                                    art_found = false;
-                                }
-                            }
-                            else if ( attr.name().toString() == QLatin1String("type") )
-                            {
-                                QString attribute_value = attr.value().toString();
-                                if( attribute_value == "logo_unrestricted" )
-                                {
-                                    art_found = true;
-                                    if( !artCache.isEmpty() )
-                                    {
-                                        siList[index].mArtwork = artCache;
-                                        art_found = false;
-                                        artCache = "";
-                                    }
-                                }
-                                else
-                                {
-                                    art_found = false;
-                                }
                             }
                             else if ( attr.name().toString() == QLatin1String("url") )
                             {
                                 QString attribute_value = attr.value().toString();
                                 value = attribute_value;
-
-                                artCache = attribute_value;
-                                if( art_found == true )
-                                {
-                                    siList[index].mArtwork = attribute_value;
-                                }
                             }
                             else
                             {
@@ -260,6 +216,7 @@ void XmlReader::ReadSiXmlData
                             if( !key.isEmpty() && !value.isEmpty() )
                             {
                                 siList[index].mArtworkAvailable.insert( key, value );
+                                siList[index].mArtwork = value;
                             }
                         }
                     }
@@ -296,60 +253,16 @@ void XmlReader::ReadSiXmlData
             }
             else if( reader.name() == "bearer" && index >= 0 )
             {
-                bool id_found = false;
-                bool bearer_found = false;
-                QString idCache("");
-                int bearerIndex = -1;
-
                 Q_FOREACH( const QXmlStreamAttribute &attr, reader.attributes() )
                 {
                     if ( attr.name().toString() == QLatin1String("bitrate") )
                     {                        
                         QString attribute_value = attr.value().toString();
                         siList[index].mBitRate = attribute_value;
-                        id_found = true;
-                    }
-                    else if ( attr.name().toString() == QLatin1String("cost") )
-                    {
-                        QString attribute_value = attr.value().toString();                        
-                        // TODO Remove
-                        if( attribute_value == "73" || attribute_value == "80" || attribute_value == "70" || attribute_value == "110" || attribute_value == "120" )
-                        {
-
-                            id_found = true;
-                            if(!idCache.isEmpty())
-                            {
-                                siList[index].mPlayableMedia = idCache;
-                                idCache = "";
-                                id_found = false;
-                            }
-                        }
-                        // TODO Remove
-                        else if( attribute_value == "20" || attribute_value == "10" || attribute_value == "30" || attribute_value == "40" || attribute_value == "100" || attribute_value == "101")
-                        {
-                            bearer_found = true;
-                            if(!idCache.isEmpty())
-                            {
-
-                                BearerInfo data;
-                                siList[index].mBearerInfo.push_back( data );
-                                bearerIndex = siList[index].mBearerInfo.size() - 1;
-
-                                siList[index].mBearerInfo[bearerIndex].mId = idCache;
-                                idCache = "";
-                                bearer_found = false;
-                            }
-                        }
-                        else
-                        {
-                            id_found = false;
-                            bearer_found = false;
-                        }
                     }
                     else if ( attr.name().toString() == QLatin1String("id") )
                     {
                         QString attribute_value = attr.value().toString();
-                        idCache = attribute_value;
                         // This should add playable media
                         if( attribute_value.contains("http",Qt::CaseInsensitive) || attribute_value.contains("https",Qt::CaseInsensitive) )
                         {
@@ -361,8 +274,7 @@ void XmlReader::ReadSiXmlData
                         {
                             BearerInfo data;
                             siList[index].mBearerInfo.push_back( data );
-                            bearerIndex = siList[index].mBearerInfo.size() - 1;
-
+                            int bearerIndex = siList[index].mBearerInfo.size() - 1;
                             siList[index].mBearerInfo[bearerIndex].mId = attr.value().toString();
                         }
                     }
