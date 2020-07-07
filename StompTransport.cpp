@@ -214,6 +214,28 @@ void StompTransport::OnFrameReceived()
                     qDebug() << "[STOMP-TRANSPORT] ResponseMessage[TEXT] " << Text;
                     emit SignalTextChanged( Text );
                 }
+                else if( part.contains( "link" ) && frameDestination == mCurrentImageTopic )
+                {
+                    QString link = part.right( part.size() - sizeof ("link:") );
+                    qDebug() << "[STOMP-TRANSPORT] ResponseMessage[link] " << link;
+                    emit SignalLinkInformation( link );
+                }
+                else if( part.contains( "SlideID" ) && frameDestination == mCurrentImageTopic )
+                {
+                    QString slideId = part.right( part.size() - sizeof ("SlideID:") );
+                    qDebug() << "[STOMP-TRANSPORT] ResponseMessage[SlideID] " << slideId;
+                    emit SignalSlideId( slideId );
+                }
+                else if( part.contains( "trigger-time" ) && frameDestination == mCurrentImageTopic )
+                {
+                    QString triggerTime = part.right( part.size() - sizeof ("trigger-time:") );
+                    qDebug() << "[STOMP-TRANSPORT] ResponseMessage[triggerTime] " << triggerTime;
+                    emit SignalSlideId( triggerTime );
+                }
+                else if( part.contains( "timestamp" ) )
+                {
+                    qDebug() << "[STOMP-TRANSPORT] ResponseMessage[timestamp] " << part;
+                }
             }
         }
     }

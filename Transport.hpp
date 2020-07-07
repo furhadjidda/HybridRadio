@@ -33,6 +33,9 @@ public:
 signals:
     void SignalTextChanged( const QString& aText );
     void SignalImageChanged( const QString& aImage );
+    void SignalSlideId( const QString& aData );
+    void SignalTriggerTime( const QString& aData );
+    void SignalLinkInformation( const QString& aData );
 
 public slots:
     virtual void OnTextResponse() = 0;

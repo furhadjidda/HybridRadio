@@ -88,6 +88,22 @@ void SignalHandler::OnSelect( int aIndex )
 {
     mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mHybridRadioCore->PlayServiceAtIndex( aIndex );
+    QString data("Bearer Info: ");
+    for( auto bearer : mList[aIndex].mBearerInfo )
+    {
+        data.append( bearer.mId );
+        data.append( " ; ");
+    }
+
+    data.append("Additional Streams: ");
+
+    for( auto media : mList[aIndex].mPlaylableMediaList )
+    {
+        data.append( media );
+        data.append( " ; ");
+    }
+
+    mUiHandler.QmlMethodInvokeAddMoreInfo( data );
 }
 
 void SignalHandler::OnServiceInformationDownloaded()
@@ -298,6 +314,22 @@ void SignalHandler::OnStationFound( const SiData& aData )
     qDebug() << temp.FormattedData();
     qDebug() << "[HANDLER] Media " << aData.mPlayableMedia;
     mHybridRadioCore->PlayMedia( aData.mPlayableMedia );
+
+    QString data("Bearer Info: ");
+    for( auto bearer : aData.mBearerInfo )
+    {
+        data.append( bearer.mId );
+        data.append( " ; ");
+    }
+
+    data.append("Additional Streams: ");
+
+    for( auto media : aData.mPlaylableMediaList )
+    {
+        data.append( media );
+        data.append( " ; ");
+    }
+    mUiHandler.QmlMethodInvokeAddMoreInfo( data );
 
 }
 
