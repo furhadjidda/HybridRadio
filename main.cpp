@@ -16,7 +16,8 @@
 #include "dnslookup.hpp"
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine   engine;
@@ -27,7 +28,8 @@ int main(int argc, char *argv[]) {
             );
 
     QObject *object = component.create();
-    if (component.isError()) {
+    if (component.isError())
+    {
         qWarning() << component.errors();
     }
 

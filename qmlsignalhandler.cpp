@@ -12,7 +12,6 @@ static const QString Selecttion_UK_FM("FM(UK)");
 static const QString Selecttion_UK_DAB("DAB(UK)");
 static const QString Selecttion_DE_FM("FM(DEUTSCHLAND)");
 static const QString Selection_DE_DAB("DAB(DEUTSCHLAND)");
-// New
 static const QString SelectRadio1("FM(RADIO1 UK)");
 static const QString SelectBBC2("FM(BBC-2 UK)");
 static const QString SelectBBC4("FM(BBC-4 UK)");
@@ -20,17 +19,6 @@ static const QString SelectCoxMedia1("FM(USA)-73978");
 static const QString SelectAustralia ("DAB(AUS)");
 static const QString SelectNorway ("DAB(NORWAY)");
 
-static const QString ServiceInformationFileName("RadioDns_ServiceInformation.xml");
-static const QString ProgramInformationFileName("RadioDns_ProgramInformation.xml");
-
-// PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c36b/09630/20160904_PI.xml
-// PI document link formation http://epg.musicradio.com/radiodns/spi/3.1/fm/ce1/c479/09580/20160904_PI.xml
-// http://epg.musicradio.com/radiodns/spi/3.1/id/www.capitalfm.com/london/20160906_PI.xml
-// http://epg.musicradio.com/radiodns/spi/3.1/id/london/20160906_PI.xml
-// http://radio-service-information.api.bbci.co.uk/radiodns/spi/3.1/p00fzl86/20170202_PI.xml
-// http://<host>:<port>/radiodns/spi/3.1/<ServiceIdentifier>/<date>_PI.xml
-// http://radio-service-information.api.bbci.co.uk/radiodns/spi/3.1/id/radiodns.api.bbci.co.uk/p00fzl86/20170202_PI.xml
-// http://epg.musicradio.com/radiodns/spi/3.1/id/www.helpmechill.com/chill/20170202_PI.xml
 
 SignalHandler::SignalHandler
     (
@@ -46,9 +34,7 @@ SignalHandler::SignalHandler
 
 SignalHandler::~SignalHandler()
 {
-
 }
-
 
 void SignalHandler::OnTextChanged( const QString& aText )
 {
@@ -88,22 +74,7 @@ void SignalHandler::OnSelect( int aIndex )
 {
     mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mHybridRadioCore->PlayServiceAtIndex( aIndex );
-    QString data("Bearer Info: ");
-    for( auto bearer : mList[aIndex].mBearerInfo )
-    {
-        data.append( bearer.mId );
-        data.append( " ; ");
-    }
-
-    data.append("Additional Streams: ");
-
-    for( auto media : mList[aIndex].mPlaylableMediaList )
-    {
-        data.append( media );
-        data.append( " ; ");
-    }
-
-    mUiHandler.QmlMethodInvokeAddMoreInfo( data );
+    PopulateAdditionalInfo( mList[aIndex] );
 }
 
 void SignalHandler::OnServiceInformationDownloaded()
@@ -311,26 +282,10 @@ void SignalHandler::ConnectSignals()
 void SignalHandler::OnStationFound( const SiData& aData )
 {
     SiData temp( aData );
-    qDebug() << temp.FormattedData();
-    qDebug() << "[HANDLER] Media " << aData.mPlayableMedia;
+    qDebug() << "[HANDLER] OnStationFound "<< temp.FormattedData();
+    qDebug() << "[HANDLER] OnStationFound " << aData.mPlayableMedia;
     mHybridRadioCore->PlayMedia( aData.mPlayableMedia );
-
-    QString data("Bearer Info: ");
-    for( auto bearer : aData.mBearerInfo )
-    {
-        data.append( bearer.mId );
-        data.append( " ; ");
-    }
-
-    data.append("Additional Streams: ");
-
-    for( auto media : aData.mPlaylableMediaList )
-    {
-        data.append( media );
-        data.append( " ; ");
-    }
-    mUiHandler.QmlMethodInvokeAddMoreInfo( data );
-
+    PopulateAdditionalInfo( aData );
 }
 
 void SignalHandler::OnStationNameChanged( const QString& aData )
@@ -483,4 +438,25 @@ void SignalHandler::OnSelectionChanged(QString value)
     }
     mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mHybridRadioCore->LookForStation( data );
+}
+
+
+void SignalHandler::PopulateAdditionalInfo( const SiData& aData )
+{
+    QString data("Bearer Info: ");
+    for( auto bearer : aData.mBearerInfo )
+    {
+        data.append( bearer.mId );
+        data.append( " ; ");
+    }
+
+    data.append("Additional Streams: ");
+
+    for( auto media : aData.mPlaylableMediaList )
+    {
+        data.append( media );
+        data.append( " ; ");
+    }
+
+    mUiHandler.QmlMethodInvokeAddMoreInfo( data );
 }

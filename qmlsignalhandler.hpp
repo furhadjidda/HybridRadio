@@ -46,6 +46,7 @@ private:
     void ConnectSignals();
     void ClearMetaData();
     void PlayAtIndex( const qint16 aIndex );
+    void PopulateAdditionalInfo( const SiData& aData );
 
     QObject* mUIObject;
     std::unique_ptr<HybridRadioCore> mHybridRadioCore;
