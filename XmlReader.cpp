@@ -183,6 +183,10 @@ void XmlReader::ReadSiXmlData
             {
                 siList[index].mServiceName = reader.readElementText();
             }
+            else if( reader.name() == "mediumName" && index >= 0 )
+            {
+                siList[index].mServiceName = reader.readElementText();
+            }
 
             else if( "shortDescription" == reader.name()  && index >= 0 )
             {

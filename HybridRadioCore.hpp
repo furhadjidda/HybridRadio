@@ -77,6 +77,7 @@ public slots:
     void OnHttpVisSupported( bool aVal );
     void OnStompVisSupported( bool aVal );
     void OnStompConnectionReady();
+    void OnStompDisconnected();
 
 private:
     void ConnectSignals();

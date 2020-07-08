@@ -301,6 +301,14 @@ void HybridRadioCore::OnStompConnectionReady()
     mStompTransport->SubscribeImageTopic( mImageTopic );
 }
 
+void HybridRadioCore::OnStompDisconnected()
+{
+    // TODO uncomment this code for when STOMP gets disconnected and HTTP is supported
+    //mHttpTransport->EnableTransport(); // Enables Http Transport if STOMP is disconnected
+    //mHttpTransport->SubscribeTextTopic( mTextTopic );
+    //mHttpTransport->SubscribeImageTopic( mImageTopic );
+}
+
 void HybridRadioCore::ConnectSignals()
 {
     QObject::connect
@@ -358,6 +366,14 @@ void HybridRadioCore::ConnectSignals()
             &StompTransport::SignalStompConnectionReady,
             this,
             &HybridRadioCore::OnStompConnectionReady
+            );
+
+    QObject::connect
+            (
+            static_cast<StompTransport*>( mStompTransport.get() ),
+            &StompTransport::SignalStompConnectionBroken,
+            this,
+            &HybridRadioCore::OnStompDisconnected
             );
 
     QObject::connect

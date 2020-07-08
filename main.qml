@@ -34,7 +34,7 @@ Window {
             y: 109
             width: 240
             height: 240
-            fillMode: Image.Stretch
+            fillMode: Image.PreserveAspectFit
             z: 1
             antialiasing: true
             clip: true
@@ -77,18 +77,21 @@ Window {
                   ListElement { text: "FM(BBC-4 UK)" } // new
                   ListElement { text: "FM(UK)"}
                   ListElement { text: "DAB(NORWAY)"}
+                  ListElement { text: "DAB(NORWAY)2"}
                   ListElement { text: "DAB(UK)"}
                   ListElement { text: "DAB(AUS)"}
+                  ListElement { text: "FM(SPAIN)"}
+                  ListElement { text: "FM(NETHERLANDS)"}
               }
             signal sendSelectionChanged(string data)
             x: 456
             y: 27
             width: 208
             height: 31
-             onCurrentIndexChanged:
-             {
-                 sendSelectionChanged(cbItems.get(currentIndex).text)
-             }
+            onCurrentIndexChanged:
+            {
+                sendSelectionChanged(cbItems.get(currentIndex).text)
+            }
         }
 
         Text {

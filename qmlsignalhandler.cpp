@@ -18,6 +18,9 @@ static const QString SelectBBC4("FM(BBC-4 UK)");
 static const QString SelectCoxMedia1("FM(USA)-73978");
 static const QString SelectAustralia ("DAB(AUS)");
 static const QString SelectNorway ("DAB(NORWAY)");
+static const QString SelectNorway2 ("DAB(NORWAY)2");
+static const QString SelectSpain ("FM(SPAIN)");
+static const QString SelectNetherLands ("FM(NETHERLANDS)");
 
 
 SignalHandler::SignalHandler
@@ -405,6 +408,11 @@ void SignalHandler::OnSelectionChanged(QString value)
     }
     else if( SelectCoxMedia1 == value )
     {
+        // For more information on how we got 292 and 7426 , refer to section 4.1
+        // 4.1 Station ID Number (MSG ID= 0000) of the document below
+        // https://www.nrscstandards.org/standards-and-guidelines/documents/standards/nrsc-5-d/reference-docs/1020s.pdf
+        // 7426 is the fcc facility id
+        // 292 is the country code
         data.PopulateIbocFields( 0x7426, 0, "292" );
     }
     else if( SelectAustralia == value )
@@ -428,6 +436,36 @@ void SignalHandler::OnSelectionChanged(QString value)
         data.mGcc = mGccHelper.FormGcc
                         (
                         mGccHelper.CountryIdentifier( 0xf204 ),
+                        "NO"
+                        );
+    }
+    else if( SelectSpain == value )
+    {
+        // [<uatype>.]<scids>.<sid>.<eid>.<gcc>.dab.radiodns.org
+        // dab/<gcc>/<eid>/<sid>/<scids>[/<uatype>]
+        //static QString DABDemo2_Lookup("0.c7d8.c1ce.ce1.dab.radiodns.org");
+        data.PopulateFmFields( 9320, 0xe213 );
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xe213 ),
+                        "ES"
+                        );
+    }
+    else if( SelectNetherLands == value )
+    {
+        data.PopulateFmFields( 8860, 0x8203 );
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0x8203 ),
+                        "NL"
+                        );
+    }
+    else if( SelectNorway2 == value )
+    {
+        data.PopulateDabFields( 0xf214, 0, 0xf201 );
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xf214 ),
                         "NO"
                         );
     }
