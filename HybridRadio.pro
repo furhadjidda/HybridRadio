@@ -41,7 +41,8 @@ HEADERS += \
 
 DISTFILES += \
     ../build-HybridRadio-Desktop_Qt_5_7_0_MinGW_32bit-Debug/PlayStrip.PNG \
-    countries.csv
+    countries.csv \
+    hybridRadio.service
 
 
 unix:!macx: LIBS += -L$$PWD/../qt5pi/lib/ -lqstomp

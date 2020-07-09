@@ -1,0 +1,14 @@
+GNU nano 3.2                                                                          /lib/systemd/system/hybridRadio.service
+
+[Unit]
+Description=Hybrid Radio application
+
+[Service]
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+ExecStart=/home/pi/qt-apps/HybridRadio/bin/HybridRadio
+KillMode=process
+User=root
+
+[Install]
+WantedBy=graphical.target

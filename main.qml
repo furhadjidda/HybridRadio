@@ -82,6 +82,8 @@ Window {
                   ListElement { text: "DAB(AUS)"}
                   ListElement { text: "FM(SPAIN)"}
                   ListElement { text: "FM(NETHERLANDS)"}
+                  ListElement { text: "FM(IRELAND)"}
+                  ListElement { text: "FM(AUSTRIA)"}
               }
             signal sendSelectionChanged(string data)
             x: 456

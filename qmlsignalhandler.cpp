@@ -21,6 +21,8 @@ static const QString SelectNorway ("DAB(NORWAY)");
 static const QString SelectNorway2 ("DAB(NORWAY)2");
 static const QString SelectSpain ("FM(SPAIN)");
 static const QString SelectNetherLands ("FM(NETHERLANDS)");
+static const QString SelectIreland ("FM(IRELAND)");
+static const QString SelectAustria ("FM(AUSTRIA)");
 
 
 SignalHandler::SignalHandler
@@ -467,6 +469,24 @@ void SignalHandler::OnSelectionChanged(QString value)
                         (
                         mGccHelper.CountryIdentifier( 0xf214 ),
                         "NO"
+                        );
+    }
+    else if( SelectIreland == value )
+    {
+        data.PopulateFmFields( 10060, 0x2205 );
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0x2205 ),
+                        "IE"
+                        );
+    }
+    else if( SelectAustria == value )
+    {
+        data.PopulateFmFields( 9200, 0xA943 );
+        data.mGcc = mGccHelper.FormGcc
+                        (
+                        mGccHelper.CountryIdentifier( 0xA943 ),
+                        "AT"
                         );
     }
     else
