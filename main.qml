@@ -176,7 +176,7 @@ Window {
                 Image {
                     id: soundWave
                     anchors.fill: parent
-                    source: "b122_3-512.png"
+                    source: "Qml-Popup-SoundUnavailable.png"
                 }
                 Text {
                     id: popupText
@@ -235,7 +235,7 @@ Window {
                         popupProgramView.close()
                     }
                 }
-                source: "close-512.png"
+                source: "Qml-CloseImage.png"
             }
 
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent | Popup.CloseOnReleaseOutside | Popup.CloseOnReleaseOutsideParent
@@ -378,7 +378,7 @@ Window {
             height: 43
             visible: false
             fillMode: Image.PreserveAspectFit
-            source: "epg_image.jpg"
+            source: "Qml-Epg-Image.jpg"
             MouseArea{
                 anchors.fill: parent
                 onClicked: popupProgramView.open()
@@ -392,7 +392,7 @@ Window {
             width: 97
             height: 50
             fillMode: Image.PreserveAspectFit
-            source: "radio-dns.png"
+            source: "Qml-RadioDnsLogo.png"
         }
 
         Image {
@@ -402,7 +402,7 @@ Window {
             width: 86
             height: 39
             fillMode: Image.PreserveAspectFit
-            source: "400x235_DABplus_Logo_Farbe_sRGB.png"
+            source: "Qml-DabPlusLogo.png"
         }
 
         Image {
@@ -412,7 +412,7 @@ Window {
             width: 76
             height: 34
             fillMode: Image.PreserveAspectFit
-            source: "RDS-logo.jpg"
+            source: "Qml-Rdslogo.jpg"
         }
 
         Image {
@@ -422,7 +422,7 @@ Window {
             width: 73
             height: 24
             fillMode: Image.PreserveAspectFit
-            source: "HD-Radio-logo-HD-Only.jpeg"
+            source: "Qml-HdLogo.jpeg"
         }
 
         Text {
@@ -443,7 +443,7 @@ Window {
             width: 73
             height: 20
             visible: false
-            source: "HttpImage.jpg"
+            source: "Qml-HttpImage.jpg"
             fillMode: Image.PreserveAspectCrop
         }
 
@@ -454,7 +454,7 @@ Window {
             width: 73
             height: 20
             visible: false
-            source: "StompImage.png"
+            source: "Qml-StompImage.png"
             fillMode: Image.PreserveAspectCrop
         }
 
@@ -490,7 +490,7 @@ Window {
                             additionalInfoPopup.close()
                         }
                     }
-                    source: "close-512.png"
+                    source: "Qml-CloseImage.png"
                 }
             }
 
@@ -503,7 +503,7 @@ Window {
             y: 71
             width: 30
             height: 32
-            source: "info.png"
+            source: "Qml-MoreInfo.png"
             fillMode: Image.PreserveAspectFit
             MouseArea{
                 anchors.fill: parent
