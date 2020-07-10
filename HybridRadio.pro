@@ -44,8 +44,9 @@ DISTFILES += \
     countries.csv \
     hybridRadio.service
 
+HOME = /home/furhad/raspi
 
-unix:!macx: LIBS += -L$$PWD/../qt5pi/lib/ -lqstomp
+unix:!macx: LIBS += -L$$HOME/qt5pi/lib/ -lqstomp
 
-INCLUDEPATH += $$PWD/../qt5pi/include
-DEPENDPATH += $$PWD/../qt5pi/include
+INCLUDEPATH += $$HOME/qt5pi/include
+DEPENDPATH += $$HOME/qt5pi/include
