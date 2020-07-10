@@ -41,7 +41,7 @@ QString GccHelper::FormGcc
 
 void GccHelper::ReadLookUpTable()
 {
-    QFile file( "countries.csv" );
+    QFile file( "/home/pi/qt-apps/HybridRadio/bin/countries.csv" );
 
     if ( !file.open( QIODevice::ReadOnly ) )
     {
