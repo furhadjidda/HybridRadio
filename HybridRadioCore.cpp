@@ -8,7 +8,7 @@ HybridRadioCore::HybridRadioCore()
     , mProgramInformationDownloader( new DownloadManager( ProgramInformationFileName ) )
     , mPlayer( new Player() )
     , mReader( new XmlReader() )
-    , mDnsLookup( new DNSLookup() )
+    , mDnsLookup( new DnsLookup() )
     , mHttpTransport( static_cast<HttpTransport*>( new HttpTransport() ) )
     , mStompTransport( static_cast<StompTransport*>(new StompTransport() ) )
 {
@@ -322,7 +322,7 @@ void HybridRadioCore::ConnectSignals()
     QObject::connect
             (
             mDnsLookup.get(),
-            &DNSLookup::SignalServiceInformationAvailable,
+            &DnsLookup::SignalServiceInformationAvailable,
             this,
             &HybridRadioCore::OnServiceInformationAvailable
             );
@@ -395,7 +395,7 @@ void HybridRadioCore::ConnectSignals()
     QObject::connect
             (
             mDnsLookup.get(),
-            &DNSLookup::SignalHttpVisSupported,
+            &DnsLookup::SignalHttpVisSupported,
             this,
             &HybridRadioCore::OnHttpVisSupported
             );
@@ -403,7 +403,7 @@ void HybridRadioCore::ConnectSignals()
     QObject::connect
             (
             mDnsLookup.get(),
-            &DNSLookup::SignalStompVisSupported,
+            &DnsLookup::SignalStompVisSupported,
             this,
             &HybridRadioCore::OnStompVisSupported
             );

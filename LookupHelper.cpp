@@ -1,4 +1,4 @@
-#include "lookuphelper.hpp"
+#include "LookupHelper.hpp"
 #include <QTextStream>
 #include <QDebug>
 #include <QStringList>

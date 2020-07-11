@@ -1,10 +1,22 @@
-#include "dnslookup.hpp"
+#include "DnsLookup.hpp"
 #include <QtNetwork>
 #include <QUrl>
 #include <QTimer>
 #include <QTimerEvent>
 
-void DNSLookup::lookupCName( QString& val )
+
+DnsLookup::DnsLookup()
+{
+}
+
+DnsLookup::~DnsLookup()
+{
+}
+
+void DnsLookup::lookupCName
+    (
+    const QString& val
+    )
 {
     // Create a DNS lookup.
     mCName = new QDnsLookup
@@ -24,7 +36,10 @@ void DNSLookup::lookupCName( QString& val )
     mCName->lookup();
 }
 
-void DNSLookup::lookupService( QString& val )
+void DnsLookup::lookupService
+    (
+    const QString& val
+    )
 {
     QString lookUp("_radioepg._tcp.");
 
@@ -47,7 +62,7 @@ void DNSLookup::lookupService( QString& val )
     mService->lookup();
 }
 
-void DNSLookup::lookupHttpVis()
+void DnsLookup::lookupHttpVis()
 {
     // Formation of this is mentioned in ETSI TS 101 499 V3.1.1  Page 17
     /*
@@ -86,7 +101,7 @@ void DNSLookup::lookupHttpVis()
     mHttpVis->lookup();
 }
 
- void DNSLookup::lookupVis()
+ void DnsLookup::lookupVis()
  {
      // Formation of this is mentioned in ETSI TS 101 499 V3.1.1  Page 17
      /*
@@ -125,7 +140,7 @@ void DNSLookup::lookupHttpVis()
      mStompVis->lookup();
  }
 
-void DNSLookup::onCNameResponse()
+void DnsLookup::onCNameResponse()
 {
     // Check the lookup succeeded.
     if ( mCName->error() != QDnsLookup::NoError )
@@ -149,7 +164,7 @@ void DNSLookup::onCNameResponse()
     mCName->deleteLater();
 }
 
-void DNSLookup::onServiceResponse()
+void DnsLookup::onServiceResponse()
 {
     // Check the lookup succeeded.
     if ( mService->error() != QDnsLookup::NoError )
@@ -179,7 +194,7 @@ void DNSLookup::onServiceResponse()
     mService->deleteLater();
 }
 
-void DNSLookup::onHttpVisResponse()
+void DnsLookup::onHttpVisResponse()
 {
     // Check the lookup succeeded.
     if ( mHttpVis->error() != QDnsLookup::NoError )
@@ -204,7 +219,7 @@ void DNSLookup::onHttpVisResponse()
     mHttpVis->deleteLater();
 }
 
-void DNSLookup::onVisResponse()
+void DnsLookup::onVisResponse()
 {
     // Check the lookup succeeded.
     if ( mStompVis->error() != QDnsLookup::NoError )

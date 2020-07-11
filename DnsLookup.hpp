@@ -11,22 +11,33 @@
 #include <QDnsTextRecord>
 #include <QDate>
 
-class DNSLookup : public QObject
+class DnsLookup
+        : public QObject
 {
     Q_OBJECT
 public:
-    DNSLookup()
-    {
-    }
-    ~DNSLookup()
-    {
-    }
-    void lookupCName( QString& val );
-    void lookupService( QString& val );
+    DnsLookup();
+
+    ~DnsLookup();
+
+    void lookupCName
+        (
+        const QString& val
+        );
+
+    void lookupService
+        (
+        const QString& val
+        );
+
     void lookupHttpVis();
+
     void lookupVis();
 
-    inline void ConstructServiceInfoFileName( QString& aRef )
+    inline void ConstructServiceInfoFileName
+        (
+        QString& aRef
+        )
     {
         aRef = GetServiceName();
         aRef.replace(".","_");
@@ -53,32 +64,32 @@ public:
     }
 
 
-    QString GetServiceName()
+    inline QString GetServiceName()
     {
         return mServiceName;
     }
 
-    uint GetPortNumber()
+    inline uint GetPortNumber()
     {
         return mServicePort;
     }
 
-    QString GetHttpTargetName()
+    inline QString GetHttpTargetName()
     {
         return mHttpTargetName;
     }
 
-    uint GetHttpPortNumber()
+    inline uint GetHttpPortNumber()
     {
         return mHttpServicePort;
     }
 
-    QString GetStompTargetName()
+    inline QString GetStompTargetName()
     {
         return mStompTargetName;
     }
 
-    uint GetStompPortNumber()
+    inline uint GetStompPortNumber()
     {
         return mStompServicePort;
     }

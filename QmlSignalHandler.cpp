@@ -1,9 +1,9 @@
-#include "qmlsignalhandler.hpp"
-#include "downloadmanager.h"
+#include "QmlSignalHandler.hpp"
+#include "DownloadManager.hpp"
 #include <QDebug>
 #include <stdlib.h>
 #include <QProcess>
-#include "lookuphelper.hpp"
+#include "LookupHelper.hpp"
 #include <QtAlgorithms>
 #include <QCollator>
 

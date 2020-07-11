@@ -4,11 +4,11 @@
 #include <QObject>
 #include <memory>
 #include "HybridRadioCommonTypes.hpp"
-#include "lookuphelper.hpp"
-#include "player.hpp"
-#include "dnslookup.hpp"
+#include "LookupHelper.hpp"
+#include "Player.hpp"
+#include "DnsLookup.hpp"
 #include "XmlReader.h"
-#include "downloadmanager.h"
+#include "DownloadManager.hpp"
 #include "HttpTransport.hpp"
 #include "StompTransport.hpp"
 #include "GccHelper.hpp"
@@ -99,7 +99,7 @@ private:
     std::unique_ptr<DownloadManager> mProgramInformationDownloader;
     std::unique_ptr<Player> mPlayer;
     std::unique_ptr<XmlReader> mReader;
-    std::unique_ptr<DNSLookup> mDnsLookup;
+    std::unique_ptr<DnsLookup> mDnsLookup;
     std::unique_ptr<Transport> mHttpTransport;
     std::unique_ptr<Transport> mStompTransport;
 

@@ -4,7 +4,7 @@
 #include <QVector>
 #include <QMap>
 #include <stdint.h>
-#include "lookuphelper.hpp"
+#include "LookupHelper.hpp"
 
 //! Structure to hold Information about EPG
 typedef struct {

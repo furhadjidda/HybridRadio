@@ -1,4 +1,4 @@
-#include "downloadmanager.h"
+#include "DownloadManager.hpp"
 #include <QDateTime>
 #include <QTime>
 #include <QRegularExpression>

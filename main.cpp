@@ -9,11 +9,11 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QDebug>
-#include "downloadmanager.h"
-#include "qmlsignalhandler.hpp"
+#include "DownloadManager.hpp"
+#include "QmlSignalHandler.hpp"
 #include "XmlReader.h"
-#include "player.hpp"
-#include "dnslookup.hpp"
+#include "Player.hpp"
+#include "DnsLookup.hpp"
 
 
 int main(int argc, char *argv[])
