@@ -1,0 +1,9 @@
+[Unit]
+Description=Raspberry Pi Volume Control Service
+
+[Service]
+ExecStart=/usr/bin/python /home/pi/ky040/KY040/examples/volumeControl.py
+RestartSec=5
+
+[install]
+WantedBy=multi-user.target
