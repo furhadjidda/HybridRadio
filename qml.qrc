@@ -13,5 +13,8 @@
         <file>Qml-StompImage.png</file>
         <file>Qml-MoreInfo.png</file>
         <file>playIcons_Mod.png</file>
+        <file>playIcons_Mod_negate.png</file>
+        <file>Qml-HttpLogo.png</file>
+        <file>qml-animated-playing.gif</file>
     </qresource>
 </RCC>

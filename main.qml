@@ -20,7 +20,17 @@ Window {
         y: 0
         width: 1024
         height: 600
-        color: "#ffffff"
+        gradient: Gradient {
+            GradientStop {
+                position: 0
+                color: "#0e6082"
+            }
+
+            GradientStop {
+                position: 1
+                color: "#000000"
+            }
+        }
         rotation: 0
         z: 12
         clip: true
@@ -34,7 +44,7 @@ Window {
             y: 109
             width: 240
             height: 240
-            fillMode: Image.PreserveAspectFit
+            fillMode: Image.Stretch
             z: 1
             antialiasing: true
             clip: true
@@ -48,7 +58,7 @@ Window {
             y: 65
             width: 437
             height: 85
-            color: "#061a7e"
+            color: "#dbdde8"
             text: "StationName"
             font.family: "Tahoma"
             wrapMode: Text.WordWrap
@@ -90,6 +100,8 @@ Window {
             y: 27
             width: 208
             height: 31
+            font.wordSpacing: 0.1
+            spacing: 1
             onCurrentIndexChanged:
             {
                 sendSelectionChanged(cbItems.get(currentIndex).text)
@@ -103,6 +115,7 @@ Window {
             y: 361
             width: 91
             height: 14
+            color: "#d5d7e6"
             text: "bitrate"
             font.bold: true
             verticalAlignment: Text.AlignVCenter
@@ -117,8 +130,9 @@ Window {
             y: 223
             width: 437
             height: 31
-            color: "#6581f5"
+            color: "#edeef0"
             text: "Description"
+            lineHeight: 1
             wrapMode: Text.WordWrap
             styleColor: "#dd0b0b"
             font.family: "Tahoma"
@@ -130,10 +144,10 @@ Window {
             id: songName
             objectName: "SongObject"
             x: 13
-            y: 308
+            y: 356
             width: 437
             height: 41
-            color: "#054bba"
+            color: "#dce0e8"
             text: qsTr("SongName")
             font.family: "Tahoma"
             wrapMode: Text.WordWrap
@@ -150,14 +164,26 @@ Window {
         Text {
             id: mediastatus
             objectName: "MediaStatus"
-            x: 456
-            y: 84
-            width: 240
+            x: 13
+            y: 564
+            width: 191
             height: 19
+            color: "#e3e6e9"
             text: qsTr("Media status")
+            visible: false
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
             font.pixelSize: 15
+            onTextChanged: {
+                if( text === "Playing" )
+                {
+                    animatedImage.visible = true
+                }
+                else
+                {
+                    animatedImage.visible = false
+                }
+            }
         }
 
         Popup {
@@ -385,52 +411,13 @@ Window {
             }
         }
 
-        Image {
-            id: image
-            x: 8
-            y: 8
-            width: 97
-            height: 50
-            fillMode: Image.PreserveAspectFit
-            source: "Qml-RadioDnsLogo.png"
-        }
-
-        Image {
-            id: image3
-            x: 111
-            y: 8
-            width: 86
-            height: 39
-            fillMode: Image.PreserveAspectFit
-            source: "Qml-DabPlusLogo.png"
-        }
-
-        Image {
-            id: image4
-            x: 217
-            y: 18
-            width: 76
-            height: 34
-            fillMode: Image.PreserveAspectFit
-            source: "Qml-Rdslogo.jpg"
-        }
-
-        Image {
-            id: image5
-            x: 321
-            y: 23
-            width: 73
-            height: 24
-            fillMode: Image.PreserveAspectFit
-            source: "Qml-HdLogo.jpeg"
-        }
-
         Text {
             id: element
             x: 616
             y: 387
             width: 88
             height: 17
+            color: "#cfd2e3"
             text: qsTr("Count: " + programListModel.count )
             font.bold: true
             font.pixelSize: 14
@@ -441,21 +428,21 @@ Window {
             x: 526
             y: 361
             width: 73
-            height: 20
+            height: 27
             visible: false
-            source: "Qml-HttpImage.jpg"
-            fillMode: Image.PreserveAspectCrop
+            source: "Qml-HttpLogo.png"
+            fillMode: Image.Stretch
         }
 
         Image {
             id: stompProtocolImage
             x: 526
-            y: 387
+            y: 394
             width: 73
-            height: 20
+            height: 26
             visible: false
             source: "Qml-StompImage.png"
-            fillMode: Image.PreserveAspectCrop
+            fillMode: Image.PreserveAspectFit
         }
 
 
@@ -517,7 +504,7 @@ Window {
             y: 462
             width: 366
             height: 103
-            source: "playIcons_Mod.png"
+            source: "playIcons_Mod_negate.png"
             fillMode: Image.PreserveAspectFit
             MouseArea {
                 id: stopMouseArea
@@ -568,6 +555,17 @@ Window {
                 onClicked: sendPrevious()
             }
 
+        }
+
+        AnimatedImage {
+            id: animatedImage
+            x: 517
+            y: 65
+            width: 119
+            height: 35
+            visible: false
+            fillMode: Image.PreserveAspectCrop
+            source: "qml-animated-playing.gif"
         }
 
         function displayPopUp()
@@ -632,6 +630,6 @@ Window {
 
 /*##^##
 Designer {
-    D{i:4;anchors_height:31;anchors_width:208;anchors_x:456;anchors_y:27}
+    D{i:7;anchors_height:31;anchors_width:208;anchors_x:456;anchors_y:27}
 }
 ##^##*/

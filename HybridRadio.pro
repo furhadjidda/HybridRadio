@@ -42,7 +42,10 @@ HEADERS += \
 DISTFILES += \
     ../build-HybridRadio-Desktop_Qt_5_7_0_MinGW_32bit-Debug/PlayStrip.PNG \
     countries.csv \
-    hybridRadio.service
+    hybridRadio.desktop \
+    hybridRadio.service \
+    volumeControl.py \
+    volumeControl.service
 
 HOME = /home/furhad/raspi
 
