@@ -1,4 +1,4 @@
- Hybrid Radio using Radio DNS open standards
+ # Hybrid Radio using Radio DNS open standards
  
  Notes:
  For auto starting the Hybrid Radio app on startup I am using autostart method
@@ -15,18 +15,18 @@ In addition to running commands in autostart, Linux will also look for and execu
 The easiest way to execute GUI programs on boot is to create one of these .desktop scripts.
 
 
-mkdir /home/pi/.config/autostart
-nano /home/pi/.config/autostart/hybridRadio.dekstop
+`mkdir /home/pi/.config/autostart`
+`nano /home/pi/.config/autostart/hybridRadio.dekstop`
 
 Copy in the following text into the clock.desktop file
 
-[Desktop Entry]
+`[Desktop Entry]
 Type=Application
 Name=HybridRadio
-Exec=/home/pi/qt-apps/HybridRadio/bin/HybridRadio
+Exec=/home/pi/qt-apps/HybridRadio/bin/HybridRadio`
 
 
-sudo reboot
+`sudo reboot`
 
 
 For Volume Controller using KY040 , I am using the systemd method of starting it automatically.
@@ -34,18 +34,18 @@ copy the volumeControl.service file in location /lib/systemd/system/
 
 then run the following commands
 
-sudo systemctl daemon-reload
+`sudo systemctl daemon-reload`
 
-sudo systemctl enable volumeControl.service
+`sudo systemctl enable volumeControl.service`
 
-sudo reboot
+`sudo reboot`
 
 To restart the service use:
-sudo systemctl restart volumeControl.service
+`sudo systemctl restart volumeControl.service`
 
 To stop the service use:
-sudo systemctl stop volumeControl.service
+`sudo systemctl stop volumeControl.service`
 
 To see the logs use
-journalctl -u volumeControl.service  OR
-journalctl -fu volumeControl.service
+`journalctl -u volumeControl.service`  OR
+`journalctl -fu volumeControl.service`
