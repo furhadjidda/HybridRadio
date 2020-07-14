@@ -16,14 +16,19 @@ The easiest way to execute GUI programs on boot is to create one of these .deskt
 
 
 `mkdir /home/pi/.config/autostart`
+
 `nano /home/pi/.config/autostart/hybridRadio.dekstop`
 
 Copy in the following text into the clock.desktop file
 
 `[Desktop Entry]
+
 Type=Application
+
 Name=HybridRadio
+
 Exec=/home/pi/qt-apps/HybridRadio/bin/HybridRadio`
+
 
 
 `sudo reboot`
@@ -47,5 +52,8 @@ To stop the service use:
 `sudo systemctl stop volumeControl.service`
 
 To see the logs use
-`journalctl -u volumeControl.service`  OR
+`journalctl -u volumeControl.service`
+
+OR
+
 `journalctl -fu volumeControl.service`
