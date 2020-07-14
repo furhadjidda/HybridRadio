@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Name=HybridRadio
+Exec=/home/pi/qt-apps/HybridRadio/bin/HybridRadio
