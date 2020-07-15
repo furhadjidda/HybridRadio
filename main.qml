@@ -274,7 +274,9 @@ Window {
                 Row {
                     Rectangle {
                         width: 282; height: 60
-                        color: index % 2 == 0 ? "Light Blue" : "Light Pink"
+                        //color: index % 2 == 0 ? "#0e6082" : "#0e6082"
+                        color: "#0e6082"
+                        border.color: "black"
                         Image {
                             id: image2
                             x: 5
@@ -290,7 +292,7 @@ Window {
                             font.family: "Tahoma"
                             x: 60
                             y: 5
-                            color: "Black"
+                            color: "snow"
                             font.pixelSize: 14
                             width: 220
                             wrapMode: Text.WordWrap
