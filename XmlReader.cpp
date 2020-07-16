@@ -42,9 +42,11 @@ void XmlReader::ReadPiXmlData
     {
         QTextStream in( &piXmlFile );
         piXmlString = in.readAll();
-
         qDebug() << "[XML_READER] Reading " << fileName << "\nSize = " << piXmlFile.size() << " Bytes";
-
+    }
+    else
+    {
+        qWarning() << "[XML_READER] Failed Reading " << fileName << "\nSize = " << piXmlFile.size() << " Bytes";
     }
 
     QXmlStreamReader reader( piXmlString );

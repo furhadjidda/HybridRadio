@@ -381,3 +381,31 @@ void UiHandler::QmlMethodInvokeAddMoreInfo( const QVariant& aValue )
     }
 }
 
+void UiHandler::UpdatePresetBox( const QString aIndex, const SiData& aValue )
+{
+    QString id("presetid");
+    id.append( aIndex );
+
+    QObject *prsesetImage = mUiObject->findChild<QObject*>(id);
+    qDebug() << "aValue.mArtwork = " << aValue.mArtwork;
+    if( prsesetImage )
+    {
+        prsesetImage->setProperty
+                (
+                "source",
+                aValue.mArtwork
+                );
+
+        QQmlProperty
+                (
+                prsesetImage,
+                "source"
+                )
+                .write
+                (
+                aValue.mArtwork
+                );
+    }
+}
+
+

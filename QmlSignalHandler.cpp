@@ -35,6 +35,15 @@ SignalHandler::SignalHandler
     mHybridRadioCore->InitializeCore();
     ConnectSignals();
     OnSelectionChanged( SelectCoxMedia1 );
+
+    SiDataList presets;
+    mPresets.GetAllPresets( presets );
+
+    // preset id starts with 1
+    for( qint16 index =0; index < presets.size(); ++index )
+    {
+        mUiHandler.UpdatePresetBox( QString::number( index+1, 10 ), presets[index] );
+    }
 }
 
 SignalHandler::~SignalHandler()
@@ -80,6 +89,7 @@ void SignalHandler::OnSelect( int aIndex )
     mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mHybridRadioCore->PlayServiceAtIndex( aIndex );
     PopulateAdditionalInfo( mList[aIndex] );
+    mCurrentPlayingIndex = aIndex;
 }
 
 void SignalHandler::OnServiceInformationDownloaded()
@@ -176,6 +186,54 @@ void SignalHandler::ConnectSignals()
             SIGNAL(sendSelectionChanged(QString)),
             this,
             SLOT(OnSelectionChanged(QString))
+            );
+
+    QObject *presetId = mUIObject->findChild<QObject*>("presetid1_MouseArea");
+    QObject::connect
+            (
+            presetId,
+            SIGNAL(sendPresetSave(QString)),
+            this,
+            SLOT(OnPresetSave(QString))
+            );
+    QObject::connect
+            (
+            presetId,
+            SIGNAL(sendPresetRecall(QString)),
+            this,
+            SLOT(OnPresetRecall(QString))
+            );
+
+    QObject *presetId2 = mUIObject->findChild<QObject*>("presetid2_MouseArea");
+    QObject::connect
+            (
+            presetId2,
+            SIGNAL(sendPresetSave(QString)),
+            this,
+            SLOT(OnPresetSave(QString))
+            );
+    QObject::connect
+            (
+            presetId2,
+            SIGNAL(sendPresetRecall(QString)),
+            this,
+            SLOT(OnPresetRecall(QString))
+            );
+
+    QObject *presetId3 = mUIObject->findChild<QObject*>("presetid3_MouseArea");
+    QObject::connect
+            (
+            presetId3,
+            SIGNAL(sendPresetSave(QString)),
+            this,
+            SLOT(OnPresetSave(QString))
+            );
+    QObject::connect
+            (
+            presetId3,
+            SIGNAL(sendPresetRecall(QString)),
+            this,
+            SLOT(OnPresetRecall(QString))
             );
 
     QObject::connect
@@ -291,6 +349,7 @@ void SignalHandler::OnStationFound( const SiData& aData )
     qDebug() << "[HANDLER] OnStationFound " << aData.mPlayableMedia;
     mHybridRadioCore->PlayMedia( aData.mPlayableMedia );
     PopulateAdditionalInfo( aData );
+    mCurrentPlayingIndex = mHybridRadioCore->GetCurrentServiceIndex();
 }
 
 void SignalHandler::OnStationNameChanged( const QString& aData )
@@ -333,6 +392,31 @@ void SignalHandler::ClearMetaData()
 
     QString data("Bearer Info: ");
     mUiHandler.QmlMethodInvokeAddMoreInfo( data );
+}
+
+
+void SignalHandler::OnPresetSave(const QString& aData)
+{
+    qDebug() << "PresetSaved" << aData;
+    mPresets.SavePreset( aData.toInt(), mList[mCurrentPlayingIndex] );
+    mUiHandler.UpdatePresetBox( aData, mList[mCurrentPlayingIndex] );
+}
+
+void SignalHandler::OnPresetRecall(const QString& aData)
+{
+    qDebug() << "PresetRecalled" << aData;
+    mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
+    SiData data;
+    mPresets.RecallPreset( aData.toInt(), data );
+    if( 0 == data.mBearerInfo.size() )
+    {
+        qWarning() << "[PRESET MANAGER] No Bearer info preset";
+        return;
+    }
+    StationInformation stationInfo;
+    DeconstructBearer( stationInfo, data.mBearerInfo[0].mId );
+    mHybridRadioCore->LookForStation( stationInfo );
+
 }
 
 void SignalHandler::OnSelectionChanged(QString value)

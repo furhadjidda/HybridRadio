@@ -16,5 +16,6 @@
         <file>playIcons_Mod_negate.png</file>
         <file>Qml-HttpLogo.png</file>
         <file>qml-animated-playing.gif</file>
+        <file>Qml-PresetAdd.png</file>
     </qresource>
 </RCC>

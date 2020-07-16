@@ -570,6 +570,117 @@ Window {
             source: "qml-animated-playing.gif"
         }
 
+        Text {
+            id: clockText
+            x: 13
+            y: 8
+            width: 199
+            height: 17
+            color: "#f7f7f7"
+            text: qsTr("")
+            font.wordSpacing: 0.6
+            font.bold: true
+            font.letterSpacing: 0.6
+            style: Text.Raised
+            font.weight: Font.DemiBold
+            font.capitalization: Font.AllUppercase
+            fontSizeMode: Text.HorizontalFit
+            renderType: Text.NativeRendering
+            textFormat: Text.RichText
+            font.pixelSize: 14
+        }
+
+        Timer {
+            interval: 500; running: true; repeat: true
+            onTriggered: {
+                var date = new Date;
+                clockText.text = date.toString()
+            }
+        }
+
+        Image {
+            id: presetid1
+            objectName: "presetid1"
+            x: 545
+            y: 449
+            width: 75
+            height: 75
+            source: "Qml-PresetAdd.png"
+            fillMode: Image.PreserveAspectFit
+            MouseArea{
+                id: presetid1_MouseArea
+                objectName: "presetid1_MouseArea"
+                x:0
+                y:0
+                anchors.fill: parent
+                signal sendPresetSave(string index)
+                signal sendPresetRecall(string index)
+                onPressAndHold: {
+                    sendPresetSave("1")
+                }
+                onClicked: {
+                    sendPresetRecall("1")
+                }
+            }
+
+        }
+
+        Image {
+            id: presetid2
+            objectName: "presetid2"
+            x: 456
+            y: 449
+            width: 70
+            height: 70
+            source: "Qml-PresetAdd.png"
+            fillMode: Image.PreserveAspectFit
+            MouseArea{
+                id: presetid2_MouseArea
+                objectName: "presetid2_MouseArea"
+                x:0
+                y:0
+                width: 75
+                height: 75
+                anchors.fill: parent
+                signal sendPresetSave(string index)
+                signal sendPresetRecall(string index)
+                onPressAndHold: {
+                    sendPresetSave("2")
+                }
+                onClicked: {
+                    sendPresetRecall("2")
+                }
+            }
+        }
+
+        Image {
+            id: presetid3
+            objectName: "presetid3"
+            x: 632
+            y: 449
+            width: 70
+            height: 70
+            source: "Qml-PresetAdd.png"
+            fillMode: Image.PreserveAspectFit
+            MouseArea{
+                id: presetid3_MouseArea
+                objectName: "presetid3_MouseArea"
+                x:0
+                y:0
+                width: 75
+                height: 75
+                anchors.fill: parent
+                signal sendPresetSave(string index)
+                signal sendPresetRecall(string index)
+                onPressAndHold: {
+                    sendPresetSave("3")
+                }
+                onClicked: {
+                    sendPresetRecall("3")
+                }
+            }
+        }
+
         function displayPopUp()
         {
             popup.open()

@@ -31,6 +31,7 @@ public:
     void QmlMethodInvokeMethodDisplayHttpProtocolSupport( bool aStatus );
     void QmlMethodInvokeMethodDisplayStompProtocolSupport( bool aStatus );
     void QmlMethodInvokeAddMoreInfo( const QVariant& aValue );
+    void UpdatePresetBox( const QString aIndex, const SiData& aValue );
 
 
 private:

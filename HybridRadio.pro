@@ -1,7 +1,8 @@
 TEMPLATE = app
 
-QT += qml quick multimedia network core websockets
+QT += qml quick multimedia network core websockets sql
 CONFIG += c++11
+CONFIG += sql
 
 SOURCES += main.cpp \
     DnsLookup.cpp \
@@ -11,6 +12,7 @@ SOURCES += main.cpp \
     HybridRadioCore.cpp \
     LookupHelper.cpp \
     Player.cpp \
+    PresetHandler.cpp \
     QmlSignalHandler.cpp \
     StompTransport.cpp \
     UiHandler.cpp \
@@ -33,6 +35,7 @@ HEADERS += \
     HybridRadioCore.hpp \
     LookupHelper.hpp \
     Player.hpp \
+    PresetHandler.hpp \
     QmlSignalHandler.hpp \
     StompTransport.hpp \
     Transport.hpp \

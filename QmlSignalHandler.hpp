@@ -9,6 +9,7 @@
 #include <QUrl>
 #include "HybridRadioCore.hpp"
 #include "UiHandler.hpp"
+#include "PresetHandler.hpp"
 
 class SignalHandler : public QObject
 {
@@ -40,6 +41,8 @@ public slots:
     void OnBitRateChanged( const QString& aData );
     void OnMediaStateChanged( const QString& aData );
     void OnStationFound( const SiData& aData );
+    void OnPresetSave(const QString& aData);
+    void OnPresetRecall(const QString& aData);
 
 
 private:
@@ -57,6 +60,7 @@ private:
     // UI Handler
     UiHandler mUiHandler{ mUIObject };
     GccHelper mGccHelper;
+    PresetHandler mPresets;
 };
 #endif // MAIN_H
 

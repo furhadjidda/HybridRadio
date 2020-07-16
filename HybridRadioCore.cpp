@@ -1,7 +1,7 @@
 #include "HybridRadioCore.hpp"
 
-static const QString ServiceInformationFileName("RadioDns_ServiceInformation.xml");
-static const QString ProgramInformationFileName("RadioDns_ProgramInformation.xml");
+static const QString ServiceInformationFileName("/home/pi/qt-apps/RadioDns_ServiceInformation.xml");
+static const QString ProgramInformationFileName("/home/pi/qt-apps/RadioDns_ProgramInformation.xml");
 
 HybridRadioCore::HybridRadioCore()
     : mServiceInformationDownloader( new DownloadManager( ServiceInformationFileName ) )
@@ -157,6 +157,7 @@ void HybridRadioCore::OnServiceInformationAvailable( const QString& aFilePath )
     qDebug() << "[HYBRID_CORE] SI FileName=" << aFilePath;
     QString serviceName;
     mDnsLookup->ConstructServiceInfoFileName( serviceName );
+    serviceName.prepend("/home/pi/qt-apps/");
     mServiceInformationDownloader->SetFileName( serviceName );
     qDebug() << "[HYBRID_CORE] serviceName FileName=" << serviceName;
     mServiceInformationDownloader->DownloadFile( aFilePath );
@@ -169,6 +170,7 @@ void HybridRadioCore::OnServiceInformationDownloaded( const QString& aFilePath )
     mList.clear();
     QString serviceName;
     mDnsLookup->ConstructServiceInfoFileName( serviceName );
+    serviceName.prepend("/home/pi/qt-apps/");
     mReader->ReadSiXmlData( serviceName, mList );
 
     // This is for sorting the list
@@ -475,6 +477,7 @@ QString HybridRadioCore::DownloadProgramInformation
             );
 
     // Create a file Name
+    fileNameFormation.prepend("/home/pi/qt-apps/");
     mProgramInformationDownloader->SetFileName( fileNameFormation );
     // Download a file
     mProgramInformationDownloader->DownloadFile( urlFormation );

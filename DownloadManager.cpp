@@ -110,6 +110,7 @@ bool DownloadManager::IsFilePresent
     if( birthTime.daysTo( currDateAndTime ) > 5 )
     {
         // Data could be out of date.
+        qWarning() << "[ DOWNLOADER ] File more than 5 days old";
         //return false;
     }
 
