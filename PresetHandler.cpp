@@ -8,6 +8,7 @@ static const QString CreateTableSqlQuery("CREATE TABLE IF NOT EXISTS presetData(
                                  "artWork TEXT NOT NULL"
                                  ");"
                                  );
+static const qint16 PresetCount = 4;
 
 PresetHandler::PresetHandler()
 {
@@ -20,23 +21,23 @@ PresetHandler::PresetHandler()
     QSqlQuery batchquery( mPresetDatabase );
     batchquery.prepare("INSERT INTO presetData values (?, ?, ?, ?, ?)");
     QVariantList keys;
-    keys << 1 << 2 << 3;
+    keys << 1 << 2 << 3 << 4;
     batchquery.addBindValue( keys, QSql::In );
 
     QVariantList bearer;
-    bearer << "Preset1_bearer" << "Preset2_bearer" << "Preset3_bearer";
+    bearer << "Preset1_bearer" << "Preset2_bearer" << "Preset3_bearer"<< "Preset4_bearer";
     batchquery.addBindValue( bearer, QSql::In );
 
     QVariantList serviceId;
-    serviceId << "Preset1_serviceId" << "Preset2_serviceId" << "Preset3_serviceId";
+    serviceId << "Preset1_serviceId" << "Preset2_serviceId" << "Preset3_serviceId"<< "Preset4_serviceId";
     batchquery.addBindValue( serviceId, QSql::In );
 
     QVariantList audioStream;
-    audioStream << "audioStream" << "audioStream" << "audioStream";
+    audioStream << "audioStream" << "audioStream" << "audioStream" << "audioStream";
     batchquery.addBindValue( audioStream, QSql::In );
 
     QVariantList artWork;
-    artWork << "artWork" << "artWork" << "artWork";
+    artWork << "Qml-PresetAdd.png" << "Qml-PresetAdd.png" << "Qml-PresetAdd.png" << "Qml-PresetAdd.png";
     batchquery.addBindValue( artWork, QSql::In );
 
     if(! batchquery.execBatch())
@@ -52,7 +53,7 @@ void PresetHandler::SavePreset
     const SiData& aSiData
     )
 {
-    qDebug() << "Saving Preset";
+    qDebug() << "[PRESET HANDLER] Saving Preset at " << aBankId;
     QSqlQuery query( mPresetDatabase );
     query.prepare( "Update presetData SET bearer = ?, serviceId = ?,audioStream = ?, artWork = ? WHERE id = ?;" );
     query.addBindValue( aSiData.mBearerInfo[0].mId );
@@ -62,7 +63,7 @@ void PresetHandler::SavePreset
     query.addBindValue( aBankId );
     if(! query.exec())
     {
-        qDebug() <<"SAVING - " << query.lastError();
+        qDebug() <<"[PRESET HANDLER] Error - " << query.lastError();
     }
 }
 
@@ -73,7 +74,7 @@ void PresetHandler::RecallPreset
     )
 {
     QString queryText("select * from presetData where id = " + QString::number( aBankId, 10 ) );
-    qDebug() << queryText;
+    qDebug() << "[PRESET HANDLER]" << queryText;
     QSqlQuery q( queryText, mPresetDatabase );
     QSqlRecord rec = q.record();
 
@@ -98,7 +99,7 @@ void PresetHandler::GetAllPresets
     SiDataList& aSiData
     )
 {
-    for( int index = 1; index < 4; ++index )
+    for( int index = 1; index <= PresetCount; ++index )
     {
         SiData siData;
         QString queryText("select * from presetData where id = " + QString::number( index, 10 ) );

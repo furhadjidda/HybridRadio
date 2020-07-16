@@ -386,8 +386,7 @@ void UiHandler::UpdatePresetBox( const QString aIndex, const SiData& aValue )
     QString id("presetid");
     id.append( aIndex );
 
-    QObject *prsesetImage = mUiObject->findChild<QObject*>(id);
-    qDebug() << "aValue.mArtwork = " << aValue.mArtwork;
+    QObject *prsesetImage = mUiObject->findChild<QObject*>( id );
     if( prsesetImage )
     {
         prsesetImage->setProperty

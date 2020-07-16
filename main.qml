@@ -111,12 +111,12 @@ Window {
         Text {
             id: bitrate
             objectName: "BitRateObject"
-            x: 605
-            y: 361
+            x: 13
+            y: 578
             width: 91
             height: 14
             color: "#d5d7e6"
-            text: "bitrate"
+            text: "Bitrate"
             font.bold: true
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
@@ -164,8 +164,8 @@ Window {
         Text {
             id: mediastatus
             objectName: "MediaStatus"
-            x: 13
-            y: 564
+            x: 17
+            y: 553
             width: 191
             height: 19
             color: "#e3e6e9"
@@ -400,8 +400,8 @@ Window {
         Image {
             id: epgImage
             objectName: "epgImageVisibility"
-            x: 456
-            y: 361
+            x: 643
+            y: 61
             width: 49
             height: 43
             visible: false
@@ -415,22 +415,22 @@ Window {
 
         Text {
             id: element
-            x: 616
-            y: 387
+            x: 142
+            y: 578
             width: 88
             height: 17
             color: "#cfd2e3"
             text: qsTr("Count: " + programListModel.count )
             font.bold: true
-            font.pixelSize: 14
+            font.pixelSize: 15
         }
 
         Image {
             id: httpProtocolImage
-            x: 526
-            y: 361
-            width: 73
-            height: 27
+            x: 264
+            y: 566
+            width: 70
+            height: 25
             visible: false
             source: "Qml-HttpLogo.png"
             fillMode: Image.Stretch
@@ -438,10 +438,10 @@ Window {
 
         Image {
             id: stompProtocolImage
-            x: 526
-            y: 394
-            width: 73
-            height: 26
+            x: 360
+            y: 566
+            width: 70
+            height: 25
             visible: false
             source: "Qml-StompImage.png"
             fillMode: Image.PreserveAspectFit
@@ -601,17 +601,15 @@ Window {
         Image {
             id: presetid1
             objectName: "presetid1"
-            x: 545
-            y: 449
-            width: 75
-            height: 75
+            x: 456
+            y: 387
+            width: 90
+            height: 90
             source: "Qml-PresetAdd.png"
             fillMode: Image.PreserveAspectFit
             MouseArea{
                 id: presetid1_MouseArea
                 objectName: "presetid1_MouseArea"
-                x:0
-                y:0
                 anchors.fill: parent
                 signal sendPresetSave(string index)
                 signal sendPresetRecall(string index)
@@ -628,22 +626,19 @@ Window {
         Image {
             id: presetid2
             objectName: "presetid2"
-            x: 456
-            y: 449
-            width: 70
-            height: 70
+            x: 586
+            y: 387
+            width: 90
+            height: 90
             source: "Qml-PresetAdd.png"
             fillMode: Image.PreserveAspectFit
             MouseArea{
                 id: presetid2_MouseArea
                 objectName: "presetid2_MouseArea"
-                x:0
-                y:0
-                width: 75
-                height: 75
                 anchors.fill: parent
                 signal sendPresetSave(string index)
                 signal sendPresetRecall(string index)
+                width: 90
                 onPressAndHold: {
                     sendPresetSave("2")
                 }
@@ -656,19 +651,15 @@ Window {
         Image {
             id: presetid3
             objectName: "presetid3"
-            x: 632
-            y: 449
-            width: 70
-            height: 70
+            x: 456
+            y: 493
+            width: 90
+            height: 90
             source: "Qml-PresetAdd.png"
             fillMode: Image.PreserveAspectFit
             MouseArea{
                 id: presetid3_MouseArea
                 objectName: "presetid3_MouseArea"
-                x:0
-                y:0
-                width: 75
-                height: 75
                 anchors.fill: parent
                 signal sendPresetSave(string index)
                 signal sendPresetRecall(string index)
@@ -679,6 +670,50 @@ Window {
                     sendPresetRecall("3")
                 }
             }
+        }
+
+
+        Image {
+            id: presetid4
+            objectName: "presetid4"
+            x: 586
+            y: 493
+            width: 90
+            height: 90
+            source: "Qml-PresetAdd.png"
+            fillMode: Image.PreserveAspectFit
+            MouseArea{
+                id: presetid4_MouseArea
+                objectName: "presetid4_MouseArea"
+                anchors.fill: parent
+                signal sendPresetSave(string index)
+                signal sendPresetRecall(string index)
+                onPressAndHold: {
+                    sendPresetSave("4")
+                }
+                onClicked: {
+                    sendPresetRecall("4")
+                }
+            }
+        }
+
+        Text {
+            id: element1
+            x: 524
+            y: 366
+            width: 94
+            height: 15
+            color: "#f9f9f9"
+            text: qsTr("PRESETS")
+            styleColor: "#1526a6"
+            fontSizeMode: Text.HorizontalFit
+            textFormat: Text.RichText
+            horizontalAlignment: Text.AlignHCenter
+            font.letterSpacing: 2.6
+            style: Text.Raised
+            font.bold: true
+            font.weight: Font.Light
+            font.pixelSize: 15
         }
 
         function displayPopUp()
