@@ -13,7 +13,7 @@ class PresetHandler
 public:
     PresetHandler();
 
-    void SavePreset
+    bool SavePreset
         (
         const qint16 aBankId,
         const SiData& aSiData

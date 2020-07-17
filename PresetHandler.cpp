@@ -3,7 +3,7 @@
 static const QString CreateTableSqlQuery("CREATE TABLE IF NOT EXISTS presetData("
                                  "id int primary KEY,"
                                  "bearer TEXT NOT NULL,"
-                                 "serviceId TEXT NOT NULL,"
+                                 "serviceId TEXT,"
                                  "audioStream TEXT NOT NULL,"
                                  "artWork TEXT NOT NULL"
                                  ");"
@@ -47,12 +47,17 @@ PresetHandler::PresetHandler()
 }
 
 
-void PresetHandler::SavePreset
+bool PresetHandler::SavePreset
     (
     const qint16 aBankId,
     const SiData& aSiData
     )
 {
+    if( 0 == aSiData.mBearerInfo.size() )
+    {
+        qWarning() << "[PRESET HANDLER] Unable to save preset without bearer";
+        return false;
+    }
     qDebug() << "[PRESET HANDLER] Saving Preset at " << aBankId;
     QSqlQuery query( mPresetDatabase );
     query.prepare( "Update presetData SET bearer = ?, serviceId = ?,audioStream = ?, artWork = ? WHERE id = ?;" );
@@ -64,7 +69,9 @@ void PresetHandler::SavePreset
     if(! query.exec())
     {
         qDebug() <<"[PRESET HANDLER] Error - " << query.lastError();
+        return false;
     }
+    return true;
 }
 
 void PresetHandler::RecallPreset

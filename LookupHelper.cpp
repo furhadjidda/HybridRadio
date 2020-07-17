@@ -137,6 +137,7 @@ void ConstructBearerUri
         }
         else if( HdBand == aStationInfo.mBand )
         {
+            // hd:<cc>.<tx>[.<mId>]
             QString ibocHdId("");
             if( 0 != aStationInfo.mIbocHdId )
             {
@@ -188,12 +189,25 @@ void DeconstructBearer
     }
     else if( aStationInfo.mBand == "dab" )
     {
+        // dab:<gcc>.<eid>.<sid>.<scids>[.<uatype>]
         bool ok;
         int lastIndex = query.size() - 1;
         aStationInfo.mScids = query.at(lastIndex).toUInt(&ok,16);
         aStationInfo.mSid = query.at(--lastIndex).toUInt(&ok,16);
         aStationInfo.mEid = query.at(--lastIndex).toUInt(&ok,16);
         aStationInfo.mGcc = query.at(--lastIndex);
+    }
+    else if( aStationInfo.mBand == "hd" )
+    {
+        // hd:<cc>.<tx>[.<mId>]
+        bool ok;
+        int lastIndex = query.size() - 1;
+        if( query.size() == 4 )
+        {
+            aStationInfo.mIbocHdId = query.at(lastIndex).toUInt(&ok,16);
+        }
+        aStationInfo.mIbocTxId = query.at(--lastIndex);
+        aStationInfo.mIbocCountryCode = query.at(--lastIndex);
     }
     qDebug() << "[ HELPER ] Bearer Info " << bearer;
     qDebug() << "[ HELPER ] Splitting Bearer -> Band = " << aStationInfo.mBand
@@ -202,5 +216,8 @@ void DeconstructBearer
              << " Scids = " << hex << aStationInfo.mScids
              << " Sid = " << hex << aStationInfo.mSid
              << " Eid = " << hex << aStationInfo.mEid
+             << " IbocTxId = " << hex << aStationInfo.mIbocTxId
+             << " IbocCountryCode = " << hex << aStationInfo.mIbocCountryCode
+             << " IbocHdId = " << hex << aStationInfo.mIbocHdId
              << " Freq = " << aStationInfo.mFrequency;
 }

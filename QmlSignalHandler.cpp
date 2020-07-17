@@ -414,8 +414,10 @@ void SignalHandler::ClearMetaData()
 void SignalHandler::OnPresetSave(const QString& aData)
 {
     qDebug() << "PresetSaved" << aData;
-    mPresets.SavePreset( aData.toInt(), mList[mCurrentPlayingIndex] );
-    mUiHandler.UpdatePresetBox( aData, mList[mCurrentPlayingIndex] );
+    if ( mPresets.SavePreset( aData.toInt(), mList[mCurrentPlayingIndex] ) )
+    {
+        mUiHandler.UpdatePresetBox( aData, mList[mCurrentPlayingIndex] );
+    }
 }
 
 void SignalHandler::OnPresetRecall(const QString& aData)
@@ -426,7 +428,7 @@ void SignalHandler::OnPresetRecall(const QString& aData)
     mPresets.RecallPreset( aData.toInt(), data );
     if( 0 == data.mBearerInfo.size() )
     {
-        qWarning() << "[PRESET MANAGER] No Bearer info preset";
+        qWarning() << "[HANDLER] No Bearer info preset";
         return;
     }
     StationInformation stationInfo;
