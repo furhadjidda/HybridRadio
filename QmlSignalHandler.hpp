@@ -44,12 +44,12 @@ public slots:
     void OnPresetSave(const QString& aData);
     void OnPresetRecall(const QString& aData);
 
-
 private:
     void ConnectSignals();
     void ClearMetaData();
     void PlayAtIndex( const qint16 aIndex );
     void PopulateAdditionalInfo( const SiData& aData );
+    void PopulatePresetFields();
 
     QObject* mUIObject;
     std::unique_ptr<HybridRadioCore> mHybridRadioCore;

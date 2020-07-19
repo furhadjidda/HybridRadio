@@ -20,6 +20,7 @@ Window {
         y: 0
         width: 1024
         height: 600
+        objectName: "RectBox"
         gradient: Gradient {
             GradientStop {
                 position: 0
@@ -35,7 +36,6 @@ Window {
         z: 12
         clip: true
         border.color: "#090909"
-        objectName: "RectBox"
 
         Image {
             id: image1

@@ -6,6 +6,7 @@
 #include "LookupHelper.hpp"
 #include <QtAlgorithms>
 #include <QCollator>
+#include <QThread>
 
 
 static const QString Selecttion_UK_FM("FM(UK)");
@@ -34,16 +35,9 @@ SignalHandler::SignalHandler
 {    
     mHybridRadioCore->InitializeCore();
     ConnectSignals();
-    OnSelectionChanged( SelectCoxMedia1 );
-
-    SiDataList presets;
-    mPresets.GetAllPresets( presets );
-
-    // preset id starts with 1
-    for( qint16 index =0; index < presets.size(); ++index )
-    {
-        mUiHandler.UpdatePresetBox( QString::number( index+1, 10 ), presets[index] );
-    }
+    OnSelectionChanged( SelectCoxMedia1 );    
+    QThread::sleep( 5 ) ;
+    PopulatePresetFields();
 }
 
 SignalHandler::~SignalHandler()
@@ -619,4 +613,18 @@ void SignalHandler::PopulateAdditionalInfo( const SiData& aData )
     }
 
     mUiHandler.QmlMethodInvokeAddMoreInfo( data );
+}
+
+
+
+void SignalHandler::PopulatePresetFields()
+{
+    SiDataList presets;
+    mPresets.GetAllPresets( presets );
+
+    // preset id starts with 1
+    for( qint16 index =0; index < presets.size(); ++index )
+    {
+        mUiHandler.UpdatePresetBox( QString::number( index+1, 10 ), presets[index] );
+    }
 }
