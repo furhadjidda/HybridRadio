@@ -47,6 +47,7 @@ DISTFILES += \
     countries.csv \
     hybridRadio.desktop \
     hybridRadio.service \
+    pi-code-location-data-usa.csv \
     volumeControl.py \
     volumeControl.service
 
