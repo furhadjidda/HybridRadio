@@ -256,6 +256,40 @@ void SignalHandler::ConnectSignals()
             SLOT(OnPresetRecall(QString))
             );
 
+    QObject *presetId5 = mUIObject->findChild<QObject*>("presetid5_MouseArea");
+    QObject::connect
+            (
+            presetId5,
+            SIGNAL(sendPresetSave(QString)),
+            this,
+            SLOT(OnPresetSave(QString))
+            );
+    QObject::connect
+            (
+            presetId5,
+            SIGNAL(sendPresetRecall(QString)),
+            this,
+            SLOT(OnPresetRecall(QString))
+            );
+
+
+    QObject *presetId6 = mUIObject->findChild<QObject*>("presetid6_MouseArea");
+    QObject::connect
+            (
+            presetId6,
+            SIGNAL(sendPresetSave(QString)),
+            this,
+            SLOT(OnPresetSave(QString))
+            );
+    QObject::connect
+            (
+            presetId6,
+            SIGNAL(sendPresetRecall(QString)),
+            this,
+            SLOT(OnPresetRecall(QString))
+            );
+
+
     QObject::connect
             (
             mHybridRadioCore.get(),

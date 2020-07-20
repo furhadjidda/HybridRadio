@@ -671,7 +671,7 @@ Window {
             id: presetid3
             objectName: "presetid3"
             x: 244
-            y: 502
+            y: 501
             width: 90
             height: 90
             source: "Qml-PresetAdd.png"
@@ -712,6 +712,56 @@ Window {
                 }
                 onClicked: {
                     sendPresetRecall("4")
+                }
+            }
+        }
+
+
+        Image {
+            id: presetid5
+            objectName: "presetid5"
+            x: 470
+            y: 501
+            width: 90
+            height: 90
+            source: "Qml-PresetAdd.png"
+            fillMode: Image.PreserveAspectFit
+            MouseArea{
+                id: presetid5_MouseArea
+                objectName: "presetid5_MouseArea"
+                anchors.fill: parent
+                signal sendPresetSave(string index)
+                signal sendPresetRecall(string index)
+                onPressAndHold: {
+                    sendPresetSave("5")
+                }
+                onClicked: {
+                    sendPresetRecall("5")
+                }
+            }
+        }
+
+
+        Image {
+            id: presetid6
+            objectName: "presetid6"
+            x: 580
+            y: 501
+            width: 90
+            height: 90
+            source: "Qml-PresetAdd.png"
+            fillMode: Image.PreserveAspectFit
+            MouseArea{
+                id: presetid6_MouseArea
+                objectName: "presetid6_MouseArea"
+                anchors.fill: parent
+                signal sendPresetSave(string index)
+                signal sendPresetRecall(string index)
+                onPressAndHold: {
+                    sendPresetSave("6")
+                }
+                onClicked: {
+                    sendPresetRecall("6")
                 }
             }
         }
@@ -955,6 +1005,8 @@ Window {
         }
     }
 }
+
+
 
 /*##^##
 Designer {

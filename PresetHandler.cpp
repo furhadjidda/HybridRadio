@@ -8,7 +8,7 @@ static const QString CreateTableSqlQuery("CREATE TABLE IF NOT EXISTS presetData(
                                  "artWork TEXT NOT NULL"
                                  ");"
                                  );
-static const qint16 PresetCount = 4;
+static const qint16 PresetCount = 6;
 
 PresetHandler::PresetHandler()
 {
@@ -21,23 +21,23 @@ PresetHandler::PresetHandler()
     QSqlQuery batchquery( mPresetDatabase );
     batchquery.prepare("INSERT INTO presetData values (?, ?, ?, ?, ?)");
     QVariantList keys;
-    keys << 1 << 2 << 3 << 4;
+    keys << 1 << 2 << 3 << 4 << 5 << 6;
     batchquery.addBindValue( keys, QSql::In );
 
     QVariantList bearer;
-    bearer << "Preset1_bearer" << "Preset2_bearer" << "Preset3_bearer"<< "Preset4_bearer";
+    bearer << "Preset1_bearer" << "Preset2_bearer" << "Preset3_bearer"<< "Preset4_bearer" << "Preset5_bearer" << "Preset6_bearer";
     batchquery.addBindValue( bearer, QSql::In );
 
     QVariantList serviceId;
-    serviceId << "Preset1_serviceId" << "Preset2_serviceId" << "Preset3_serviceId"<< "Preset4_serviceId";
+    serviceId << "Preset1_serviceId" << "Preset2_serviceId" << "Preset3_serviceId"<< "Preset4_serviceId" << "Preset5_serviceId" << "Preset6_serviceId";
     batchquery.addBindValue( serviceId, QSql::In );
 
     QVariantList audioStream;
-    audioStream << "audioStream" << "audioStream" << "audioStream" << "audioStream";
+    audioStream << "audioStream" << "audioStream" << "audioStream" << "audioStream" << "audioStream" << "audioStream";
     batchquery.addBindValue( audioStream, QSql::In );
 
     QVariantList artWork;
-    artWork << "Qml-PresetAdd.png" << "Qml-PresetAdd.png" << "Qml-PresetAdd.png" << "Qml-PresetAdd.png";
+    artWork << "qrc:/Qml-PresetAdd.png" << "qrc:/Qml-PresetAdd.png" << "qrc:/Qml-PresetAdd.png" << "qrc:/Qml-PresetAdd.png" << "qrc:/Qml-PresetAdd.png"<< "qrc:/Qml-PresetAdd.png";
     batchquery.addBindValue( artWork, QSql::In );
 
     if(! batchquery.execBatch())
