@@ -17,5 +17,15 @@
         <file>Qml-HttpLogo.png</file>
         <file>qml-animated-playing.gif</file>
         <file>Qml-PresetAdd.png</file>
+        <file>Qml-WorldMapIcon.png</file>
+        <file>countries_flags/Australia.jpg</file>
+        <file>countries_flags/Austria.png</file>
+        <file>countries_flags/Germany.png</file>
+        <file>countries_flags/Ireland.jpg</file>
+        <file>countries_flags/Netherlands.png</file>
+        <file>countries_flags/Norway.png</file>
+        <file>countries_flags/Spain.png</file>
+        <file>countries_flags/Uk.png</file>
+        <file>countries_flags/Usa.png</file>
     </qresource>
 </RCC>

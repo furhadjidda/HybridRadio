@@ -37,6 +37,8 @@ Window {
         clip: true
         border.color: "#090909"
 
+        signal sendSelectionChanged(string data)
+
         Image {
             id: image1
             objectName: "artWork"
@@ -96,10 +98,11 @@ Window {
                   ListElement { text: "FM(AUSTRIA)"}
               }
             signal sendSelectionChanged(string data)
-            x: 456
-            y: 27
-            width: 208
+            x: 254
+            y: 18
+            width: 151
             height: 31
+            visible: false
             font.wordSpacing: 0.1
             spacing: 1
             onCurrentIndexChanged:
@@ -111,23 +114,23 @@ Window {
         Text {
             id: bitrate
             objectName: "BitRateObject"
-            x: 13
-            y: 578
+            x: 456
+            y: 383
             width: 91
             height: 14
             color: "#d5d7e6"
             text: "Bitrate"
             font.bold: true
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignTop
+            horizontalAlignment: Text.AlignLeft
             font.pixelSize: 15
         }
 
         Text {
             id: description
             objectName: "DescriptionObject"
-            x: 13
-            y: 223
+            x: 14
+            y: 214
             width: 437
             height: 31
             color: "#edeef0"
@@ -143,8 +146,8 @@ Window {
         Text {
             id: songName
             objectName: "SongObject"
-            x: 13
-            y: 356
+            x: 14
+            y: 340
             width: 437
             height: 41
             color: "#dce0e8"
@@ -164,8 +167,8 @@ Window {
         Text {
             id: mediastatus
             objectName: "MediaStatus"
-            x: 17
-            y: 553
+            x: 456
+            y: 434
             width: 191
             height: 19
             color: "#e3e6e9"
@@ -213,6 +216,21 @@ Window {
                     horizontalAlignment: Text.AlignHCenter
                     text: qsTr("No Audio Stream Available")
                 }
+            }
+
+
+            Image{
+                width: 25
+                height: 25
+                x: 300
+                y: 5
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        popup.close()
+                    }
+                }
+                source: "Qml-CloseImage.png"
             }
 
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent | Popup.CloseOnReleaseOutside | Popup.CloseOnReleaseOutsideParent
@@ -347,7 +365,8 @@ Window {
                 Column {
                     Rectangle {
                         width: 250; height: 150
-                        color: index % 2 == 0 ? "Dark Gray" : "Light Gray"
+                        //color: index % 2 == 0 ? "Dark Gray" : "Light Gray"
+                        color: "#0e6082"
                         Text {
                             id: programText
                             text: name
@@ -402,8 +421,8 @@ Window {
             objectName: "epgImageVisibility"
             x: 643
             y: 61
-            width: 49
-            height: 43
+            width: 45
+            height: 45
             visible: false
             fillMode: Image.PreserveAspectFit
             source: "Qml-Epg-Image.jpg"
@@ -415,8 +434,8 @@ Window {
 
         Text {
             id: element
-            x: 142
-            y: 578
+            x: 456
+            y: 356
             width: 88
             height: 17
             color: "#cfd2e3"
@@ -427,8 +446,8 @@ Window {
 
         Image {
             id: httpProtocolImage
-            x: 264
-            y: 566
+            x: 626
+            y: 356
             width: 70
             height: 25
             visible: false
@@ -438,8 +457,8 @@ Window {
 
         Image {
             id: stompProtocolImage
-            x: 360
-            y: 566
+            x: 626
+            y: 395
             width: 70
             height: 25
             visible: false
@@ -502,8 +521,8 @@ Window {
 
         Image {
             id: playIconsImage
-            x: 22
-            y: 462
+            x: 49
+            y: 403
             width: 366
             height: 103
             source: "playIcons_Mod_negate.png"
@@ -524,8 +543,8 @@ Window {
                 objectName: "Play"
                 x: 81
                 y: 3
-                width: 84
-                height: 97
+                width: 88
+                height: 92
                 z: 12
                 signal sendPlay()
                 onClicked: sendPlay()
@@ -551,8 +570,8 @@ Window {
                 objectName: "Previous"
                 x: 0
                 y: 4
-                width: 82
-                height: 96
+                width: 81
+                height: 91
                 signal sendPrevious()
                 onClicked: sendPrevious()
             }
@@ -601,8 +620,8 @@ Window {
         Image {
             id: presetid1
             objectName: "presetid1"
-            x: 456
-            y: 387
+            x: 23
+            y: 501
             width: 90
             height: 90
             source: "Qml-PresetAdd.png"
@@ -626,8 +645,8 @@ Window {
         Image {
             id: presetid2
             objectName: "presetid2"
-            x: 586
-            y: 387
+            x: 135
+            y: 501
             width: 90
             height: 90
             source: "Qml-PresetAdd.png"
@@ -651,8 +670,8 @@ Window {
         Image {
             id: presetid3
             objectName: "presetid3"
-            x: 456
-            y: 493
+            x: 244
+            y: 502
             width: 90
             height: 90
             source: "Qml-PresetAdd.png"
@@ -676,8 +695,8 @@ Window {
         Image {
             id: presetid4
             objectName: "presetid4"
-            x: 586
-            y: 493
+            x: 360
+            y: 501
             width: 90
             height: 90
             source: "Qml-PresetAdd.png"
@@ -697,23 +716,184 @@ Window {
             }
         }
 
-        Text {
-            id: element1
-            x: 524
-            y: 366
-            width: 94
-            height: 15
-            color: "#f9f9f9"
-            text: qsTr("PRESETS")
-            styleColor: "#1526a6"
-            fontSizeMode: Text.HorizontalFit
-            textFormat: Text.RichText
-            horizontalAlignment: Text.AlignHCenter
-            font.letterSpacing: 2.6
-            style: Text.Raised
-            font.bold: true
-            font.weight: Font.Light
-            font.pixelSize: 15
+        Image {
+            id: countrySelection
+            x: 502
+            y: 12
+            width: 149
+            height: 43
+            fillMode: Image.Stretch
+            source: "Qml-WorldMapIcon.png"
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    popupSelection.open()
+                }
+            }
+        }
+
+        Popup {
+            id: popupSelection
+            objectName: "popUpSelection"
+            x: Math.round((parent.width - width) / 2)
+            y: Math.round((parent.height - height) / 2)
+            width: 800
+            height: 175
+            Rectangle{
+                width: 750
+                height: 150
+                anchors.fill: parent
+                ListView {
+                    id: selectionListView
+                    x: 0
+                    y: 0
+                    width: 700
+                    height: 200
+                    layer.enabled: false
+                    highlightRangeMode: ListView.ApplyRange
+                    snapMode: ListView.SnapToItem
+                    cacheBuffer: 20
+                    keyNavigationWraps: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    orientation: ListView.Horizontal
+                    flickableDirection: Flickable.HorizontalFlick
+                    pixelAligned: false
+                    model: selectionInfoModel
+                    delegate: selectionComponentDelegate
+                }
+            }
+
+            Image{
+                width: 25
+                height: 25
+                x: 750
+                y: 5
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        popupSelection.close()
+                    }
+                }
+                source: "Qml-CloseImage.png"
+            }
+        }
+
+        ListModel {
+            id: selectionInfoModel
+            objectName: "selectionInfoModel"
+            ListElement {
+                name: "Australia"
+                image: "countries_flags/Australia.jpg"
+                selection: "DAB(AUS)"
+            }
+            ListElement {
+                name: "USA"
+                image: "countries_flags/Usa.png"
+                selection: "FM(USA)-73978"
+            }
+            ListElement {
+                name: "United Kingdom - Cluster 1"
+                image: "countries_flags/Uk.png"
+                selection: "FM(UK)"
+            }
+            ListElement {
+                name: "United Kingdom - Cluster 2"
+                image: "countries_flags/Uk.png"
+                selection: "FM(RADIO1 UK)"
+            }
+            ListElement {
+                name: "United Kingdom - Cluster 3"
+                image: "countries_flags/Uk.png"
+                selection: "FM(BBC-2 UK)"
+            }
+            ListElement {
+                name: "United Kingdom - Cluster 4"
+                image: "countries_flags/Uk.png"
+                selection: "FM(BBC-4 UK)"
+            }
+            ListElement {
+                name: "Norway - Cluster 1"
+                image: "countries_flags/Norway.png"
+                selection: "DAB(NORWAY)"
+            }
+            ListElement {
+                name: "Norway - Cluster 2"
+                image: "countries_flags/Norway.png"
+                selection: "DAB(NORWAY)2"
+            }
+            ListElement {
+                name: "Netherlands"
+                image: "countries_flags/Uk.png"
+                selection: "FM(NETHERLANDS)"
+            }
+            ListElement {
+                name: "Ireland"
+                image: "countries_flags/Ireland.jpg"
+                selection: "FM(IRELAND)"
+            }
+            ListElement {
+                name: "Austria"
+                image: "countries_flags/Austria.png"
+                selection: "FM(AUSTRIA)"
+            }
+            ListElement {
+                name: "Germany - Cluster 1(DAB)"
+                image: "countries_flags/Germany.png"
+                selection: "DAB(DEUTSCHLAND)"
+            }
+            ListElement {
+                name: "Germany - Cluster 2(FM)"
+                image: "countries_flags/Germany.png"
+                selection: "FM(DEUTSCHLAND)"
+            }
+            ListElement {
+                name: "Spain"
+                image: "countries_flags/Spain.png"
+                selection: "FM(SPAIN)"
+            }
+        }
+        // This is for EPG
+        Component {
+            id: selectionComponentDelegate
+            Item {
+                width: 205; height: 150
+                Column {
+                    Rectangle {
+                        border.color: "black"
+                        width: 205; height: 150
+                        //color: index % 2 == 0 ? "Dark Gray" : "Light Gray"
+                        color: "#0e6082"
+                        Text {
+                            id: countryName
+                            text: name
+                            font.family: "Tahoma"
+                            x: 5
+                            y: 4
+                            color: "Black"
+                            font.pixelSize: 13
+                            width: 200
+                            wrapMode: Text.WordWrap
+                            textFormat: Text.RichText
+                        }
+                        BorderImage {
+                            id: flagImage
+                            x: 5
+                            y: 30
+                            width: 175
+                            height: 110
+                            opacity: 1
+                            source: image
+
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                rectangle1.sendSelectionChanged( selection )
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         function displayPopUp()

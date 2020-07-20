@@ -36,7 +36,7 @@ SignalHandler::SignalHandler
     mHybridRadioCore->InitializeCore();
     ConnectSignals();
     OnSelectionChanged( SelectCoxMedia1 );    
-    QThread::sleep( 5 ) ;
+    QThread::sleep( 2 ) ;
     PopulatePresetFields();
 }
 
@@ -177,6 +177,16 @@ void SignalHandler::ConnectSignals()
     QObject::connect
             (
             comboBox_Object,
+            SIGNAL(sendSelectionChanged(QString)),
+            this,
+            SLOT(OnSelectionChanged(QString))
+            );
+
+    // Connect Selection Combo Box
+    QObject *popUpSelectionObject = mUIObject->findChild<QObject*>("RectBox");
+    QObject::connect
+            (
+            popUpSelectionObject,
             SIGNAL(sendSelectionChanged(QString)),
             this,
             SLOT(OnSelectionChanged(QString))
