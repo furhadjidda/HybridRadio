@@ -206,6 +206,12 @@ Window {
                     id: soundWave
                     anchors.fill: parent
                     source: "Qml-Popup-SoundUnavailable.png"
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            popup.close()
+                        }
+                    }
                 }
                 Text {
                     id: popupText
@@ -479,11 +485,14 @@ Window {
                 width: 700
                 height: 175
                 anchors.fill: parent
+                color: "#0e6082"
                 Text {
                     id: moreInfoId
                     anchors.fill: parent
                     wrapMode: Text.WordWrap
                     text: qsTr("text")
+                    font.pixelSize: 14
+                    color: "snow"
                 }
 
                 // Image for closing
@@ -939,6 +948,7 @@ Window {
                             anchors.fill: parent
                             onClicked: {
                                 rectangle1.sendSelectionChanged( selection )
+                                popupSelection.close()
                             }
                         }
                     }
