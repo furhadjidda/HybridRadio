@@ -902,7 +902,7 @@ Window {
                 selection: "FM(SPAIN)"
             }
         }
-        // This is for EPG
+        // This is for Contry Selection
         Component {
             id: selectionComponentDelegate
             Item {
@@ -955,6 +955,10 @@ Window {
             height: 21
             color: "#ffffff"
             text: qsTr("")
+            style: Text.Raised
+            font.weight: Font.DemiBold
+            font.capitalization: Font.AllUppercase
+            font.bold: true
             font.pixelSize: 15
         }
 

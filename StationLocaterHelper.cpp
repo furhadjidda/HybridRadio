@@ -18,11 +18,11 @@ QString StationLocaterHelper::LookUpState
     {
         if( !aFacilityId.isEmpty() && ( value.mFacilityId == aFacilityId ))
         {
-            return value.mState;
+            return ( value.mCityOfLicense + ", " + value.mState);
         }
         else if( ( value.mFrequency == aFrequency ) && ( value.mActivePiCode == aPiCode ) )
         {
-            return value.mState;
+            return ( value.mCityOfLicense + ", " + value.mState);
         }
         else
         {
