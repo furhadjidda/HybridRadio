@@ -18,6 +18,7 @@ public:
     void SetMoreInfoValue( const QVariant& aValue );
     void SetMediaStatusValue( const QVariant& aValue );
     void SetSongNameValue( const QVariant& aValue );
+    void SetStateValue( const QVariant& aValue );
 
     void QmlMethodInvokeclearListElement();
     void QmlMethodInvokeaddListElement( const SiData& aValue );

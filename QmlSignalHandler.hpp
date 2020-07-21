@@ -10,6 +10,7 @@
 #include "HybridRadioCore.hpp"
 #include "UiHandler.hpp"
 #include "PresetHandler.hpp"
+#include "StationLocaterHelper.hpp"
 
 class SignalHandler : public QObject
 {
@@ -50,6 +51,7 @@ private:
     void PlayAtIndex( const qint16 aIndex );
     void PopulateAdditionalInfo( const SiData& aData );
     void PopulatePresetFields();
+    void PopulateStateField( const SiData& aData );
 
     QObject* mUIObject;
     std::unique_ptr<HybridRadioCore> mHybridRadioCore;
@@ -61,6 +63,7 @@ private:
     UiHandler mUiHandler{ mUIObject };
     GccHelper mGccHelper;
     PresetHandler mPresets;
+    StationLocaterHelper mStationLocaterHelper;
 };
 #endif // MAIN_H
 

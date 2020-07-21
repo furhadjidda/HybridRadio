@@ -14,6 +14,7 @@ SOURCES += main.cpp \
     Player.cpp \
     PresetHandler.cpp \
     QmlSignalHandler.cpp \
+    StationLocaterHelper.cpp \
     StompTransport.cpp \
     UiHandler.cpp \
     XmlReader.cpp
@@ -37,6 +38,7 @@ HEADERS += \
     Player.hpp \
     PresetHandler.hpp \
     QmlSignalHandler.hpp \
+    StationLocaterHelper.hpp \
     StompTransport.hpp \
     Transport.hpp \
     UiHandler.hpp \

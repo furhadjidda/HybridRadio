@@ -946,6 +946,18 @@ Window {
             }
         }
 
+        Text {
+            id: stateImageId
+            objectName: "stateImageObject"
+            x: 456
+            y: 413
+            width: 214
+            height: 21
+            color: "#ffffff"
+            text: qsTr("")
+            font.pixelSize: 15
+        }
+
         function displayPopUp()
         {
             popup.open()

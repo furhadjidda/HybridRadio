@@ -191,6 +191,29 @@ void UiHandler::SetSongNameValue( const QVariant& aValue )
     }
 }
 
+void UiHandler::SetStateValue( const QVariant& aValue )
+{
+    QObject *stateImageObject = mUiObject->findChild<QObject*>("stateImageObject");
+    if( stateImageObject )
+    {
+        stateImageObject->setProperty
+                (
+                "text",
+                aValue
+                );
+
+        QQmlProperty
+                (
+                stateImageObject,
+                "text"
+                )
+                .write
+                (
+                aValue
+                );
+    }
+}
+
 void UiHandler::QmlMethodInvokeclearListElement()
 {
     QVariant retValue = 0;

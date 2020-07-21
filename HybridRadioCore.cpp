@@ -138,7 +138,8 @@ void HybridRadioCore::LookForStation( const StationInformation& aStationData )
     mImageTopic.clear();
     mCurrentBearer.clear();
     mHttpTransport->UnSubscribeTextTopic( mTextTopic );
-    mHttpTransport->UnSubscribeImageTopic( mImageTopic );
+    mHttpTransport->UnSubscribeImageTopic( mImageTopic );    
+    mHttpTransport->DisableTransport();
     mStompTransport->UnSubscribeTextTopic( mTextTopic );
     mStompTransport->UnSubscribeImageTopic( mImageTopic );
     mStompTransport->ResetTransport();
@@ -272,7 +273,6 @@ void HybridRadioCore::OnHttpVisSupported( bool aVal )
 
     mHttpTransport->SubscribeTextTopic( mTextTopic );
     mHttpTransport->SubscribeImageTopic( mImageTopic );
-
     emit SignalHttpTransportSupport( true );
 }
 

@@ -2,6 +2,7 @@ unix:!android {
 
     isEmpty(target.path) {
         data.files = countries.csv
+        data.files += pi-code-location-data-usa.csv
         qnx {
             target.path = /tmp/$${TARGET}/bin
         } else {
@@ -15,4 +16,7 @@ unix:!android {
 }
 
 export(INSTALLS)
+
+DISTFILES += \
+    $$PWD/pi-code-location-data-usa.csv
 

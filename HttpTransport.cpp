@@ -42,6 +42,9 @@ void HttpTransport::SetPortAndTarget
 
 void HttpTransport::SubscribeTextTopic( const QString& aTextTopic )
 {
+    if( mIsDiabled )
+        return;
+
     RequestTextTopic( aTextTopic );
     mCurrentTextTopic = aTextTopic;
     mTextTopicTimer->start( sTimerValue );
@@ -49,6 +52,9 @@ void HttpTransport::SubscribeTextTopic( const QString& aTextTopic )
 
 void HttpTransport::SubscribeImageTopic( const QString& aImageTopic )
 {
+    if( mIsDiabled )
+        return;
+
     RequestImageTopic( aImageTopic );
     mCurrentImageTopic = aImageTopic;
     mImageTopicTimer->start( sTimerValue );

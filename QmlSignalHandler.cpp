@@ -70,12 +70,14 @@ void SignalHandler::OnNext()
 {
     mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mCurrentPlayingIndex = mHybridRadioCore->PlayNextServiceIndex();
+    PopulateStateField( mList[mCurrentPlayingIndex] );
 }
 
 void SignalHandler::OnPrevious()
 {
     mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mCurrentPlayingIndex = mHybridRadioCore->PlayPreviousServiceIndex();
+    PopulateStateField( mList[mCurrentPlayingIndex] );
 }
 
 void SignalHandler::OnSelect( int aIndex )
@@ -83,6 +85,7 @@ void SignalHandler::OnSelect( int aIndex )
     mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     mHybridRadioCore->PlayServiceAtIndex( aIndex );
     PopulateAdditionalInfo( mList[aIndex] );
+    PopulateStateField( mList[aIndex] );
     mCurrentPlayingIndex = aIndex;
 }
 
@@ -404,6 +407,7 @@ void SignalHandler::OnStationFound( const SiData& aData )
     mHybridRadioCore->PlayMedia( aData.mPlayableMedia );
     PopulateAdditionalInfo( aData );
     mCurrentPlayingIndex = mHybridRadioCore->GetCurrentServiceIndex();
+    PopulateStateField( aData );
 }
 
 void SignalHandler::OnStationNameChanged( const QString& aData )
@@ -670,5 +674,23 @@ void SignalHandler::PopulatePresetFields()
     for( qint16 index =0; index < presets.size(); ++index )
     {
         mUiHandler.UpdatePresetBox( QString::number( index+1, 10 ), presets[index] );
+    }
+}
+
+void SignalHandler::PopulateStateField( const SiData& aData )
+{
+    StationInformation stationInfo;
+
+    DeconstructBearer( stationInfo, aData.mBearerInfo[0].mId );
+    if( !stationInfo.mFrequency.isEmpty() )
+    {
+        float freq = stationInfo.mFrequency.toFloat()/100;
+        QString State = mStationLocaterHelper.LookUpState
+                    (
+                    QString::number(freq),
+                    QString::number(stationInfo.mPi,16).toUpper(),
+                    stationInfo.mIbocTxId
+                    );
+        mUiHandler.SetStateValue( State );
     }
 }
