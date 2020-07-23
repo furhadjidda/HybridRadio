@@ -195,7 +195,7 @@ void SignalHandler::ConnectSignals()
             SLOT(OnSelectionChanged(QString))
             );
 
-    QObject *presetId = mUIObject->findChild<QObject*>("presetid1_MouseArea");
+    QObject *presetId = mUIObject->findChild<QObject*>("RectBox");
     QObject::connect
             (
             presetId,
@@ -210,88 +210,6 @@ void SignalHandler::ConnectSignals()
             this,
             SLOT(OnPresetRecall(QString))
             );
-
-    QObject *presetId2 = mUIObject->findChild<QObject*>("presetid2_MouseArea");
-    QObject::connect
-            (
-            presetId2,
-            SIGNAL(sendPresetSave(QString)),
-            this,
-            SLOT(OnPresetSave(QString))
-            );
-    QObject::connect
-            (
-            presetId2,
-            SIGNAL(sendPresetRecall(QString)),
-            this,
-            SLOT(OnPresetRecall(QString))
-            );
-
-    QObject *presetId3 = mUIObject->findChild<QObject*>("presetid3_MouseArea");
-    QObject::connect
-            (
-            presetId3,
-            SIGNAL(sendPresetSave(QString)),
-            this,
-            SLOT(OnPresetSave(QString))
-            );
-    QObject::connect
-            (
-            presetId3,
-            SIGNAL(sendPresetRecall(QString)),
-            this,
-            SLOT(OnPresetRecall(QString))
-            );
-
-    QObject *presetId4 = mUIObject->findChild<QObject*>("presetid4_MouseArea");
-    QObject::connect
-            (
-            presetId4,
-            SIGNAL(sendPresetSave(QString)),
-            this,
-            SLOT(OnPresetSave(QString))
-            );
-    QObject::connect
-            (
-            presetId4,
-            SIGNAL(sendPresetRecall(QString)),
-            this,
-            SLOT(OnPresetRecall(QString))
-            );
-
-    QObject *presetId5 = mUIObject->findChild<QObject*>("presetid5_MouseArea");
-    QObject::connect
-            (
-            presetId5,
-            SIGNAL(sendPresetSave(QString)),
-            this,
-            SLOT(OnPresetSave(QString))
-            );
-    QObject::connect
-            (
-            presetId5,
-            SIGNAL(sendPresetRecall(QString)),
-            this,
-            SLOT(OnPresetRecall(QString))
-            );
-
-
-    QObject *presetId6 = mUIObject->findChild<QObject*>("presetid6_MouseArea");
-    QObject::connect
-            (
-            presetId6,
-            SIGNAL(sendPresetSave(QString)),
-            this,
-            SLOT(OnPresetSave(QString))
-            );
-    QObject::connect
-            (
-            presetId6,
-            SIGNAL(sendPresetRecall(QString)),
-            this,
-            SLOT(OnPresetRecall(QString))
-            );
-
 
     QObject::connect
             (

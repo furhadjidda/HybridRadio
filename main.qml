@@ -626,6 +626,9 @@ Window {
             }
         }
 
+        signal sendPresetSave(string index)
+        signal sendPresetRecall(string index)
+
         Image {
             id: presetid1
             objectName: "presetid1"
@@ -639,13 +642,11 @@ Window {
                 id: presetid1_MouseArea
                 objectName: "presetid1_MouseArea"
                 anchors.fill: parent
-                signal sendPresetSave(string index)
-                signal sendPresetRecall(string index)
                 onPressAndHold: {
-                    sendPresetSave("1")
+                    rectangle1.sendPresetSave("1")
                 }
                 onClicked: {
-                    sendPresetRecall("1")
+                    rectangle1.sendPresetRecall("1")
                 }
             }
 
@@ -664,14 +665,12 @@ Window {
                 id: presetid2_MouseArea
                 objectName: "presetid2_MouseArea"
                 anchors.fill: parent
-                signal sendPresetSave(string index)
-                signal sendPresetRecall(string index)
                 width: 90
                 onPressAndHold: {
-                    sendPresetSave("2")
+                    rectangle1.sendPresetSave("2")
                 }
                 onClicked: {
-                    sendPresetRecall("2")
+                    rectangle1.sendPresetRecall("2")
                 }
             }
         }
@@ -689,13 +688,11 @@ Window {
                 id: presetid3_MouseArea
                 objectName: "presetid3_MouseArea"
                 anchors.fill: parent
-                signal sendPresetSave(string index)
-                signal sendPresetRecall(string index)
                 onPressAndHold: {
-                    sendPresetSave("3")
+                    rectangle1.sendPresetSave("3")
                 }
                 onClicked: {
-                    sendPresetRecall("3")
+                    rectangle1.sendPresetRecall("3")
                 }
             }
         }
@@ -714,13 +711,11 @@ Window {
                 id: presetid4_MouseArea
                 objectName: "presetid4_MouseArea"
                 anchors.fill: parent
-                signal sendPresetSave(string index)
-                signal sendPresetRecall(string index)
                 onPressAndHold: {
-                    sendPresetSave("4")
+                    rectangle1.sendPresetSave("4")
                 }
                 onClicked: {
-                    sendPresetRecall("4")
+                    rectangle1.sendPresetRecall("4")
                 }
             }
         }
@@ -739,13 +734,11 @@ Window {
                 id: presetid5_MouseArea
                 objectName: "presetid5_MouseArea"
                 anchors.fill: parent
-                signal sendPresetSave(string index)
-                signal sendPresetRecall(string index)
                 onPressAndHold: {
-                    sendPresetSave("5")
+                    rectangle1.sendPresetSave("5")
                 }
                 onClicked: {
-                    sendPresetRecall("5")
+                    rectangle1.sendPresetRecall("5")
                 }
             }
         }
@@ -764,13 +757,11 @@ Window {
                 id: presetid6_MouseArea
                 objectName: "presetid6_MouseArea"
                 anchors.fill: parent
-                signal sendPresetSave(string index)
-                signal sendPresetRecall(string index)
                 onPressAndHold: {
-                    sendPresetSave("6")
+                    rectangle1.sendPresetSave("6")
                 }
                 onClicked: {
-                    sendPresetRecall("6")
+                    rectangle1.sendPresetRecall("6")
                 }
             }
         }
