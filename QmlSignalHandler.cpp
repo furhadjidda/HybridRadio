@@ -599,16 +599,19 @@ void SignalHandler::PopulateStateField( const SiData& aData )
 {
     StationInformation stationInfo;
 
-    DeconstructBearer( stationInfo, aData.mBearerInfo[0].mId );
-    if( !stationInfo.mFrequency.isEmpty() )
+    if( 0 != aData.mBearerInfo.size() )
     {
-        float freq = stationInfo.mFrequency.toFloat()/100;
-        QString State = mStationLocaterHelper.LookUpState
-                    (
-                    QString::number(freq),
-                    QString::number(stationInfo.mPi,16).toUpper(),
-                    stationInfo.mIbocTxId
-                    );
-        mUiHandler.SetStateValue( State );
+        DeconstructBearer( stationInfo, aData.mBearerInfo[0].mId );
+        if( !stationInfo.mFrequency.isEmpty() )
+        {
+            float freq = stationInfo.mFrequency.toFloat()/100;
+            QString State = mStationLocaterHelper.LookUpState
+                        (
+                        QString::number(freq),
+                        QString::number(stationInfo.mPi,16).toUpper(),
+                        stationInfo.mIbocTxId
+                        );
+            mUiHandler.SetStateValue( State );
+        }
     }
 }
