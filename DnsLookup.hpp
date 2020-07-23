@@ -10,6 +10,7 @@
 #include <QDnsHostAddressRecord>
 #include <QDnsTextRecord>
 #include <QDate>
+#include <memory>
 
 class DnsLookup
         : public QObject
@@ -107,11 +108,11 @@ public slots:
 
 
 private:
-    QDnsLookup* mCName;
-    QDnsLookup* mService;
-    QDnsLookup* mHttpVis;
-    QDnsLookup* mStompVis;
-    QString mCNAME;
+    QDnsLookup* mCName{nullptr};
+    QDnsLookup* mService{nullptr};
+    QDnsLookup* mHttpVis{nullptr};
+    QDnsLookup* mStompVis{nullptr};
+    QString mCanonicalName;
     QString mServiceName;
     uint mServicePort;
     // For Http

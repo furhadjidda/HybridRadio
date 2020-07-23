@@ -7,10 +7,50 @@
 
 DnsLookup::DnsLookup()
 {
+    mCName = new QDnsLookup( this );
+    connect
+        (
+        mCName,
+        &QDnsLookup::finished,
+        this,
+        &DnsLookup::onCNameResponse
+        );
+
+    mService = new QDnsLookup( this );
+    connect
+        (
+        mService,
+        &QDnsLookup::finished,
+        this,
+        &DnsLookup::onServiceResponse
+        );
+
+    mHttpVis = new QDnsLookup( this );
+    connect
+        (
+        mHttpVis,
+        &QDnsLookup::finished,
+        this,
+        &DnsLookup::onHttpVisResponse
+        );
+
+    mStompVis = new QDnsLookup( this );
+    connect
+        (
+        mStompVis,
+        &QDnsLookup::finished,
+        this,
+        &DnsLookup::onVisResponse
+        );
+
 }
 
 DnsLookup::~DnsLookup()
 {
+    mCName->deleteLater();
+    mService->deleteLater();
+    mHttpVis->deleteLater();
+    mStompVis->deleteLater();
 }
 
 void DnsLookup::lookupCName
@@ -19,19 +59,7 @@ void DnsLookup::lookupCName
     )
 {
     // Create a DNS lookup.
-    mCName = new QDnsLookup
-            (
-            QDnsLookup::ANY,
-            QString( val )
-            );
-
-    connect
-        (
-        mCName,
-        SIGNAL(finished()),
-        this,
-        SLOT(onCNameResponse()));
-
+    mCName->setType( QDnsLookup::CNAME );
     mCName->setName( val );
     mCName->lookup();
 }
@@ -42,23 +70,11 @@ void DnsLookup::lookupService
     )
 {
     QString lookUp("_radioepg._tcp.");
-
     lookUp = lookUp + val;
     qDebug() << "[DNS Look-up] Looking Service " << lookUp;
 
-    mService = new QDnsLookup
-                        (
-                        QDnsLookup::SRV,
-                        lookUp
-                        );
-
-    connect
-        (
-        mService,
-        SIGNAL(finished()),
-        this,
-        SLOT(onServiceResponse())
-        );
+    mService->setName( lookUp );
+    mService->setType( QDnsLookup::SRV );
     mService->lookup();
 }
 
@@ -81,23 +97,11 @@ void DnsLookup::lookupHttpVis()
      */
 
     QString lookUp("_radiovis-http._tcp.");
-
-    lookUp = lookUp + mCNAME;
+    lookUp = lookUp + mCanonicalName;
     qDebug() << "[DNS Look-up] Checking HTTP VIS support" << lookUp;
 
-    mHttpVis = new QDnsLookup
-                        (
-                        QDnsLookup::ANY,
-                        lookUp
-                        );
-
-    connect
-        (
-        mHttpVis,
-        SIGNAL(finished()),
-        this,
-        SLOT(onHttpVisResponse())
-        );
+    mHttpVis->setName( lookUp );
+    mHttpVis->setType( QDnsLookup::ANY );
     mHttpVis->lookup();
 }
 
@@ -121,33 +125,27 @@ void DnsLookup::lookupHttpVis()
 
      QString lookUp("_radiovis._tcp.");
 
-     lookUp = lookUp + mCNAME;
+     lookUp = lookUp + mCanonicalName;
      qDebug() << "[DNS Look-up] Checking Stomp support " << lookUp;
 
-     mStompVis = new QDnsLookup
-                         (
-                         QDnsLookup::ANY,
-                         lookUp
-                         );
-
-     connect
-         (
-         mStompVis,
-         SIGNAL(finished()),
-         this,
-         SLOT(onVisResponse())
-         );
+     mStompVis->setName( lookUp );
+     mStompVis->setType( QDnsLookup::ANY );
      mStompVis->lookup();
  }
 
 void DnsLookup::onCNameResponse()
 {
     // Check the lookup succeeded.
+    if( nullptr == mCName )
+    {
+        qWarning() << endl << "[DNS Look-up ERR] nullptr == mCName";
+        return;
+    }
+
     if ( mCName->error() != QDnsLookup::NoError )
     {
         qWarning() << "[DNS Look-up ERR] onCNameResponse::DNS lookup failed";
         qWarning() << "[DNS Look-up ERR] mCName->error()" << mCName->error();
-        mCName->deleteLater();
         return;
     }
 
@@ -156,22 +154,25 @@ void DnsLookup::onCNameResponse()
     for ( const QDnsDomainNameRecord &name : cName )
     {
         qDebug() << "[DNS Look-up] cName response Response " << name.value();
-        mCNAME = name.value();
-        lookupService( mCNAME );
+        mCanonicalName = name.value();
+        lookupService( mCanonicalName );
         lookupHttpVis();
         lookupVis();
     }
-    mCName->deleteLater();
 }
 
 void DnsLookup::onServiceResponse()
 {
     // Check the lookup succeeded.
+    if( nullptr == mService )
+    {
+        qWarning() << endl << "[DNS Look-up ERR] nullptr == mService";
+        return;
+    }
     if ( mService->error() != QDnsLookup::NoError )
     {
         qWarning() << "[DNS Look-up ERR] onServiceResponse::DNS lookup failed";
         qWarning() << "[DNS Look-up ERR] mService->error()" << mService->error();
-        mService->deleteLater();
         return;
     }
     // Handle the results.
@@ -191,18 +192,21 @@ void DnsLookup::onServiceResponse()
         QString ServiceInformationLink = HTTP + GetServiceName() + SIFilePostFix;
         emit SignalServiceInformationAvailable( ServiceInformationLink );
     }
-    mService->deleteLater();
 }
 
 void DnsLookup::onHttpVisResponse()
 {
     // Check the lookup succeeded.
+    if( nullptr == mHttpVis )
+    {
+        qWarning() << endl << "[DNS Look-up ERR] nullptr == mHttpVis";
+        return;
+    }
     if ( mHttpVis->error() != QDnsLookup::NoError )
     {
         qWarning() << "[DNS Look-up ERR] -> HttpVisResponse::DNS lookup failed"
                    << " , mHttpVis->error()" << mHttpVis->error();
         emit SignalHttpVisSupported( false );
-        mHttpVis->deleteLater();
         return;
     }
     // Handle the results.
@@ -216,18 +220,21 @@ void DnsLookup::onHttpVisResponse()
                  << " Port" <<record.port();
     }
     emit SignalHttpVisSupported( true );
-    mHttpVis->deleteLater();
 }
 
 void DnsLookup::onVisResponse()
 {
+    if( nullptr == mStompVis )
+    {
+        qWarning() << endl << "nullptr == mStompVis";
+        return;
+    }
     // Check the lookup succeeded.
     if ( mStompVis->error() != QDnsLookup::NoError )
     {
         qWarning() << "[DNS Look-up ERR] -> VisResponse::DNS lookup failed"
                    << " , mStompVis->error()" << mStompVis->error();
         emit SignalStompVisSupported( false );
-        mStompVis->deleteLater();
         return;
     }
     // Handle the results.
@@ -236,10 +243,9 @@ void DnsLookup::onVisResponse()
     {
         mStompTargetName = record.target();
         mStompServicePort = record.port();
-        qDebug() << "[DNS Look-up] -> VisResponse Service" <<record.name()
-                 << " Target" <<record.target()
-                 << " Port" <<record.port();
+        qDebug() << "[DNS Look-up] -> VisResponse Service"
+                 << " Target" << mStompTargetName
+                 << " Port" << mStompServicePort;
     }
     emit SignalStompVisSupported( true );
-    mStompVis->deleteLater();
 }
