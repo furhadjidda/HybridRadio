@@ -145,7 +145,7 @@ void HybridRadioCore::LookForStation( const StationInformation& aStationData )
     mStompTransport->ResetTransport();
 
     ConstructFqdn( aStationData, fqdn );
-    mDnsLookup->lookupCName(fqdn);
+    mDnsLookup->LookupFullyQualifiedDomainName( fqdn );
     qDebug() << " [LookForStation] -> " << aStationData.mBand;
     ConstructBearerUri( aStationData, mCurrentBearer );
     qDebug() << " [LookForStation] -> " << mCurrentBearer;

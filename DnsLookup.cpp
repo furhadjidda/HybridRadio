@@ -13,7 +13,7 @@ DnsLookup::DnsLookup()
         mCName,
         &QDnsLookup::finished,
         this,
-        &DnsLookup::onCNameResponse
+        &DnsLookup::OnCanonicalNameResponse
         );
 
     mService = new QDnsLookup( this );
@@ -22,7 +22,7 @@ DnsLookup::DnsLookup()
         mService,
         &QDnsLookup::finished,
         this,
-        &DnsLookup::onServiceResponse
+        &DnsLookup::OnServiceResponse
         );
 
     mHttpVis = new QDnsLookup( this );
@@ -31,7 +31,7 @@ DnsLookup::DnsLookup()
         mHttpVis,
         &QDnsLookup::finished,
         this,
-        &DnsLookup::onHttpVisResponse
+        &DnsLookup::OnHttpVisSupportResponse
         );
 
     mStompVis = new QDnsLookup( this );
@@ -40,7 +40,7 @@ DnsLookup::DnsLookup()
         mStompVis,
         &QDnsLookup::finished,
         this,
-        &DnsLookup::onVisResponse
+        &DnsLookup::OnStompVisSupportResponse
         );
 
 }
@@ -53,24 +53,21 @@ DnsLookup::~DnsLookup()
     mStompVis->deleteLater();
 }
 
-void DnsLookup::lookupCName
+void DnsLookup::LookupFullyQualifiedDomainName
     (
-    const QString& val
+    const QString& aFqdn
     )
 {
     // Create a DNS lookup.
     mCName->setType( QDnsLookup::CNAME );
-    mCName->setName( val );
+    mCName->setName( aFqdn );
     mCName->lookup();
 }
 
-void DnsLookup::lookupService
-    (
-    const QString& val
-    )
+void DnsLookup::LookupMetadataServer()
 {
     QString lookUp("_radioepg._tcp.");
-    lookUp = lookUp + val;
+    lookUp = lookUp + mCanonicalName;
     qDebug() << "[DNS Look-up] Looking Service " << lookUp;
 
     mService->setName( lookUp );
@@ -78,7 +75,7 @@ void DnsLookup::lookupService
     mService->lookup();
 }
 
-void DnsLookup::lookupHttpVis()
+void DnsLookup::LookupHttpSupport()
 {
     // Formation of this is mentioned in ETSI TS 101 499 V3.1.1  Page 17
     /*
@@ -105,7 +102,7 @@ void DnsLookup::lookupHttpVis()
     mHttpVis->lookup();
 }
 
- void DnsLookup::lookupVis()
+ void DnsLookup::LookupStompSupport()
  {
      // Formation of this is mentioned in ETSI TS 101 499 V3.1.1  Page 17
      /*
@@ -133,12 +130,12 @@ void DnsLookup::lookupHttpVis()
      mStompVis->lookup();
  }
 
-void DnsLookup::onCNameResponse()
+void DnsLookup::OnCanonicalNameResponse()
 {
     // Check the lookup succeeded.
     if( nullptr == mCName )
     {
-        qWarning() << endl << "[DNS Look-up ERR] nullptr == mCName";
+        qWarning() << "[DNS Look-up ERR] nullptr == mCName";
         return;
     }
 
@@ -155,18 +152,18 @@ void DnsLookup::onCNameResponse()
     {
         qDebug() << "[DNS Look-up] cName response Response " << name.value();
         mCanonicalName = name.value();
-        lookupService( mCanonicalName );
-        lookupHttpVis();
-        lookupVis();
+        LookupMetadataServer();
+        LookupHttpSupport();
+        LookupStompSupport();
     }
 }
 
-void DnsLookup::onServiceResponse()
+void DnsLookup::OnServiceResponse()
 {
     // Check the lookup succeeded.
     if( nullptr == mService )
     {
-        qWarning() << endl << "[DNS Look-up ERR] nullptr == mService";
+        qWarning() << "[DNS Look-up ERR] nullptr == mService";
         return;
     }
     if ( mService->error() != QDnsLookup::NoError )
@@ -194,14 +191,15 @@ void DnsLookup::onServiceResponse()
     }
 }
 
-void DnsLookup::onHttpVisResponse()
+void DnsLookup::OnHttpVisSupportResponse()
 {
     // Check the lookup succeeded.
     if( nullptr == mHttpVis )
     {
-        qWarning() << endl << "[DNS Look-up ERR] nullptr == mHttpVis";
+        qWarning() << "[DNS Look-up ERR] nullptr == mHttpVis";
         return;
     }
+
     if ( mHttpVis->error() != QDnsLookup::NoError )
     {
         qWarning() << "[DNS Look-up ERR] -> HttpVisResponse::DNS lookup failed"
@@ -222,13 +220,14 @@ void DnsLookup::onHttpVisResponse()
     emit SignalHttpVisSupported( true );
 }
 
-void DnsLookup::onVisResponse()
+void DnsLookup::OnStompVisSupportResponse()
 {
     if( nullptr == mStompVis )
     {
-        qWarning() << endl << "nullptr == mStompVis";
+        qWarning() << "[DNS Look-up ERR] nullptr == mStompVis";
         return;
     }
+
     // Check the lookup succeeded.
     if ( mStompVis->error() != QDnsLookup::NoError )
     {
@@ -237,6 +236,7 @@ void DnsLookup::onVisResponse()
         emit SignalStompVisSupported( false );
         return;
     }
+
     // Handle the results.
     const auto serviceRecords = mStompVis->serviceRecords();
     for ( const QDnsServiceRecord &record : serviceRecords )

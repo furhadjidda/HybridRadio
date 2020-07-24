@@ -10,7 +10,6 @@
 #include <QDnsHostAddressRecord>
 #include <QDnsTextRecord>
 #include <QDate>
-#include <memory>
 
 class DnsLookup
         : public QObject
@@ -21,19 +20,10 @@ public:
 
     ~DnsLookup();
 
-    void lookupCName
+    void LookupFullyQualifiedDomainName
         (
-        const QString& val
+        const QString& aFqdn
         );
-
-    void lookupService
-        (
-        const QString& val
-        );
-
-    void lookupHttpVis();
-
-    void lookupVis();
 
     inline void ConstructServiceInfoFileName
         (
@@ -101,13 +91,19 @@ signals:
     void SignalStompVisSupported( bool aVal );
 
 public slots:
-    void onCNameResponse();
-    void onServiceResponse();
-    void onHttpVisResponse();
-    void onVisResponse();
+    void OnCanonicalNameResponse();
+    void OnServiceResponse();
+    void OnHttpVisSupportResponse();
+    void OnStompVisSupportResponse();
 
 
-private:
+private:    
+    void LookupMetadataServer();
+
+    void LookupHttpSupport();
+
+    void LookupStompSupport();
+
     QDnsLookup* mCName{nullptr};
     QDnsLookup* mService{nullptr};
     QDnsLookup* mHttpVis{nullptr};
