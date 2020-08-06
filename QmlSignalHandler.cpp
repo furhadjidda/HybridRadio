@@ -36,7 +36,7 @@ SignalHandler::SignalHandler
     mHybridRadioCore->InitializeCore();
     ConnectSignals();
     OnSelectionChanged( SelectCoxMedia1 );    
-    QThread::sleep( 2 ) ;
+    QThread::sleep( 5 ) ;
     PopulatePresetFields();
 }
 

@@ -355,6 +355,10 @@ Window {
             y: 58
             width: 282
             height: 480
+            flickableDirection: Flickable.AutoFlickDirection
+            boundsBehavior: Flickable.StopAtBounds
+            layer.textureMirroring: ShaderEffectSource.NoMirroring
+            highlightRangeMode: ListView.NoHighlightRange
             keyNavigationWraps: true
             pixelAligned: false
             highlight: Rectangle { color: "lightsteelblue"}
