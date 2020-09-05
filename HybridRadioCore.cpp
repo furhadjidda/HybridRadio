@@ -261,6 +261,7 @@ void HybridRadioCore::OnHttpVisSupported( bool aVal )
     if( !aVal )
     {
         qDebug() << "[HYBRID_CORE] Http Vis NOT SUPPORTED !! ";
+        mHttpTransport->DisableTransport();
         emit SignalHttpTransportSupport( false );
         return;
     }
@@ -281,6 +282,7 @@ void HybridRadioCore::OnStompVisSupported( bool aVal )
     if( !aVal )
     {
         qDebug() << "[HYBRID_CORE] Stomp Vis NOT SUPPORTED !! ";
+        mStompTransport->DisableTransport();
         emit SignalStompTransportSupport( false );
         return;
     }
@@ -305,10 +307,13 @@ void HybridRadioCore::OnStompConnectionReady()
 
 void HybridRadioCore::OnStompDisconnected()
 {
-    // TODO uncomment this code for when STOMP gets disconnected and HTTP is supported
-    //mHttpTransport->EnableTransport(); // Enables Http Transport if STOMP is disconnected
-    //mHttpTransport->SubscribeTextTopic( mTextTopic );
-    //mHttpTransport->SubscribeImageTopic( mImageTopic );
+    if( mHttpTransport->IsSupported() )
+    {
+        mHttpTransport->DisableTransport();
+        mHttpTransport->EnableTransport();
+        mHttpTransport->SubscribeTextTopic( mTextTopic );
+        mHttpTransport->SubscribeImageTopic( mImageTopic );
+    }
 }
 
 void HybridRadioCore::ConnectSignals()

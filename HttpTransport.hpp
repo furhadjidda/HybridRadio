@@ -58,6 +58,11 @@ public:
         mIsDiabled = false;
     }
 
+    bool IsSupported() override
+    {
+        return mIsSupported;
+    }
+
 public slots:
     void OnTextResponse() override;
     void OnImageResponse() override;

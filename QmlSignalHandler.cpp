@@ -365,6 +365,7 @@ void SignalHandler::ClearMetaData()
     mUiHandler.SetBitrateValue( "" );
     mUiHandler.SetSongNameValue( "" );
     mUiHandler.SetArtworkValue("");
+    mUiHandler.SetStateValue( "" );
 
     QString data("Bearer Info: ");
     mUiHandler.QmlMethodInvokeAddMoreInfo( data );
@@ -383,6 +384,7 @@ void SignalHandler::OnPresetSave(const QString& aData)
 void SignalHandler::OnPresetRecall(const QString& aData)
 {
     qDebug() << "PresetRecalled" << aData;
+    ClearMetaData();
     mUiHandler.QmlMethodInvokeMethodHideEpgPresentImage();
     SiData data;
     mPresets.RecallPreset( aData.toInt(), data );

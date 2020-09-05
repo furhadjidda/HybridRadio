@@ -45,7 +45,8 @@ void UiHandler::SetArtworkValue( const QVariant& aValue )
     QString artWorkString = aValue.toString();
     if( 0 == artWorkString.size() )
     {
-        artWorkString = "default-art.jpg";
+        //artWorkString = "default-art.jpg";
+        return;
     }
     QObject *artWork = mUiObject->findChild<QObject*>("artWork");
 

@@ -50,6 +50,10 @@ void StompTransport::SetPortAndTarget
 
     mPort = aPort;
     mTarget = aTarget;
+    if( !mPort.isEmpty() && !mTarget.isEmpty() )
+    {
+        mIsSupported = true;
+    }
 
     mStompClient->connectToHost( mTarget, mPort.toUShort() );
     QObject::connect(mStompClient,SIGNAL(socketError(QAbstractSocket::SocketError )),

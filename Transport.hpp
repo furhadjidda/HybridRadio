@@ -30,6 +30,8 @@ public:
 
     virtual void EnableTransport() = 0;
 
+    virtual bool IsSupported() = 0;
+
 signals:
     void SignalTextChanged( const QString& aText );
     void SignalImageChanged( const QString& aImage );
@@ -47,6 +49,7 @@ protected:
     QString mPort;
     QString mTarget;
     bool mIsDiabled{false};
+    bool mIsSupported{false};
 
 };
 

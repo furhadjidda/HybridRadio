@@ -38,6 +38,10 @@ void HttpTransport::SetPortAndTarget
 {
     mPort = aPort;
     mTarget = aTarget;
+    if( !mPort.isEmpty() && !mTarget.isEmpty() )
+    {
+        mIsSupported = true;
+    }
 }
 
 void HttpTransport::SubscribeTextTopic( const QString& aTextTopic )
