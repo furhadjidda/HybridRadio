@@ -56,3 +56,7 @@ To see the logs use
 `journalctl -u volumeControl.service`
 OR
 `journalctl -fu volumeControl.service`
+
+
+# References
+* Cross-Compile QT 5.15.2 / Raspberry Pi 4 - https://wapel.de/?p=842 
